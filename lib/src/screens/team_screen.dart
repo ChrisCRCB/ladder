@@ -44,6 +44,11 @@ class TeamScreen extends ConsumerWidget {
               tooltip: 'Create point',
             ),
           ),
+          TabbedScaffoldTab(
+            title: 'Ladder Nights',
+            icon: const Icon(Icons.calendar_month),
+            child: LadderNightsPage(teamId: teamId),
+          ),
         ],
       ),
     ),

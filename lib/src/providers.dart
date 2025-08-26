@@ -32,6 +32,15 @@ Future<List<ShowdownTeam>> showdownTeams(final Ref ref) {
       .get();
 }
 
+/// Provide a single team.
+@riverpod
+Future<ShowdownTeam> showdownTeam(final Ref ref, final int teamId) {
+  final database = ref.watch(databaseProvider);
+  return database.managers.showdownTeams
+      .filter((final f) => f.id.equals(teamId))
+      .getSingle();
+}
+
 /// Provide all players on a team.
 @riverpod
 Future<List<TeamPlayer>> teamPlayers(final Ref ref, final int teamId) {
@@ -60,9 +69,7 @@ Future<int> playerPoints(final Ref ref, final int playerId) async {
   final player = await managers.teamPlayers
       .filter((final f) => f.id.equals(playerId))
       .getSingle();
-  final team = await managers.showdownTeams
-      .filter((final f) => f.id.equals(player.teamId))
-      .getSingle();
+  final team = await ref.watch(showdownTeamProvider(player.teamId).future);
   final recentNights = await managers.ladderNights
       .orderBy((final o) => o.createdAt.desc())
       .limit(team.sessionsPerCycle)
@@ -94,4 +101,18 @@ Future<int> playerPoints(final Ref ref, final int playerId) async {
     }
   }
   return playerPoints;
+}
+
+/// Provide the recent ladder nights.
+@riverpod
+Future<List<LadderNight>> recentLadderNights(
+  final Ref ref,
+  final int teamId,
+) async {
+  final database = ref.watch(databaseProvider);
+  final team = await ref.watch(showdownTeamProvider(teamId).future);
+  return database.managers.ladderNights
+      .orderBy((final o) => o.createdAt.desc())
+      .limit(team.sessionsPerCycle)
+      .get();
 }
