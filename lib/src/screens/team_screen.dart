@@ -34,7 +34,14 @@ class TeamScreen extends ConsumerWidget {
           TabbedScaffoldTab(
             title: 'Points',
             icon: const Icon(Icons.score),
-            child: PointsPage(teamId: teamId),
+            child: CommonShortcuts(
+              child: PointsPage(teamId: teamId),
+              newCallback: () => _createPoint(ref),
+            ),
+            floatingActionButton: NewButton(
+              onPressed: () => _createPoint(ref),
+              tooltip: 'Create point',
+            ),
           ),
         ],
       );
@@ -53,6 +60,21 @@ class TeamScreen extends ConsumerWidget {
           },
           labelText: 'Player name',
           title: 'Create Player',
+        ),
+      );
+
+  /// Create a new point.
+  Future<void> _createPoint(final WidgetRef ref) =>
+      ref.context.pushWidgetBuilder(
+        (final innerContext) => GetText(
+          onDone: (final value) async {
+            innerContext.pop();
+            final database = ref.read(databaseProvider);
+            await database.managers.showdownPoints.create(
+              (final o) => o(name: value, teamId: teamId, value: -1),
+            );
+            ref.invalidate(showdownPointsProvider(teamId));
+          },
         ),
       );
 }

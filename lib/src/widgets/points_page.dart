@@ -49,6 +49,26 @@ class PointsPage extends ConsumerWidget {
                 ),
               ),
               PerformableAction(
+                name: 'Increase points',
+                activator: moveUpShortcut,
+                invoke: () async {
+                  await query.update(
+                    (final o) => o(value: Value(point.value + 1)),
+                  );
+                  ref.invalidate(showdownPointsProvider(teamId));
+                },
+              ),
+              PerformableAction(
+                name: 'Decrease points',
+                activator: moveDownShortcut,
+                invoke: () async {
+                  await query.update(
+                    (final o) => o(value: Value(point.value - 1)),
+                  );
+                  ref.invalidate(showdownPointsProvider(teamId));
+                },
+              ),
+              PerformableAction(
                 name: 'Delete',
                 activator: deleteShortcut,
                 invoke: () => context.showConfirmMessage(
