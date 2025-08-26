@@ -16,6 +16,8 @@ part 'database.g.dart';
     TeamPlayers,
     LadderNights,
     ShowdownGames,
+    ShowdownChallenges,
+    GamePoints,
   ],
 )
 class LadderDatabase extends _$LadderDatabase {

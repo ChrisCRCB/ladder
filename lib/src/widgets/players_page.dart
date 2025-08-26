@@ -31,6 +31,7 @@ class PlayersPage extends ConsumerWidget {
             (final f) => f.id.equals(player.id),
           );
           return PerformableActionsListTile(
+            autofocus: index == 0,
             actions: [
               PerformableAction(
                 name: 'Rename',
@@ -80,6 +81,7 @@ class PlayersPage extends ConsumerWidget {
               ),
             ],
             title: CustomText(text: player.name),
+            subtitle: ShowdownPlayerPointsText(playerId: player.id),
             onTap: () {},
           );
         },

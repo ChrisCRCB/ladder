@@ -16,8 +16,9 @@ class TeamScreen extends ConsumerWidget {
 
   /// Build the widget.
   @override
-  Widget build(final BuildContext context, final WidgetRef ref) =>
-      TabbedScaffold(
+  Widget build(final BuildContext context, final WidgetRef ref) => Cancel(
+    child: FontShortcuts(
+      child: TabbedScaffold(
         tabs: [
           TabbedScaffoldTab(
             title: 'Players',
@@ -44,7 +45,9 @@ class TeamScreen extends ConsumerWidget {
             ),
           ),
         ],
-      );
+      ),
+    ),
+  );
 
   /// Create a new player.
   Future<void> _createPlayer(final WidgetRef ref) =>

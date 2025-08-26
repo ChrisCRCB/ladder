@@ -301,5 +301,79 @@ final class ShowdownPointsFamily extends $Family
   String toString() => r'showdownPointsProvider';
 }
 
+/// Provide the points for the given player.
+@ProviderFor(playerPoints)
+const playerPointsProvider = PlayerPointsFamily._();
+
+/// Provide the points for the given player.
+final class PlayerPointsProvider
+    extends $FunctionalProvider<AsyncValue<int>, int, FutureOr<int>>
+    with $FutureModifier<int>, $FutureProvider<int> {
+  /// Provide the points for the given player.
+  const PlayerPointsProvider._({
+    required PlayerPointsFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'playerPointsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$playerPointsHash();
+
+  @override
+  String toString() {
+    return r'playerPointsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<int> create(Ref ref) {
+    final argument = this.argument as int;
+    return playerPoints(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PlayerPointsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$playerPointsHash() => r'a0da3a27f2535eca02e4e622246280f0dae7f225';
+
+/// Provide the points for the given player.
+final class PlayerPointsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<int>, int> {
+  const PlayerPointsFamily._()
+    : super(
+        retry: null,
+        name: r'playerPointsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provide the points for the given player.
+  PlayerPointsProvider call(int playerId) =>
+      PlayerPointsProvider._(argument: playerId, from: this);
+
+  @override
+  String toString() => r'playerPointsProvider';
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
