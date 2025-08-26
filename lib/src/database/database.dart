@@ -9,7 +9,15 @@ import 'package:path_provider/path_provider.dart';
 part 'database.g.dart';
 
 /// The database class.
-@DriftDatabase(tables: [ShowdownTeams, ShowdownPoints, TeamPlayers])
+@DriftDatabase(
+  tables: [
+    ShowdownTeams,
+    ShowdownPoints,
+    TeamPlayers,
+    LadderNights,
+    ShowdownGames,
+  ],
+)
 class LadderDatabase extends _$LadderDatabase {
   /// Create an instance.
   LadderDatabase({final String filename = 'ladder.sqlite3'})

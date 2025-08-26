@@ -1,4 +1,11 @@
 import 'package:drift/drift.dart';
+import 'package:ladder/ladder.dart' show LadderNight, ShowdownGame;
+import 'package:ladder/src/database/_DATABASE.dart'
+    show LadderNight, ShowdownGame;
+import 'package:ladder/src/database/_database.dart'
+    show LadderNight, ShowdownGame;
+import 'package:ladder/src/database/database.dart'
+    show LadderNight, ShowdownGame;
 
 /// Add an [id] column.
 mixin IdMixin on Table {
@@ -59,3 +66,36 @@ class ShowdownTeams extends Table
 /// The team players table.
 class TeamPlayers extends Table
     with IdMixin, NameMixin, CreatedAtMixin, EmailAddressMixin, TeamIdMixin {}
+
+/// A single ladder night.
+///
+/// Each [LadderNight] can have multiple [ShowdownGame]s.
+class LadderNights extends Table with IdMixin, CreatedAtMixin, TeamIdMixin {}
+
+/// A game in a [LadderNight].
+class ShowdownGames extends Table with IdMixin {
+  /// The ID of the night this game belongs to.
+  late final ladderNightId = integer().references(
+    LadderNights,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+
+  /// The ID of the first player.
+  ///
+  /// The first player is the one who initiated the challenge.
+  @ReferenceName('gamesAsFirstPlayer')
+  late final firstPlayerId = integer().references(
+    TeamPlayers,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+
+  /// The ID of the second player.
+  @ReferenceName('gamesAsSecondPlayer')
+  late final secondPlayerId = integer().references(
+    TeamPlayers,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+}

@@ -1108,12 +1108,608 @@ class TeamPlayersCompanion extends UpdateCompanion<TeamPlayer> {
   }
 }
 
+class $LadderNightsTable extends LadderNights
+    with TableInfo<$LadderNightsTable, LadderNight> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LadderNightsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _teamIdMeta = const VerificationMeta('teamId');
+  @override
+  late final GeneratedColumn<int> teamId = GeneratedColumn<int>(
+    'team_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES showdown_teams (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, createdAt, teamId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ladder_nights';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LadderNight> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('team_id')) {
+      context.handle(
+        _teamIdMeta,
+        teamId.isAcceptableOrUnknown(data['team_id']!, _teamIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_teamIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LadderNight map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LadderNight(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      teamId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}team_id'],
+      )!,
+    );
+  }
+
+  @override
+  $LadderNightsTable createAlias(String alias) {
+    return $LadderNightsTable(attachedDatabase, alias);
+  }
+}
+
+class LadderNight extends DataClass implements Insertable<LadderNight> {
+  /// The primary key.
+  final int id;
+
+  /// The date and time this row was created.
+  final DateTime createdAt;
+
+  /// The ID of the team.
+  final int teamId;
+  const LadderNight({
+    required this.id,
+    required this.createdAt,
+    required this.teamId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['team_id'] = Variable<int>(teamId);
+    return map;
+  }
+
+  LadderNightsCompanion toCompanion(bool nullToAbsent) {
+    return LadderNightsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      teamId: Value(teamId),
+    );
+  }
+
+  factory LadderNight.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LadderNight(
+      id: serializer.fromJson<int>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      teamId: serializer.fromJson<int>(json['teamId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'teamId': serializer.toJson<int>(teamId),
+    };
+  }
+
+  LadderNight copyWith({int? id, DateTime? createdAt, int? teamId}) =>
+      LadderNight(
+        id: id ?? this.id,
+        createdAt: createdAt ?? this.createdAt,
+        teamId: teamId ?? this.teamId,
+      );
+  LadderNight copyWithCompanion(LadderNightsCompanion data) {
+    return LadderNight(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      teamId: data.teamId.present ? data.teamId.value : this.teamId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LadderNight(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('teamId: $teamId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, createdAt, teamId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LadderNight &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.teamId == this.teamId);
+}
+
+class LadderNightsCompanion extends UpdateCompanion<LadderNight> {
+  final Value<int> id;
+  final Value<DateTime> createdAt;
+  final Value<int> teamId;
+  const LadderNightsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.teamId = const Value.absent(),
+  });
+  LadderNightsCompanion.insert({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    required int teamId,
+  }) : teamId = Value(teamId);
+  static Insertable<LadderNight> custom({
+    Expression<int>? id,
+    Expression<DateTime>? createdAt,
+    Expression<int>? teamId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (teamId != null) 'team_id': teamId,
+    });
+  }
+
+  LadderNightsCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? createdAt,
+    Value<int>? teamId,
+  }) {
+    return LadderNightsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      teamId: teamId ?? this.teamId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (teamId.present) {
+      map['team_id'] = Variable<int>(teamId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LadderNightsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('teamId: $teamId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ShowdownGamesTable extends ShowdownGames
+    with TableInfo<$ShowdownGamesTable, ShowdownGame> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ShowdownGamesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _ladderNightIdMeta = const VerificationMeta(
+    'ladderNightId',
+  );
+  @override
+  late final GeneratedColumn<int> ladderNightId = GeneratedColumn<int>(
+    'ladder_night_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ladder_nights (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _firstPlayerIdMeta = const VerificationMeta(
+    'firstPlayerId',
+  );
+  @override
+  late final GeneratedColumn<int> firstPlayerId = GeneratedColumn<int>(
+    'first_player_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES team_players (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _secondPlayerIdMeta = const VerificationMeta(
+    'secondPlayerId',
+  );
+  @override
+  late final GeneratedColumn<int> secondPlayerId = GeneratedColumn<int>(
+    'second_player_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES team_players (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    ladderNightId,
+    firstPlayerId,
+    secondPlayerId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'showdown_games';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ShowdownGame> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('ladder_night_id')) {
+      context.handle(
+        _ladderNightIdMeta,
+        ladderNightId.isAcceptableOrUnknown(
+          data['ladder_night_id']!,
+          _ladderNightIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_ladderNightIdMeta);
+    }
+    if (data.containsKey('first_player_id')) {
+      context.handle(
+        _firstPlayerIdMeta,
+        firstPlayerId.isAcceptableOrUnknown(
+          data['first_player_id']!,
+          _firstPlayerIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_firstPlayerIdMeta);
+    }
+    if (data.containsKey('second_player_id')) {
+      context.handle(
+        _secondPlayerIdMeta,
+        secondPlayerId.isAcceptableOrUnknown(
+          data['second_player_id']!,
+          _secondPlayerIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_secondPlayerIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ShowdownGame map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ShowdownGame(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      ladderNightId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ladder_night_id'],
+      )!,
+      firstPlayerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}first_player_id'],
+      )!,
+      secondPlayerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}second_player_id'],
+      )!,
+    );
+  }
+
+  @override
+  $ShowdownGamesTable createAlias(String alias) {
+    return $ShowdownGamesTable(attachedDatabase, alias);
+  }
+}
+
+class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
+  /// The primary key.
+  final int id;
+
+  /// The ID of the night this game belongs to.
+  final int ladderNightId;
+
+  /// The ID of the first player.
+  ///
+  /// The first player is the one who initiated the challenge.
+  final int firstPlayerId;
+
+  /// The ID of the second player.
+  final int secondPlayerId;
+  const ShowdownGame({
+    required this.id,
+    required this.ladderNightId,
+    required this.firstPlayerId,
+    required this.secondPlayerId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['ladder_night_id'] = Variable<int>(ladderNightId);
+    map['first_player_id'] = Variable<int>(firstPlayerId);
+    map['second_player_id'] = Variable<int>(secondPlayerId);
+    return map;
+  }
+
+  ShowdownGamesCompanion toCompanion(bool nullToAbsent) {
+    return ShowdownGamesCompanion(
+      id: Value(id),
+      ladderNightId: Value(ladderNightId),
+      firstPlayerId: Value(firstPlayerId),
+      secondPlayerId: Value(secondPlayerId),
+    );
+  }
+
+  factory ShowdownGame.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ShowdownGame(
+      id: serializer.fromJson<int>(json['id']),
+      ladderNightId: serializer.fromJson<int>(json['ladderNightId']),
+      firstPlayerId: serializer.fromJson<int>(json['firstPlayerId']),
+      secondPlayerId: serializer.fromJson<int>(json['secondPlayerId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'ladderNightId': serializer.toJson<int>(ladderNightId),
+      'firstPlayerId': serializer.toJson<int>(firstPlayerId),
+      'secondPlayerId': serializer.toJson<int>(secondPlayerId),
+    };
+  }
+
+  ShowdownGame copyWith({
+    int? id,
+    int? ladderNightId,
+    int? firstPlayerId,
+    int? secondPlayerId,
+  }) => ShowdownGame(
+    id: id ?? this.id,
+    ladderNightId: ladderNightId ?? this.ladderNightId,
+    firstPlayerId: firstPlayerId ?? this.firstPlayerId,
+    secondPlayerId: secondPlayerId ?? this.secondPlayerId,
+  );
+  ShowdownGame copyWithCompanion(ShowdownGamesCompanion data) {
+    return ShowdownGame(
+      id: data.id.present ? data.id.value : this.id,
+      ladderNightId: data.ladderNightId.present
+          ? data.ladderNightId.value
+          : this.ladderNightId,
+      firstPlayerId: data.firstPlayerId.present
+          ? data.firstPlayerId.value
+          : this.firstPlayerId,
+      secondPlayerId: data.secondPlayerId.present
+          ? data.secondPlayerId.value
+          : this.secondPlayerId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShowdownGame(')
+          ..write('id: $id, ')
+          ..write('ladderNightId: $ladderNightId, ')
+          ..write('firstPlayerId: $firstPlayerId, ')
+          ..write('secondPlayerId: $secondPlayerId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, ladderNightId, firstPlayerId, secondPlayerId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ShowdownGame &&
+          other.id == this.id &&
+          other.ladderNightId == this.ladderNightId &&
+          other.firstPlayerId == this.firstPlayerId &&
+          other.secondPlayerId == this.secondPlayerId);
+}
+
+class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
+  final Value<int> id;
+  final Value<int> ladderNightId;
+  final Value<int> firstPlayerId;
+  final Value<int> secondPlayerId;
+  const ShowdownGamesCompanion({
+    this.id = const Value.absent(),
+    this.ladderNightId = const Value.absent(),
+    this.firstPlayerId = const Value.absent(),
+    this.secondPlayerId = const Value.absent(),
+  });
+  ShowdownGamesCompanion.insert({
+    this.id = const Value.absent(),
+    required int ladderNightId,
+    required int firstPlayerId,
+    required int secondPlayerId,
+  }) : ladderNightId = Value(ladderNightId),
+       firstPlayerId = Value(firstPlayerId),
+       secondPlayerId = Value(secondPlayerId);
+  static Insertable<ShowdownGame> custom({
+    Expression<int>? id,
+    Expression<int>? ladderNightId,
+    Expression<int>? firstPlayerId,
+    Expression<int>? secondPlayerId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (ladderNightId != null) 'ladder_night_id': ladderNightId,
+      if (firstPlayerId != null) 'first_player_id': firstPlayerId,
+      if (secondPlayerId != null) 'second_player_id': secondPlayerId,
+    });
+  }
+
+  ShowdownGamesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? ladderNightId,
+    Value<int>? firstPlayerId,
+    Value<int>? secondPlayerId,
+  }) {
+    return ShowdownGamesCompanion(
+      id: id ?? this.id,
+      ladderNightId: ladderNightId ?? this.ladderNightId,
+      firstPlayerId: firstPlayerId ?? this.firstPlayerId,
+      secondPlayerId: secondPlayerId ?? this.secondPlayerId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (ladderNightId.present) {
+      map['ladder_night_id'] = Variable<int>(ladderNightId.value);
+    }
+    if (firstPlayerId.present) {
+      map['first_player_id'] = Variable<int>(firstPlayerId.value);
+    }
+    if (secondPlayerId.present) {
+      map['second_player_id'] = Variable<int>(secondPlayerId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ShowdownGamesCompanion(')
+          ..write('id: $id, ')
+          ..write('ladderNightId: $ladderNightId, ')
+          ..write('firstPlayerId: $firstPlayerId, ')
+          ..write('secondPlayerId: $secondPlayerId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$LadderDatabase extends GeneratedDatabase {
   _$LadderDatabase(QueryExecutor e) : super(e);
   $LadderDatabaseManager get managers => $LadderDatabaseManager(this);
   late final $ShowdownTeamsTable showdownTeams = $ShowdownTeamsTable(this);
   late final $ShowdownPointsTable showdownPoints = $ShowdownPointsTable(this);
   late final $TeamPlayersTable teamPlayers = $TeamPlayersTable(this);
+  late final $LadderNightsTable ladderNights = $LadderNightsTable(this);
+  late final $ShowdownGamesTable showdownGames = $ShowdownGamesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1122,6 +1718,8 @@ abstract class _$LadderDatabase extends GeneratedDatabase {
     showdownTeams,
     showdownPoints,
     teamPlayers,
+    ladderNights,
+    showdownGames,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -1138,6 +1736,34 @@ abstract class _$LadderDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('team_players', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'showdown_teams',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('ladder_nights', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'ladder_nights',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('showdown_games', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'team_players',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('showdown_games', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'team_players',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('showdown_games', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -1205,6 +1831,27 @@ final class $$ShowdownTeamsTableReferences
     ).filter((f) => f.teamId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_teamPlayersRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$LadderNightsTable, List<LadderNight>>
+  _ladderNightsRefsTable(_$LadderDatabase db) => MultiTypedResultKey.fromTable(
+    db.ladderNights,
+    aliasName: $_aliasNameGenerator(
+      db.showdownTeams.id,
+      db.ladderNights.teamId,
+    ),
+  );
+
+  $$LadderNightsTableProcessedTableManager get ladderNightsRefs {
+    final manager = $$LadderNightsTableTableManager(
+      $_db,
+      $_db.ladderNights,
+    ).filter((f) => f.teamId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_ladderNightsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -1291,6 +1938,31 @@ class $$ShowdownTeamsTableFilterComposer
           }) => $$TeamPlayersTableFilterComposer(
             $db: $db,
             $table: $db.teamPlayers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> ladderNightsRefs(
+    Expression<bool> Function($$LadderNightsTableFilterComposer f) f,
+  ) {
+    final $$LadderNightsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ladderNights,
+      getReferencedColumn: (t) => t.teamId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LadderNightsTableFilterComposer(
+            $db: $db,
+            $table: $db.ladderNights,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -1423,6 +2095,31 @@ class $$ShowdownTeamsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> ladderNightsRefs<T extends Object>(
+    Expression<T> Function($$LadderNightsTableAnnotationComposer a) f,
+  ) {
+    final $$LadderNightsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ladderNights,
+      getReferencedColumn: (t) => t.teamId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LadderNightsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ladderNights,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ShowdownTeamsTableTableManager
@@ -1441,6 +2138,7 @@ class $$ShowdownTeamsTableTableManager
           PrefetchHooks Function({
             bool showdownPointsRefs,
             bool teamPlayersRefs,
+            bool ladderNightsRefs,
           })
         > {
   $$ShowdownTeamsTableTableManager(
@@ -1497,12 +2195,17 @@ class $$ShowdownTeamsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({showdownPointsRefs = false, teamPlayersRefs = false}) {
+              ({
+                showdownPointsRefs = false,
+                teamPlayersRefs = false,
+                ladderNightsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (showdownPointsRefs) db.showdownPoints,
                     if (teamPlayersRefs) db.teamPlayers,
+                    if (ladderNightsRefs) db.ladderNights,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -1549,6 +2252,27 @@ class $$ShowdownTeamsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (ladderNightsRefs)
+                        await $_getPrefetchedData<
+                          ShowdownTeam,
+                          $ShowdownTeamsTable,
+                          LadderNight
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ShowdownTeamsTableReferences
+                              ._ladderNightsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ShowdownTeamsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ladderNightsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.teamId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -1569,7 +2293,11 @@ typedef $$ShowdownTeamsTableProcessedTableManager =
       $$ShowdownTeamsTableUpdateCompanionBuilder,
       (ShowdownTeam, $$ShowdownTeamsTableReferences),
       ShowdownTeam,
-      PrefetchHooks Function({bool showdownPointsRefs, bool teamPlayersRefs})
+      PrefetchHooks Function({
+        bool showdownPointsRefs,
+        bool teamPlayersRefs,
+        bool ladderNightsRefs,
+      })
     >;
 typedef $$ShowdownPointsTableCreateCompanionBuilder =
     ShowdownPointsCompanion Function({
@@ -1912,6 +2640,52 @@ final class $$TeamPlayersTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$ShowdownGamesTable, List<ShowdownGame>>
+  _gamesAsFirstPlayerTable(_$LadderDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.showdownGames,
+        aliasName: $_aliasNameGenerator(
+          db.teamPlayers.id,
+          db.showdownGames.firstPlayerId,
+        ),
+      );
+
+  $$ShowdownGamesTableProcessedTableManager get gamesAsFirstPlayer {
+    final manager = $$ShowdownGamesTableTableManager(
+      $_db,
+      $_db.showdownGames,
+    ).filter((f) => f.firstPlayerId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_gamesAsFirstPlayerTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ShowdownGamesTable, List<ShowdownGame>>
+  _gamesAsSecondPlayerTable(_$LadderDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.showdownGames,
+        aliasName: $_aliasNameGenerator(
+          db.teamPlayers.id,
+          db.showdownGames.secondPlayerId,
+        ),
+      );
+
+  $$ShowdownGamesTableProcessedTableManager get gamesAsSecondPlayer {
+    final manager = $$ShowdownGamesTableTableManager(
+      $_db,
+      $_db.showdownGames,
+    ).filter((f) => f.secondPlayerId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _gamesAsSecondPlayerTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$TeamPlayersTableFilterComposer
@@ -1964,6 +2738,56 @@ class $$TeamPlayersTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> gamesAsFirstPlayer(
+    Expression<bool> Function($$ShowdownGamesTableFilterComposer f) f,
+  ) {
+    final $$ShowdownGamesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.showdownGames,
+      getReferencedColumn: (t) => t.firstPlayerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShowdownGamesTableFilterComposer(
+            $db: $db,
+            $table: $db.showdownGames,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> gamesAsSecondPlayer(
+    Expression<bool> Function($$ShowdownGamesTableFilterComposer f) f,
+  ) {
+    final $$ShowdownGamesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.showdownGames,
+      getReferencedColumn: (t) => t.secondPlayerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShowdownGamesTableFilterComposer(
+            $db: $db,
+            $table: $db.showdownGames,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -2065,6 +2889,56 @@ class $$TeamPlayersTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> gamesAsFirstPlayer<T extends Object>(
+    Expression<T> Function($$ShowdownGamesTableAnnotationComposer a) f,
+  ) {
+    final $$ShowdownGamesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.showdownGames,
+      getReferencedColumn: (t) => t.firstPlayerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShowdownGamesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.showdownGames,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> gamesAsSecondPlayer<T extends Object>(
+    Expression<T> Function($$ShowdownGamesTableAnnotationComposer a) f,
+  ) {
+    final $$ShowdownGamesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.showdownGames,
+      getReferencedColumn: (t) => t.secondPlayerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShowdownGamesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.showdownGames,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$TeamPlayersTableTableManager
@@ -2080,7 +2954,11 @@ class $$TeamPlayersTableTableManager
           $$TeamPlayersTableUpdateCompanionBuilder,
           (TeamPlayer, $$TeamPlayersTableReferences),
           TeamPlayer,
-          PrefetchHooks Function({bool teamId})
+          PrefetchHooks Function({
+            bool teamId,
+            bool gamesAsFirstPlayer,
+            bool gamesAsSecondPlayer,
+          })
         > {
   $$TeamPlayersTableTableManager(_$LadderDatabase db, $TeamPlayersTable table)
     : super(
@@ -2129,10 +3007,415 @@ class $$TeamPlayersTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({teamId = false}) {
+          prefetchHooksCallback:
+              ({
+                teamId = false,
+                gamesAsFirstPlayer = false,
+                gamesAsSecondPlayer = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (gamesAsFirstPlayer) db.showdownGames,
+                    if (gamesAsSecondPlayer) db.showdownGames,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (teamId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.teamId,
+                                    referencedTable:
+                                        $$TeamPlayersTableReferences
+                                            ._teamIdTable(db),
+                                    referencedColumn:
+                                        $$TeamPlayersTableReferences
+                                            ._teamIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (gamesAsFirstPlayer)
+                        await $_getPrefetchedData<
+                          TeamPlayer,
+                          $TeamPlayersTable,
+                          ShowdownGame
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TeamPlayersTableReferences
+                              ._gamesAsFirstPlayerTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TeamPlayersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).gamesAsFirstPlayer,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.firstPlayerId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (gamesAsSecondPlayer)
+                        await $_getPrefetchedData<
+                          TeamPlayer,
+                          $TeamPlayersTable,
+                          ShowdownGame
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TeamPlayersTableReferences
+                              ._gamesAsSecondPlayerTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TeamPlayersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).gamesAsSecondPlayer,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.secondPlayerId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$TeamPlayersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$LadderDatabase,
+      $TeamPlayersTable,
+      TeamPlayer,
+      $$TeamPlayersTableFilterComposer,
+      $$TeamPlayersTableOrderingComposer,
+      $$TeamPlayersTableAnnotationComposer,
+      $$TeamPlayersTableCreateCompanionBuilder,
+      $$TeamPlayersTableUpdateCompanionBuilder,
+      (TeamPlayer, $$TeamPlayersTableReferences),
+      TeamPlayer,
+      PrefetchHooks Function({
+        bool teamId,
+        bool gamesAsFirstPlayer,
+        bool gamesAsSecondPlayer,
+      })
+    >;
+typedef $$LadderNightsTableCreateCompanionBuilder =
+    LadderNightsCompanion Function({
+      Value<int> id,
+      Value<DateTime> createdAt,
+      required int teamId,
+    });
+typedef $$LadderNightsTableUpdateCompanionBuilder =
+    LadderNightsCompanion Function({
+      Value<int> id,
+      Value<DateTime> createdAt,
+      Value<int> teamId,
+    });
+
+final class $$LadderNightsTableReferences
+    extends BaseReferences<_$LadderDatabase, $LadderNightsTable, LadderNight> {
+  $$LadderNightsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ShowdownTeamsTable _teamIdTable(_$LadderDatabase db) =>
+      db.showdownTeams.createAlias(
+        $_aliasNameGenerator(db.ladderNights.teamId, db.showdownTeams.id),
+      );
+
+  $$ShowdownTeamsTableProcessedTableManager get teamId {
+    final $_column = $_itemColumn<int>('team_id')!;
+
+    final manager = $$ShowdownTeamsTableTableManager(
+      $_db,
+      $_db.showdownTeams,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_teamIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$ShowdownGamesTable, List<ShowdownGame>>
+  _showdownGamesRefsTable(_$LadderDatabase db) => MultiTypedResultKey.fromTable(
+    db.showdownGames,
+    aliasName: $_aliasNameGenerator(
+      db.ladderNights.id,
+      db.showdownGames.ladderNightId,
+    ),
+  );
+
+  $$ShowdownGamesTableProcessedTableManager get showdownGamesRefs {
+    final manager = $$ShowdownGamesTableTableManager(
+      $_db,
+      $_db.showdownGames,
+    ).filter((f) => f.ladderNightId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_showdownGamesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$LadderNightsTableFilterComposer
+    extends Composer<_$LadderDatabase, $LadderNightsTable> {
+  $$LadderNightsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ShowdownTeamsTableFilterComposer get teamId {
+    final $$ShowdownTeamsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.teamId,
+      referencedTable: $db.showdownTeams,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShowdownTeamsTableFilterComposer(
+            $db: $db,
+            $table: $db.showdownTeams,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> showdownGamesRefs(
+    Expression<bool> Function($$ShowdownGamesTableFilterComposer f) f,
+  ) {
+    final $$ShowdownGamesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.showdownGames,
+      getReferencedColumn: (t) => t.ladderNightId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShowdownGamesTableFilterComposer(
+            $db: $db,
+            $table: $db.showdownGames,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$LadderNightsTableOrderingComposer
+    extends Composer<_$LadderDatabase, $LadderNightsTable> {
+  $$LadderNightsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ShowdownTeamsTableOrderingComposer get teamId {
+    final $$ShowdownTeamsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.teamId,
+      referencedTable: $db.showdownTeams,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShowdownTeamsTableOrderingComposer(
+            $db: $db,
+            $table: $db.showdownTeams,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LadderNightsTableAnnotationComposer
+    extends Composer<_$LadderDatabase, $LadderNightsTable> {
+  $$LadderNightsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$ShowdownTeamsTableAnnotationComposer get teamId {
+    final $$ShowdownTeamsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.teamId,
+      referencedTable: $db.showdownTeams,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShowdownTeamsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.showdownTeams,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> showdownGamesRefs<T extends Object>(
+    Expression<T> Function($$ShowdownGamesTableAnnotationComposer a) f,
+  ) {
+    final $$ShowdownGamesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.showdownGames,
+      getReferencedColumn: (t) => t.ladderNightId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ShowdownGamesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.showdownGames,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$LadderNightsTableTableManager
+    extends
+        RootTableManager<
+          _$LadderDatabase,
+          $LadderNightsTable,
+          LadderNight,
+          $$LadderNightsTableFilterComposer,
+          $$LadderNightsTableOrderingComposer,
+          $$LadderNightsTableAnnotationComposer,
+          $$LadderNightsTableCreateCompanionBuilder,
+          $$LadderNightsTableUpdateCompanionBuilder,
+          (LadderNight, $$LadderNightsTableReferences),
+          LadderNight,
+          PrefetchHooks Function({bool teamId, bool showdownGamesRefs})
+        > {
+  $$LadderNightsTableTableManager(_$LadderDatabase db, $LadderNightsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LadderNightsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LadderNightsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LadderNightsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> teamId = const Value.absent(),
+              }) => LadderNightsCompanion(
+                id: id,
+                createdAt: createdAt,
+                teamId: teamId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                required int teamId,
+              }) => LadderNightsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                teamId: teamId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$LadderNightsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({teamId = false, showdownGamesRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [],
+              explicitlyWatchedTables: [
+                if (showdownGamesRefs) db.showdownGames,
+              ],
               addJoins:
                   <
                     T extends TableManagerState<
@@ -2154,9 +3437,9 @@ class $$TeamPlayersTableTableManager
                           state.withJoin(
                                 currentTable: table,
                                 currentColumn: table.teamId,
-                                referencedTable: $$TeamPlayersTableReferences
+                                referencedTable: $$LadderNightsTableReferences
                                     ._teamIdTable(db),
-                                referencedColumn: $$TeamPlayersTableReferences
+                                referencedColumn: $$LadderNightsTableReferences
                                     ._teamIdTable(db)
                                     .id,
                               )
@@ -2166,7 +3449,29 @@ class $$TeamPlayersTableTableManager
                     return state;
                   },
               getPrefetchedDataCallback: (items) async {
-                return [];
+                return [
+                  if (showdownGamesRefs)
+                    await $_getPrefetchedData<
+                      LadderNight,
+                      $LadderNightsTable,
+                      ShowdownGame
+                    >(
+                      currentTable: table,
+                      referencedTable: $$LadderNightsTableReferences
+                          ._showdownGamesRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$LadderNightsTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).showdownGamesRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.ladderNightId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
               },
             );
           },
@@ -2174,19 +3479,521 @@ class $$TeamPlayersTableTableManager
       );
 }
 
-typedef $$TeamPlayersTableProcessedTableManager =
+typedef $$LadderNightsTableProcessedTableManager =
     ProcessedTableManager<
       _$LadderDatabase,
-      $TeamPlayersTable,
-      TeamPlayer,
-      $$TeamPlayersTableFilterComposer,
-      $$TeamPlayersTableOrderingComposer,
-      $$TeamPlayersTableAnnotationComposer,
-      $$TeamPlayersTableCreateCompanionBuilder,
-      $$TeamPlayersTableUpdateCompanionBuilder,
-      (TeamPlayer, $$TeamPlayersTableReferences),
-      TeamPlayer,
-      PrefetchHooks Function({bool teamId})
+      $LadderNightsTable,
+      LadderNight,
+      $$LadderNightsTableFilterComposer,
+      $$LadderNightsTableOrderingComposer,
+      $$LadderNightsTableAnnotationComposer,
+      $$LadderNightsTableCreateCompanionBuilder,
+      $$LadderNightsTableUpdateCompanionBuilder,
+      (LadderNight, $$LadderNightsTableReferences),
+      LadderNight,
+      PrefetchHooks Function({bool teamId, bool showdownGamesRefs})
+    >;
+typedef $$ShowdownGamesTableCreateCompanionBuilder =
+    ShowdownGamesCompanion Function({
+      Value<int> id,
+      required int ladderNightId,
+      required int firstPlayerId,
+      required int secondPlayerId,
+    });
+typedef $$ShowdownGamesTableUpdateCompanionBuilder =
+    ShowdownGamesCompanion Function({
+      Value<int> id,
+      Value<int> ladderNightId,
+      Value<int> firstPlayerId,
+      Value<int> secondPlayerId,
+    });
+
+final class $$ShowdownGamesTableReferences
+    extends
+        BaseReferences<_$LadderDatabase, $ShowdownGamesTable, ShowdownGame> {
+  $$ShowdownGamesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $LadderNightsTable _ladderNightIdTable(_$LadderDatabase db) =>
+      db.ladderNights.createAlias(
+        $_aliasNameGenerator(
+          db.showdownGames.ladderNightId,
+          db.ladderNights.id,
+        ),
+      );
+
+  $$LadderNightsTableProcessedTableManager get ladderNightId {
+    final $_column = $_itemColumn<int>('ladder_night_id')!;
+
+    final manager = $$LadderNightsTableTableManager(
+      $_db,
+      $_db.ladderNights,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_ladderNightIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $TeamPlayersTable _firstPlayerIdTable(_$LadderDatabase db) =>
+      db.teamPlayers.createAlias(
+        $_aliasNameGenerator(db.showdownGames.firstPlayerId, db.teamPlayers.id),
+      );
+
+  $$TeamPlayersTableProcessedTableManager get firstPlayerId {
+    final $_column = $_itemColumn<int>('first_player_id')!;
+
+    final manager = $$TeamPlayersTableTableManager(
+      $_db,
+      $_db.teamPlayers,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_firstPlayerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $TeamPlayersTable _secondPlayerIdTable(_$LadderDatabase db) =>
+      db.teamPlayers.createAlias(
+        $_aliasNameGenerator(
+          db.showdownGames.secondPlayerId,
+          db.teamPlayers.id,
+        ),
+      );
+
+  $$TeamPlayersTableProcessedTableManager get secondPlayerId {
+    final $_column = $_itemColumn<int>('second_player_id')!;
+
+    final manager = $$TeamPlayersTableTableManager(
+      $_db,
+      $_db.teamPlayers,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_secondPlayerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ShowdownGamesTableFilterComposer
+    extends Composer<_$LadderDatabase, $ShowdownGamesTable> {
+  $$ShowdownGamesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$LadderNightsTableFilterComposer get ladderNightId {
+    final $$LadderNightsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ladderNightId,
+      referencedTable: $db.ladderNights,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LadderNightsTableFilterComposer(
+            $db: $db,
+            $table: $db.ladderNights,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TeamPlayersTableFilterComposer get firstPlayerId {
+    final $$TeamPlayersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.firstPlayerId,
+      referencedTable: $db.teamPlayers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TeamPlayersTableFilterComposer(
+            $db: $db,
+            $table: $db.teamPlayers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TeamPlayersTableFilterComposer get secondPlayerId {
+    final $$TeamPlayersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.secondPlayerId,
+      referencedTable: $db.teamPlayers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TeamPlayersTableFilterComposer(
+            $db: $db,
+            $table: $db.teamPlayers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ShowdownGamesTableOrderingComposer
+    extends Composer<_$LadderDatabase, $ShowdownGamesTable> {
+  $$ShowdownGamesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$LadderNightsTableOrderingComposer get ladderNightId {
+    final $$LadderNightsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ladderNightId,
+      referencedTable: $db.ladderNights,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LadderNightsTableOrderingComposer(
+            $db: $db,
+            $table: $db.ladderNights,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TeamPlayersTableOrderingComposer get firstPlayerId {
+    final $$TeamPlayersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.firstPlayerId,
+      referencedTable: $db.teamPlayers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TeamPlayersTableOrderingComposer(
+            $db: $db,
+            $table: $db.teamPlayers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TeamPlayersTableOrderingComposer get secondPlayerId {
+    final $$TeamPlayersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.secondPlayerId,
+      referencedTable: $db.teamPlayers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TeamPlayersTableOrderingComposer(
+            $db: $db,
+            $table: $db.teamPlayers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ShowdownGamesTableAnnotationComposer
+    extends Composer<_$LadderDatabase, $ShowdownGamesTable> {
+  $$ShowdownGamesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  $$LadderNightsTableAnnotationComposer get ladderNightId {
+    final $$LadderNightsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ladderNightId,
+      referencedTable: $db.ladderNights,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LadderNightsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ladderNights,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TeamPlayersTableAnnotationComposer get firstPlayerId {
+    final $$TeamPlayersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.firstPlayerId,
+      referencedTable: $db.teamPlayers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TeamPlayersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.teamPlayers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TeamPlayersTableAnnotationComposer get secondPlayerId {
+    final $$TeamPlayersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.secondPlayerId,
+      referencedTable: $db.teamPlayers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TeamPlayersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.teamPlayers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ShowdownGamesTableTableManager
+    extends
+        RootTableManager<
+          _$LadderDatabase,
+          $ShowdownGamesTable,
+          ShowdownGame,
+          $$ShowdownGamesTableFilterComposer,
+          $$ShowdownGamesTableOrderingComposer,
+          $$ShowdownGamesTableAnnotationComposer,
+          $$ShowdownGamesTableCreateCompanionBuilder,
+          $$ShowdownGamesTableUpdateCompanionBuilder,
+          (ShowdownGame, $$ShowdownGamesTableReferences),
+          ShowdownGame,
+          PrefetchHooks Function({
+            bool ladderNightId,
+            bool firstPlayerId,
+            bool secondPlayerId,
+          })
+        > {
+  $$ShowdownGamesTableTableManager(
+    _$LadderDatabase db,
+    $ShowdownGamesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ShowdownGamesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShowdownGamesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ShowdownGamesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> ladderNightId = const Value.absent(),
+                Value<int> firstPlayerId = const Value.absent(),
+                Value<int> secondPlayerId = const Value.absent(),
+              }) => ShowdownGamesCompanion(
+                id: id,
+                ladderNightId: ladderNightId,
+                firstPlayerId: firstPlayerId,
+                secondPlayerId: secondPlayerId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int ladderNightId,
+                required int firstPlayerId,
+                required int secondPlayerId,
+              }) => ShowdownGamesCompanion.insert(
+                id: id,
+                ladderNightId: ladderNightId,
+                firstPlayerId: firstPlayerId,
+                secondPlayerId: secondPlayerId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ShowdownGamesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                ladderNightId = false,
+                firstPlayerId = false,
+                secondPlayerId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (ladderNightId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.ladderNightId,
+                                    referencedTable:
+                                        $$ShowdownGamesTableReferences
+                                            ._ladderNightIdTable(db),
+                                    referencedColumn:
+                                        $$ShowdownGamesTableReferences
+                                            ._ladderNightIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (firstPlayerId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.firstPlayerId,
+                                    referencedTable:
+                                        $$ShowdownGamesTableReferences
+                                            ._firstPlayerIdTable(db),
+                                    referencedColumn:
+                                        $$ShowdownGamesTableReferences
+                                            ._firstPlayerIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (secondPlayerId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.secondPlayerId,
+                                    referencedTable:
+                                        $$ShowdownGamesTableReferences
+                                            ._secondPlayerIdTable(db),
+                                    referencedColumn:
+                                        $$ShowdownGamesTableReferences
+                                            ._secondPlayerIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ShowdownGamesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$LadderDatabase,
+      $ShowdownGamesTable,
+      ShowdownGame,
+      $$ShowdownGamesTableFilterComposer,
+      $$ShowdownGamesTableOrderingComposer,
+      $$ShowdownGamesTableAnnotationComposer,
+      $$ShowdownGamesTableCreateCompanionBuilder,
+      $$ShowdownGamesTableUpdateCompanionBuilder,
+      (ShowdownGame, $$ShowdownGamesTableReferences),
+      ShowdownGame,
+      PrefetchHooks Function({
+        bool ladderNightId,
+        bool firstPlayerId,
+        bool secondPlayerId,
+      })
     >;
 
 class $LadderDatabaseManager {
@@ -2198,4 +4005,8 @@ class $LadderDatabaseManager {
       $$ShowdownPointsTableTableManager(_db, _db.showdownPoints);
   $$TeamPlayersTableTableManager get teamPlayers =>
       $$TeamPlayersTableTableManager(_db, _db.teamPlayers);
+  $$LadderNightsTableTableManager get ladderNights =>
+      $$LadderNightsTableTableManager(_db, _db.ladderNights);
+  $$ShowdownGamesTableTableManager get showdownGames =>
+      $$ShowdownGamesTableTableManager(_db, _db.showdownGames);
 }
