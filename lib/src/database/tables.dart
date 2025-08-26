@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:ladder/ladder.dart';
 
 /// Add an [id] column.
 mixin IdMixin on Table {
@@ -36,3 +35,27 @@ mixin TeamIdMixin on Table {
     onDelete: KeyAction.cascade,
   )();
 }
+
+/// The possible endings for game points.
+///
+/// Sensible defaults should be created with each new team.
+class ShowdownPoints extends Table with IdMixin, NameMixin, TeamIdMixin {
+  /// How many points this ending is worth.
+  ///
+  ///  If [value] is < 0, then this ending gives the points to the opponent.
+  late final value = integer()();
+}
+
+/// The showdown teams table.
+class ShowdownTeams extends Table
+    with IdMixin, NameMixin, CreatedAtMixin, EmailAddressMixin {
+  /// The last time this team was accessed.
+  late final lastAccessed = dateTime().withDefault(currentDateAndTime)();
+
+  /// How many sessions should be taken into account when calculating stats.
+  late final sessionsPerCycle = integer().withDefault(const Constant(6))();
+}
+
+/// The team players table.
+class TeamPlayers extends Table
+    with IdMixin, NameMixin, CreatedAtMixin, EmailAddressMixin, TeamIdMixin {}
