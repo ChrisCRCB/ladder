@@ -6,6 +6,51 @@ part of 'providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+/// Provide application settings.
+@ProviderFor(applicationSettings)
+const applicationSettingsProvider = ApplicationSettingsProvider._();
+
+/// Provide application settings.
+final class ApplicationSettingsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<ApplicationSettings>,
+          ApplicationSettings,
+          FutureOr<ApplicationSettings>
+        >
+    with
+        $FutureModifier<ApplicationSettings>,
+        $FutureProvider<ApplicationSettings> {
+  /// Provide application settings.
+  const ApplicationSettingsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'applicationSettingsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$applicationSettingsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<ApplicationSettings> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<ApplicationSettings> create(Ref ref) {
+    return applicationSettings(ref);
+  }
+}
+
+String _$applicationSettingsHash() =>
+    r'1ab6826ebad152db884cba8dd7643dd4188bac55';
+
 /// Provide the database.
 @ProviderFor(database)
 const databaseProvider = DatabaseProvider._();
