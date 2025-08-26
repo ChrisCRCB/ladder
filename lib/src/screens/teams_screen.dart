@@ -1,5 +1,6 @@
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
+import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +77,18 @@ class TeamsScreen extends ConsumerWidget {
                         text: team.emailAddress,
                         title: 'Change Email Address',
                       ),
+                    ),
+                  ),
+                  PerformableAction(
+                    name: 'Delete',
+                    activator: deleteShortcut,
+                    invoke: () => context.showConfirmMessage(
+                      message: 'Really delete ${team.name}?',
+                      title: deleteConfirmationTitle,
+                      yesCallback: () async {
+                        await query.delete();
+                        ref.invalidate(showdownTeamsProvider);
+                      },
                     ),
                   ),
                 ],
