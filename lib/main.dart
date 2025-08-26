@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ladder/ladder.dart';
 
 /// The main function is the entry point of the application.
 void main() {
@@ -18,6 +19,37 @@ class MyApp extends StatelessWidget {
     theme: ThemeData(
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
     ),
-    home: const Placeholder(),
+    home: const _HomeScreen(),
   );
+}
+
+class _HomeScreen extends ConsumerStatefulWidget {
+  /// Create an instance.
+  const _HomeScreen();
+
+  /// Create state for this widget.
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+/// State for [_HomeScreen].
+class _HomeScreenState extends ConsumerState<_HomeScreen> {
+  /// Initialise state.
+  @override
+  void initState() {
+    super.initState();
+    // Ensure the database has been created.
+    ref.read(databaseProvider);
+  }
+
+  /// Dispose of the widget.
+  @override
+  void dispose() {
+    super.dispose();
+    ref.invalidate(databaseProvider);
+  }
+
+  /// Build a widget.
+  @override
+  Widget build(final BuildContext context) => const TeamsScreen();
 }

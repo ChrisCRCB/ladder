@@ -1,0 +1,123 @@
+import 'package:backstreets_widgets/extensions.dart';
+import 'package:backstreets_widgets/screens.dart';
+import 'package:backstreets_widgets/widgets.dart';
+import 'package:drift/drift.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ladder/ladder.dart';
+
+/// The screen which shows all teams.
+class TeamsScreen extends ConsumerWidget {
+  /// Create an instance.
+  const TeamsScreen({super.key});
+
+  /// Build the widget.
+  @override
+  Widget build(final BuildContext context, final WidgetRef ref) {
+    final database = ref.watch(databaseProvider);
+    final teamsManager = database.managers.showdownTeams;
+    final value = ref.watch(showdownTeamsProvider);
+    return CommonShortcuts(
+      newCallback: () => _createTeam(ref),
+      child: SimpleScaffold(
+        title: 'Teams',
+        body: value.simpleWhen((final teams) {
+          if (teams.isEmpty) {
+            return const CenterText(
+              text: 'There are no teams to show.',
+              autofocus: true,
+            );
+          }
+          return ListView.builder(
+            itemBuilder: (final context, final index) {
+              final team = teams[index];
+              final query = teamsManager.filter(
+                (final f) => f.id.equals(team.id),
+              );
+              return PerformableActionsListTile(
+                actions: [
+                  PerformableAction(
+                    name: 'Rename',
+                    activator: renameShortcut,
+                    invoke: () => context.pushWidgetBuilder(
+                      (final innerContext) => GetText(
+                        onDone: (final value) async {
+                          innerContext.pop();
+                          await query.update(
+                            (final o) => o(
+                              lastAccessed: Value(DateTime.now()),
+                              name: Value(value),
+                            ),
+                          );
+                          ref.invalidate(showdownTeamsProvider);
+                        },
+                        labelText: 'Team name',
+                        text: team.name,
+                        title: 'Rename Team',
+                      ),
+                    ),
+                  ),
+                  PerformableAction(
+                    name: 'Change Email',
+                    activator: changeEmailAddressShortcut,
+                    invoke: () => context.pushWidgetBuilder(
+                      (final innerContext) => GetText(
+                        onDone: (final value) async {
+                          innerContext.pop();
+                          await query.update(
+                            (final o) => o(
+                              emailAddress: Value(value),
+                              lastAccessed: Value(DateTime.now()),
+                            ),
+                          );
+                          ref.invalidate(showdownTeamsProvider);
+                        },
+                        labelText: 'Email address',
+                        text: team.emailAddress,
+                        title: 'Change Email Address',
+                      ),
+                    ),
+                  ),
+                ],
+                autofocus: index == 0,
+                title: Text(team.name),
+                subtitle: Text(team.emailAddress),
+                onTap: () {},
+              );
+            },
+            itemCount: teams.length,
+            shrinkWrap: true,
+          );
+        }),
+        floatingActionButton: NewButton(
+          onPressed: () => _createTeam(ref),
+          tooltip: 'New team',
+        ),
+      ),
+    );
+  }
+
+  /// Create a new team.
+  Future<void> _createTeam(final WidgetRef ref) async {
+    final database = ref.read(databaseProvider);
+    final team = await database.managers.showdownTeams.createReturning(
+      (final o) => o(name: 'Untitled Team'),
+    );
+    const points = <String, int>{
+      'Goal': 2,
+      'Body touch': -1,
+      'Hand infringement': -1,
+      'Touched shades': -2,
+      'Long serve': -1,
+      'Short serve': -1,
+      'Centre board': -1,
+      'Out': -1,
+    };
+    for (final MapEntry(key: name, value: points) in points.entries) {
+      await database.managers.showdownPoints.create(
+        (final o) => o(name: name, value: points, teamId: team.id),
+      );
+    }
+    ref.invalidate(showdownTeamsProvider);
+  }
+}
