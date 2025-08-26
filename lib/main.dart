@@ -34,22 +34,20 @@ class _HomeScreen extends ConsumerStatefulWidget {
 
 /// State for [_HomeScreen].
 class _HomeScreenState extends ConsumerState<_HomeScreen> {
-  /// Initialise state.
-  @override
-  void initState() {
-    super.initState();
-    // Ensure the database has been created.
-    ref.read(databaseProvider);
-  }
+  /// The database to use.
+  late LadderDatabase _database;
 
   /// Dispose of the widget.
   @override
   void dispose() {
     super.dispose();
-    ref.invalidate(databaseProvider);
+    _database.close();
   }
 
   /// Build a widget.
   @override
-  Widget build(final BuildContext context) => const TeamsScreen();
+  Widget build(final BuildContext context) {
+    _database = ref.watch(databaseProvider);
+    return const TeamsScreen();
+  }
 }
