@@ -95,7 +95,9 @@ class TeamsScreen extends ConsumerWidget {
                   autofocus: index == 0,
                   title: CustomText(text: team.name),
                   subtitle: CustomText(text: team.emailAddress),
-                  onTap: () {},
+                  onTap: () => context.pushWidgetBuilder(
+                    (_) => TeamScreen(teamId: team.id),
+                  ),
                 );
               },
               itemCount: teams.length,
@@ -117,17 +119,7 @@ class TeamsScreen extends ConsumerWidget {
     final team = await database.managers.showdownTeams.createReturning(
       (final o) => o(name: 'Untitled Team'),
     );
-    const points = <String, int>{
-      'Goal': 2,
-      'Body touch': -1,
-      'Hand infringement': -1,
-      'Touched shades': -2,
-      'Long serve': -1,
-      'Short serve': -1,
-      'Centre board': -1,
-      'Out': -1,
-    };
-    for (final MapEntry(key: name, value: points) in points.entries) {
+    for (final MapEntry(key: name, value: points) in defaultPoints.entries) {
       await database.managers.showdownPoints.create(
         (final o) => o(teamId: team.id, name: name, value: points),
       );

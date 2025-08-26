@@ -31,22 +31,22 @@ Future<List<ShowdownTeam>> showdownTeams(final Ref ref) {
       .get();
 }
 
-// /// Provide all players on a team.
-// @riverpod
-// Future<List<TeamPlayer>> teamPlayers(final Ref ref, final int teamId) {
-//   final database = ref.watch(databaseProvider);
-//   return database.managers.teamPlayers
-//       .filter((final f) => f.name.equals(teamId))
-//       .orderBy((final o) => o.name.asc())
-//       .get();
-// }
+/// Provide all players on a team.
+@riverpod
+Future<List<TeamPlayer>> teamPlayers(final Ref ref, final int teamId) {
+  final database = ref.watch(databaseProvider);
+  return database.managers.teamPlayers
+      .filter((final f) => f.teamId.id.equals(teamId))
+      .orderBy((final o) => o.name.asc())
+      .get();
+}
 
-// /// Provide all the fouls for a given team.
-// @riverpod
-// Future<List<ShowdownPoint>> showdownPoints(final Ref ref, final int teamId) {
-//   final database = ref.watch(databaseProvider);
-//   return database.managers.showdownPoints
-//       .filter((final f) => f.teamId.equals(teamId))
-//       .orderBy((final o) => o.name.asc())
-//       .get();
-// }
+/// Provide all the fouls for a given team.
+@riverpod
+Future<List<ShowdownPoint>> showdownPoints(final Ref ref, final int teamId) {
+  final database = ref.watch(databaseProvider);
+  return database.managers.showdownPoints
+      .filter((final f) => f.teamId.id.equals(teamId))
+      .orderBy((final o) => o.name.asc())
+      .get();
+}
