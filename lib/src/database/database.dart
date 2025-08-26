@@ -38,5 +38,6 @@ class LadderDatabase extends _$LadderDatabase {
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (final m) => m.createAll(),
     beforeOpen: (final details) => customStatement('PRAGMA foreign_keys = ON'),
+    onUpgrade: (final m, final from, final to) async {},
   );
 }
