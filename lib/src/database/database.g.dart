@@ -811,6 +811,16 @@ class $TeamPlayersTable extends TeamPlayers
       'REFERENCES showdown_teams (id) ON DELETE CASCADE',
     ),
   );
+  static const VerificationMeta _pointsMeta = const VerificationMeta('points');
+  @override
+  late final GeneratedColumn<int> points = GeneratedColumn<int>(
+    'points',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -818,6 +828,7 @@ class $TeamPlayersTable extends TeamPlayers
     createdAt,
     emailAddress,
     teamId,
+    points,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -865,6 +876,12 @@ class $TeamPlayersTable extends TeamPlayers
     } else if (isInserting) {
       context.missing(_teamIdMeta);
     }
+    if (data.containsKey('points')) {
+      context.handle(
+        _pointsMeta,
+        points.isAcceptableOrUnknown(data['points']!, _pointsMeta),
+      );
+    }
     return context;
   }
 
@@ -894,6 +911,10 @@ class $TeamPlayersTable extends TeamPlayers
         DriftSqlType.int,
         data['${effectivePrefix}team_id'],
       )!,
+      points: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}points'],
+      )!,
     );
   }
 
@@ -918,12 +939,16 @@ class TeamPlayer extends DataClass implements Insertable<TeamPlayer> {
 
   /// The ID of the team.
   final int teamId;
+
+  /// How many points this player has.
+  final int points;
   const TeamPlayer({
     required this.id,
     required this.name,
     required this.createdAt,
     required this.emailAddress,
     required this.teamId,
+    required this.points,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -933,6 +958,7 @@ class TeamPlayer extends DataClass implements Insertable<TeamPlayer> {
     map['created_at'] = Variable<DateTime>(createdAt);
     map['email_address'] = Variable<String>(emailAddress);
     map['team_id'] = Variable<int>(teamId);
+    map['points'] = Variable<int>(points);
     return map;
   }
 
@@ -943,6 +969,7 @@ class TeamPlayer extends DataClass implements Insertable<TeamPlayer> {
       createdAt: Value(createdAt),
       emailAddress: Value(emailAddress),
       teamId: Value(teamId),
+      points: Value(points),
     );
   }
 
@@ -957,6 +984,7 @@ class TeamPlayer extends DataClass implements Insertable<TeamPlayer> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       emailAddress: serializer.fromJson<String>(json['emailAddress']),
       teamId: serializer.fromJson<int>(json['teamId']),
+      points: serializer.fromJson<int>(json['points']),
     );
   }
   @override
@@ -968,6 +996,7 @@ class TeamPlayer extends DataClass implements Insertable<TeamPlayer> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'emailAddress': serializer.toJson<String>(emailAddress),
       'teamId': serializer.toJson<int>(teamId),
+      'points': serializer.toJson<int>(points),
     };
   }
 
@@ -977,12 +1006,14 @@ class TeamPlayer extends DataClass implements Insertable<TeamPlayer> {
     DateTime? createdAt,
     String? emailAddress,
     int? teamId,
+    int? points,
   }) => TeamPlayer(
     id: id ?? this.id,
     name: name ?? this.name,
     createdAt: createdAt ?? this.createdAt,
     emailAddress: emailAddress ?? this.emailAddress,
     teamId: teamId ?? this.teamId,
+    points: points ?? this.points,
   );
   TeamPlayer copyWithCompanion(TeamPlayersCompanion data) {
     return TeamPlayer(
@@ -993,6 +1024,7 @@ class TeamPlayer extends DataClass implements Insertable<TeamPlayer> {
           ? data.emailAddress.value
           : this.emailAddress,
       teamId: data.teamId.present ? data.teamId.value : this.teamId,
+      points: data.points.present ? data.points.value : this.points,
     );
   }
 
@@ -1003,13 +1035,15 @@ class TeamPlayer extends DataClass implements Insertable<TeamPlayer> {
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
           ..write('emailAddress: $emailAddress, ')
-          ..write('teamId: $teamId')
+          ..write('teamId: $teamId, ')
+          ..write('points: $points')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, createdAt, emailAddress, teamId);
+  int get hashCode =>
+      Object.hash(id, name, createdAt, emailAddress, teamId, points);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1018,7 +1052,8 @@ class TeamPlayer extends DataClass implements Insertable<TeamPlayer> {
           other.name == this.name &&
           other.createdAt == this.createdAt &&
           other.emailAddress == this.emailAddress &&
-          other.teamId == this.teamId);
+          other.teamId == this.teamId &&
+          other.points == this.points);
 }
 
 class TeamPlayersCompanion extends UpdateCompanion<TeamPlayer> {
@@ -1027,12 +1062,14 @@ class TeamPlayersCompanion extends UpdateCompanion<TeamPlayer> {
   final Value<DateTime> createdAt;
   final Value<String> emailAddress;
   final Value<int> teamId;
+  final Value<int> points;
   const TeamPlayersCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.emailAddress = const Value.absent(),
     this.teamId = const Value.absent(),
+    this.points = const Value.absent(),
   });
   TeamPlayersCompanion.insert({
     this.id = const Value.absent(),
@@ -1040,6 +1077,7 @@ class TeamPlayersCompanion extends UpdateCompanion<TeamPlayer> {
     this.createdAt = const Value.absent(),
     this.emailAddress = const Value.absent(),
     required int teamId,
+    this.points = const Value.absent(),
   }) : name = Value(name),
        teamId = Value(teamId);
   static Insertable<TeamPlayer> custom({
@@ -1048,6 +1086,7 @@ class TeamPlayersCompanion extends UpdateCompanion<TeamPlayer> {
     Expression<DateTime>? createdAt,
     Expression<String>? emailAddress,
     Expression<int>? teamId,
+    Expression<int>? points,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1055,6 +1094,7 @@ class TeamPlayersCompanion extends UpdateCompanion<TeamPlayer> {
       if (createdAt != null) 'created_at': createdAt,
       if (emailAddress != null) 'email_address': emailAddress,
       if (teamId != null) 'team_id': teamId,
+      if (points != null) 'points': points,
     });
   }
 
@@ -1064,6 +1104,7 @@ class TeamPlayersCompanion extends UpdateCompanion<TeamPlayer> {
     Value<DateTime>? createdAt,
     Value<String>? emailAddress,
     Value<int>? teamId,
+    Value<int>? points,
   }) {
     return TeamPlayersCompanion(
       id: id ?? this.id,
@@ -1071,6 +1112,7 @@ class TeamPlayersCompanion extends UpdateCompanion<TeamPlayer> {
       createdAt: createdAt ?? this.createdAt,
       emailAddress: emailAddress ?? this.emailAddress,
       teamId: teamId ?? this.teamId,
+      points: points ?? this.points,
     );
   }
 
@@ -1092,6 +1134,9 @@ class TeamPlayersCompanion extends UpdateCompanion<TeamPlayer> {
     if (teamId.present) {
       map['team_id'] = Variable<int>(teamId.value);
     }
+    if (points.present) {
+      map['points'] = Variable<int>(points.value);
+    }
     return map;
   }
 
@@ -1102,7 +1147,8 @@ class TeamPlayersCompanion extends UpdateCompanion<TeamPlayer> {
           ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
           ..write('emailAddress: $emailAddress, ')
-          ..write('teamId: $teamId')
+          ..write('teamId: $teamId, ')
+          ..write('points: $points')
           ..write(')'))
         .toString();
   }
@@ -3378,6 +3424,7 @@ typedef $$TeamPlayersTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<String> emailAddress,
       required int teamId,
+      Value<int> points,
     });
 typedef $$TeamPlayersTableUpdateCompanionBuilder =
     TeamPlayersCompanion Function({
@@ -3386,6 +3433,7 @@ typedef $$TeamPlayersTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<String> emailAddress,
       Value<int> teamId,
+      Value<int> points,
     });
 
 final class $$TeamPlayersTableReferences
@@ -3550,6 +3598,11 @@ class $$TeamPlayersTableFilterComposer
 
   ColumnFilters<String> get emailAddress => $composableBuilder(
     column: $table.emailAddress,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get points => $composableBuilder(
+    column: $table.points,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3731,6 +3784,11 @@ class $$TeamPlayersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get points => $composableBuilder(
+    column: $table.points,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$ShowdownTeamsTableOrderingComposer get teamId {
     final $$ShowdownTeamsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -3777,6 +3835,9 @@ class $$TeamPlayersTableAnnotationComposer
     column: $table.emailAddress,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get points =>
+      $composableBuilder(column: $table.points, builder: (column) => column);
 
   $$ShowdownTeamsTableAnnotationComposer get teamId {
     final $$ShowdownTeamsTableAnnotationComposer composer = $composerBuilder(
@@ -3969,12 +4030,14 @@ class $$TeamPlayersTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<String> emailAddress = const Value.absent(),
                 Value<int> teamId = const Value.absent(),
+                Value<int> points = const Value.absent(),
               }) => TeamPlayersCompanion(
                 id: id,
                 name: name,
                 createdAt: createdAt,
                 emailAddress: emailAddress,
                 teamId: teamId,
+                points: points,
               ),
           createCompanionCallback:
               ({
@@ -3983,12 +4046,14 @@ class $$TeamPlayersTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<String> emailAddress = const Value.absent(),
                 required int teamId,
+                Value<int> points = const Value.absent(),
               }) => TeamPlayersCompanion.insert(
                 id: id,
                 name: name,
                 createdAt: createdAt,
                 emailAddress: emailAddress,
                 teamId: teamId,
+                points: points,
               ),
           withReferenceMapper: (p0) => p0
               .map(

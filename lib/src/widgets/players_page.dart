@@ -81,7 +81,7 @@ class PlayersPage extends ConsumerWidget {
               ),
             ],
             title: CustomText(text: player.name),
-            subtitle: ShowdownPlayerPointsText(playerId: player.id),
+            subtitle: CustomCenterText(text: '${player.points}'),
             onTap: () {},
           );
         },

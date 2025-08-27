@@ -65,7 +65,10 @@ class ShowdownTeams extends Table
 
 /// The team players table.
 class TeamPlayers extends Table
-    with IdMixin, NameMixin, CreatedAtMixin, EmailAddressMixin, TeamIdMixin {}
+    with IdMixin, NameMixin, CreatedAtMixin, EmailAddressMixin, TeamIdMixin {
+  /// How many points this player has.
+  late final points = integer().withDefault(const Constant(0))();
+}
 
 /// A single ladder night.
 ///

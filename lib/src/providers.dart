@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:drift/drift.dart';
 import 'package:ladder/ladder.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,48 +58,6 @@ Future<List<ShowdownPoint>> showdownPoints(final Ref ref, final int teamId) {
       .filter((final f) => f.teamId.id.equals(teamId))
       .orderBy((final o) => o.name.asc())
       .get();
-}
-
-/// Provide the points for the given player.
-@riverpod
-Future<int> playerPoints(final Ref ref, final int playerId) async {
-  final database = ref.watch(databaseProvider);
-  final managers = database.managers;
-  final player = await managers.teamPlayers
-      .filter((final f) => f.id.equals(playerId))
-      .getSingle();
-  final team = await ref.watch(showdownTeamProvider(player.teamId).future);
-  final recentNights = await managers.ladderNights
-      .orderBy((final o) => o.createdAt.desc())
-      .limit(team.sessionsPerCycle)
-      .get();
-  final nightIds = recentNights.map((final night) => night.id);
-  final games = await managers.showdownGames
-      .filter(
-        (final f) =>
-            f.firstPlayerId.id.equals(playerId) |
-            f.secondPlayerId.id.equals(playerId),
-      )
-      .filter((final f) => f.ladderNightId.id.isIn(nightIds))
-      .get();
-  final points = await managers.gamePoints
-      .filter((final f) => f.gameId.id.isIn(games.map((final game) => game.id)))
-      .get();
-  final showdownPoints = await managers.showdownPoints
-      .filter((final f) => f.id.isIn(points.map((final point) => point.id)))
-      .get();
-  var playerPoints = 0;
-  for (final point in points) {
-    final showdownPoint = showdownPoints.firstWhere(
-      (final p) => p.id == point.id,
-    );
-    if (point.playerId == playerId && showdownPoint.value > 0) {
-      playerPoints += showdownPoint.value;
-    } else if (point.playerId != playerId && showdownPoint.value < 0) {
-      playerPoints += showdownPoint.value * -1;
-    }
-  }
-  return playerPoints;
 }
 
 /// Provide the recent ladder nights.
