@@ -47,7 +47,14 @@ class TeamScreen extends ConsumerWidget {
           TabbedScaffoldTab(
             title: 'Ladder Nights',
             icon: const Icon(Icons.calendar_month),
-            child: LadderNightsPage(teamId: teamId),
+            child: CommonShortcuts(
+              child: LadderNightsPage(teamId: teamId),
+              newCallback: () => _createLadderNight(ref),
+            ),
+            floatingActionButton: NewButton(
+              onPressed: () => _createLadderNight(ref),
+              tooltip: 'New ladder night',
+            ),
           ),
         ],
       ),
@@ -85,4 +92,13 @@ class TeamScreen extends ConsumerWidget {
           },
         ),
       );
+
+  /// Create a new ladder night.
+  Future<void> _createLadderNight(final WidgetRef ref) async {
+    final database = ref.read(databaseProvider);
+    await database.managers.ladderNights.createReturning(
+      (final o) => o(teamId: teamId),
+    );
+    ref.invalidate(recentLadderNightsProvider(teamId));
+  }
 }

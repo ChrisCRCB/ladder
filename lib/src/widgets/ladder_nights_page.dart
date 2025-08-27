@@ -1,6 +1,10 @@
+import 'package:backstreets_widgets/shortcuts.dart';
+import 'package:backstreets_widgets/widgets.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
+import 'package:time/time.dart';
 
 /// A page which shows the most recent ladder nights.
 class LadderNightsPage extends ConsumerWidget {
@@ -13,6 +17,7 @@ class LadderNightsPage extends ConsumerWidget {
   /// Build the widget.
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
+    final database = ref.watch(databaseProvider);
     final value = ref.watch(recentLadderNightsProvider(teamId));
     return value.simpleWhen((final nights) {
       if (nights.isEmpty) {
@@ -23,8 +28,33 @@ class LadderNightsPage extends ConsumerWidget {
       return ListView.builder(
         itemBuilder: (final context, final index) {
           final night = nights[index];
-          return ListTile(
-            title: CustomText(text: 'Held on ${night.createdAt.toLocal()}'),
+          final query = database.managers.ladderNights.filter(
+            (final f) => f.id.equals(night.id),
+          );
+          return PerformableActionsListTile(
+            actions: [
+              PerformableAction(
+                name: 'Move date forward',
+                activator: moveUpShortcut,
+                invoke: () async {
+                  await query.update(
+                    (final o) => o(createdAt: Value(night.createdAt + 1.days)),
+                  );
+                  ref.invalidate(recentLadderNightsProvider(teamId));
+                },
+              ),
+              PerformableAction(
+                name: 'Move date back',
+                activator: moveDownShortcut,
+                invoke: () async {
+                  await query.update(
+                    (final o) => o(createdAt: Value(night.createdAt - 1.days)),
+                  );
+                  ref.invalidate(recentLadderNightsProvider(teamId));
+                },
+              ),
+            ],
+            title: CustomText(text: dateFormat.format(night.createdAt)),
             onTap: () {},
           );
         },

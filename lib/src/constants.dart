@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 /// The title to use for delete confirmation dialogues.
 const deleteConfirmationTitle = 'Confirm Delete';
 
@@ -17,3 +19,6 @@ const defaultPoints = <String, int>{
   'Illegal serve': -1,
   'Own goal': -2,
 };
+
+/// The date format to use.
+final dateFormat = DateFormat('EEEE d MMMM y');
