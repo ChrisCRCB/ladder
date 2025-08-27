@@ -704,5 +704,86 @@ final class GamesFamily extends $Family
   String toString() => r'gamesProvider';
 }
 
+/// Provide all the players which the given player can challenge.
+@ProviderFor(challengeablePlayers)
+const challengeablePlayersProvider = ChallengeablePlayersFamily._();
+
+/// Provide all the players which the given player can challenge.
+final class ChallengeablePlayersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<TeamPlayer>>,
+          List<TeamPlayer>,
+          FutureOr<List<TeamPlayer>>
+        >
+    with $FutureModifier<List<TeamPlayer>>, $FutureProvider<List<TeamPlayer>> {
+  /// Provide all the players which the given player can challenge.
+  const ChallengeablePlayersProvider._({
+    required ChallengeablePlayersFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'challengeablePlayersProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$challengeablePlayersHash();
+
+  @override
+  String toString() {
+    return r'challengeablePlayersProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<TeamPlayer>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<TeamPlayer>> create(Ref ref) {
+    final argument = this.argument as int;
+    return challengeablePlayers(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ChallengeablePlayersProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$challengeablePlayersHash() =>
+    r'3dcbf11d6b7212e38244bca6487b122d8db38b9c';
+
+/// Provide all the players which the given player can challenge.
+final class ChallengeablePlayersFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<TeamPlayer>>, int> {
+  const ChallengeablePlayersFamily._()
+    : super(
+        retry: null,
+        name: r'challengeablePlayersProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provide all the players which the given player can challenge.
+  ChallengeablePlayersProvider call(int playerId) =>
+      ChallengeablePlayersProvider._(argument: playerId, from: this);
+
+  @override
+  String toString() => r'challengeablePlayersProvider';
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

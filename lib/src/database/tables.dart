@@ -55,6 +55,9 @@ class ShowdownTeams extends Table
 
   /// How many minutes long should each game be.
   late final gameLength = integer().withDefault(const Constant(30))();
+
+  /// The points difference before a challenge can be made.
+  late final challengePoints = integer().withDefault(const Constant(5))();
 }
 
 /// The team players table.

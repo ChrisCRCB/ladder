@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart';
 import 'package:ladder/ladder.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -94,5 +95,26 @@ Future<List<ShowdownGame>> games(final Ref ref, final int ladderNightId) {
   return database.managers.showdownGames
       .filter((final f) => f.ladderNightId.id.equals(ladderNightId))
       .orderBy((final o) => o.createdAt.asc())
+      .get();
+}
+
+/// Provide all the players which the given player can challenge.
+@riverpod
+Future<List<TeamPlayer>> challengeablePlayers(
+  final Ref ref,
+  final int playerId,
+) async {
+  final database = ref.watch(databaseProvider);
+  final player = await ref.watch(teamPlayerProvider(playerId).future);
+  final team = await ref.watch(showdownTeamProvider(player.teamId).future);
+  return database.managers.teamPlayers
+      .filter(
+        (final f) =>
+            f.teamId.id.equals(player.teamId) &
+            f.id.not.equals(playerId) &
+            f.points.isBiggerOrEqualTo(player.points - team.challengePoints) &
+            f.points.isSmallerOrEqualTo(player.points + team.challengePoints),
+      )
+      .orderBy((final o) => o.name.asc())
       .get();
 }

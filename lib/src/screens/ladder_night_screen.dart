@@ -1,3 +1,4 @@
+import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
@@ -22,54 +23,65 @@ class LadderNightScreen extends ConsumerWidget {
     final value = ref.watch(gamesProvider(ladderNightId));
     return FontShortcuts(
       child: Cancel(
-        child: SimpleScaffold(
-          title: 'Games',
-          body: value.simpleWhen((final games) {
-            if (games.isEmpty) {
-              return const CustomCenterText(
-                text: 'There are no games for this night.',
-              );
-            }
-            return ListView.builder(
-              itemBuilder: (final context, final index) {
-                final game = games[index];
-                final query = database.managers.showdownGames.filter(
-                  (final f) => f.id.equals(game.id),
+        child: CommonShortcuts(
+          newCallback: () => _createGame(context),
+          child: SimpleScaffold(
+            title: 'Games',
+            body: value.simpleWhen((final games) {
+              if (games.isEmpty) {
+                return const CustomCenterText(
+                  text: 'There are no games for this night.',
                 );
-                return PerformableActionsListTile(
-                  actions: [
-                    PerformableAction(
-                      name: 'Move game back',
-                      activator: moveUpShortcut,
-                      invoke: () async {
-                        final night = await ref.read(
-                          ladderNightProvider(ladderNightId).future,
-                        );
-                        final team = await ref.read(
-                          showdownTeamProvider(night.teamId).future,
-                        );
-                        await query.update(
-                          (final o) => o(
-                            createdAt: Value(
-                              game.createdAt + team.gameLength.minutes,
+              }
+              return ListView.builder(
+                itemBuilder: (final context, final index) {
+                  final game = games[index];
+                  final query = database.managers.showdownGames.filter(
+                    (final f) => f.id.equals(game.id),
+                  );
+                  return PerformableActionsListTile(
+                    actions: [
+                      PerformableAction(
+                        name: 'Move game back',
+                        activator: moveUpShortcut,
+                        invoke: () async {
+                          final night = await ref.read(
+                            ladderNightProvider(ladderNightId).future,
+                          );
+                          final team = await ref.read(
+                            showdownTeamProvider(night.teamId).future,
+                          );
+                          await query.update(
+                            (final o) => o(
+                              createdAt: Value(
+                                game.createdAt + team.gameLength.minutes,
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                  autofocus: index == 0,
-                  title: PlayerCustomText(playerId: game.firstPlayerId),
-                  subtitle: PlayerCustomText(playerId: game.secondPlayerId),
-                  onTap: () {},
-                );
-              },
-              itemCount: games.length,
-              shrinkWrap: true,
-            );
-          }),
+                          );
+                        },
+                      ),
+                    ],
+                    autofocus: index == 0,
+                    title: PlayerCustomText(playerId: game.firstPlayerId),
+                    subtitle: PlayerCustomText(playerId: game.secondPlayerId),
+                    onTap: () {},
+                  );
+                },
+                itemCount: games.length,
+                shrinkWrap: true,
+              );
+            }),
+            floatingActionButton: NewButton(
+              onPressed: () => _createGame(context),
+              tooltip: 'New game',
+            ),
+          ),
         ),
       ),
     );
   }
+
+  /// Create a new game.
+  Future<void> _createGame(final BuildContext context) => context
+      .pushWidgetBuilder((_) => CreateGameScreen(ladderNightId: ladderNightId));
 }
