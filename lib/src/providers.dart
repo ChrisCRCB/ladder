@@ -50,6 +50,15 @@ Future<List<TeamPlayer>> teamPlayers(final Ref ref, final int teamId) {
       .get();
 }
 
+/// Provide a single player.
+@riverpod
+Future<TeamPlayer> teamPlayer(final Ref ref, final int playerId) {
+  final database = ref.watch(databaseProvider);
+  return database.managers.teamPlayers
+      .filter((final f) => f.id.equals(playerId))
+      .getSingle();
+}
+
 /// Provide all the fouls for a given team.
 @riverpod
 Future<List<ShowdownPoint>> showdownPoints(final Ref ref, final int teamId) {
@@ -62,14 +71,28 @@ Future<List<ShowdownPoint>> showdownPoints(final Ref ref, final int teamId) {
 
 /// Provide the recent ladder nights.
 @riverpod
-Future<List<LadderNight>> recentLadderNights(
-  final Ref ref,
-  final int teamId,
-) async {
+Future<List<LadderNight>> ladderNights(final Ref ref, final int teamId) async {
   final database = ref.watch(databaseProvider);
-  final team = await ref.watch(showdownTeamProvider(teamId).future);
   return database.managers.ladderNights
       .orderBy((final o) => o.createdAt.desc())
-      .limit(team.sessionsPerCycle)
+      .get();
+}
+
+/// Provide a single ladder night.
+@riverpod
+Future<LadderNight> ladderNight(final Ref ref, final int ladderNightId) {
+  final database = ref.watch(databaseProvider);
+  return database.managers.ladderNights
+      .filter((final f) => f.id.equals(ladderNightId))
+      .getSingle();
+}
+
+/// Provide all the games for a given ladder night.
+@riverpod
+Future<List<ShowdownGame>> games(final Ref ref, final int ladderNightId) {
+  final database = ref.watch(databaseProvider);
+  return database.managers.showdownGames
+      .filter((final f) => f.ladderNightId.id.equals(ladderNightId))
+      .orderBy((final o) => o.createdAt.asc())
       .get();
 }

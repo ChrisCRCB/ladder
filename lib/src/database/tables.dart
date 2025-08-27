@@ -1,11 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:ladder/ladder.dart' show LadderNight, ShowdownGame;
-import 'package:ladder/src/database/_DATABASE.dart'
-    show LadderNight, ShowdownGame;
-import 'package:ladder/src/database/_database.dart'
-    show LadderNight, ShowdownGame;
-import 'package:ladder/src/database/database.dart'
-    show LadderNight, ShowdownGame;
+import 'package:ladder/ladder.dart';
 
 /// Add an [id] column.
 mixin IdMixin on Table {
@@ -59,8 +53,8 @@ class ShowdownTeams extends Table
   /// The last time this team was accessed.
   late final lastAccessed = dateTime().withDefault(currentDateAndTime)();
 
-  /// How many sessions should be taken into account when calculating stats.
-  late final sessionsPerCycle = integer().withDefault(const Constant(6))();
+  /// How many minutes long should each game be.
+  late final gameLength = integer().withDefault(const Constant(30))();
 }
 
 /// The team players table.
@@ -76,7 +70,7 @@ class TeamPlayers extends Table
 class LadderNights extends Table with IdMixin, CreatedAtMixin, TeamIdMixin {}
 
 /// A game in a [LadderNight].
-class ShowdownGames extends Table with IdMixin {
+class ShowdownGames extends Table with IdMixin, CreatedAtMixin {
   /// The ID of the night this game belongs to.
   late final ladderNightId = integer().references(
     LadderNights,

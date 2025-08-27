@@ -75,17 +75,17 @@ class $ShowdownTeamsTable extends ShowdownTeams
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
-  static const VerificationMeta _sessionsPerCycleMeta = const VerificationMeta(
-    'sessionsPerCycle',
+  static const VerificationMeta _gameLengthMeta = const VerificationMeta(
+    'gameLength',
   );
   @override
-  late final GeneratedColumn<int> sessionsPerCycle = GeneratedColumn<int>(
-    'sessions_per_cycle',
+  late final GeneratedColumn<int> gameLength = GeneratedColumn<int>(
+    'game_length',
     aliasedName,
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
-    defaultValue: const Constant(6),
+    defaultValue: const Constant(30),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -94,7 +94,7 @@ class $ShowdownTeamsTable extends ShowdownTeams
     createdAt,
     emailAddress,
     lastAccessed,
-    sessionsPerCycle,
+    gameLength,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -143,13 +143,10 @@ class $ShowdownTeamsTable extends ShowdownTeams
         ),
       );
     }
-    if (data.containsKey('sessions_per_cycle')) {
+    if (data.containsKey('game_length')) {
       context.handle(
-        _sessionsPerCycleMeta,
-        sessionsPerCycle.isAcceptableOrUnknown(
-          data['sessions_per_cycle']!,
-          _sessionsPerCycleMeta,
-        ),
+        _gameLengthMeta,
+        gameLength.isAcceptableOrUnknown(data['game_length']!, _gameLengthMeta),
       );
     }
     return context;
@@ -181,9 +178,9 @@ class $ShowdownTeamsTable extends ShowdownTeams
         DriftSqlType.dateTime,
         data['${effectivePrefix}last_accessed'],
       )!,
-      sessionsPerCycle: attachedDatabase.typeMapping.read(
+      gameLength: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}sessions_per_cycle'],
+        data['${effectivePrefix}game_length'],
       )!,
     );
   }
@@ -210,15 +207,15 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
   /// The last time this team was accessed.
   final DateTime lastAccessed;
 
-  /// How many sessions should be taken into account when calculating stats.
-  final int sessionsPerCycle;
+  /// How many minutes long should each game be.
+  final int gameLength;
   const ShowdownTeam({
     required this.id,
     required this.name,
     required this.createdAt,
     required this.emailAddress,
     required this.lastAccessed,
-    required this.sessionsPerCycle,
+    required this.gameLength,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -228,7 +225,7 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
     map['created_at'] = Variable<DateTime>(createdAt);
     map['email_address'] = Variable<String>(emailAddress);
     map['last_accessed'] = Variable<DateTime>(lastAccessed);
-    map['sessions_per_cycle'] = Variable<int>(sessionsPerCycle);
+    map['game_length'] = Variable<int>(gameLength);
     return map;
   }
 
@@ -239,7 +236,7 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
       createdAt: Value(createdAt),
       emailAddress: Value(emailAddress),
       lastAccessed: Value(lastAccessed),
-      sessionsPerCycle: Value(sessionsPerCycle),
+      gameLength: Value(gameLength),
     );
   }
 
@@ -254,7 +251,7 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       emailAddress: serializer.fromJson<String>(json['emailAddress']),
       lastAccessed: serializer.fromJson<DateTime>(json['lastAccessed']),
-      sessionsPerCycle: serializer.fromJson<int>(json['sessionsPerCycle']),
+      gameLength: serializer.fromJson<int>(json['gameLength']),
     );
   }
   @override
@@ -266,7 +263,7 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'emailAddress': serializer.toJson<String>(emailAddress),
       'lastAccessed': serializer.toJson<DateTime>(lastAccessed),
-      'sessionsPerCycle': serializer.toJson<int>(sessionsPerCycle),
+      'gameLength': serializer.toJson<int>(gameLength),
     };
   }
 
@@ -276,14 +273,14 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
     DateTime? createdAt,
     String? emailAddress,
     DateTime? lastAccessed,
-    int? sessionsPerCycle,
+    int? gameLength,
   }) => ShowdownTeam(
     id: id ?? this.id,
     name: name ?? this.name,
     createdAt: createdAt ?? this.createdAt,
     emailAddress: emailAddress ?? this.emailAddress,
     lastAccessed: lastAccessed ?? this.lastAccessed,
-    sessionsPerCycle: sessionsPerCycle ?? this.sessionsPerCycle,
+    gameLength: gameLength ?? this.gameLength,
   );
   ShowdownTeam copyWithCompanion(ShowdownTeamsCompanion data) {
     return ShowdownTeam(
@@ -296,9 +293,9 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
       lastAccessed: data.lastAccessed.present
           ? data.lastAccessed.value
           : this.lastAccessed,
-      sessionsPerCycle: data.sessionsPerCycle.present
-          ? data.sessionsPerCycle.value
-          : this.sessionsPerCycle,
+      gameLength: data.gameLength.present
+          ? data.gameLength.value
+          : this.gameLength,
     );
   }
 
@@ -310,20 +307,14 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
           ..write('createdAt: $createdAt, ')
           ..write('emailAddress: $emailAddress, ')
           ..write('lastAccessed: $lastAccessed, ')
-          ..write('sessionsPerCycle: $sessionsPerCycle')
+          ..write('gameLength: $gameLength')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-    id,
-    name,
-    createdAt,
-    emailAddress,
-    lastAccessed,
-    sessionsPerCycle,
-  );
+  int get hashCode =>
+      Object.hash(id, name, createdAt, emailAddress, lastAccessed, gameLength);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -333,7 +324,7 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
           other.createdAt == this.createdAt &&
           other.emailAddress == this.emailAddress &&
           other.lastAccessed == this.lastAccessed &&
-          other.sessionsPerCycle == this.sessionsPerCycle);
+          other.gameLength == this.gameLength);
 }
 
 class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
@@ -342,14 +333,14 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
   final Value<DateTime> createdAt;
   final Value<String> emailAddress;
   final Value<DateTime> lastAccessed;
-  final Value<int> sessionsPerCycle;
+  final Value<int> gameLength;
   const ShowdownTeamsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.emailAddress = const Value.absent(),
     this.lastAccessed = const Value.absent(),
-    this.sessionsPerCycle = const Value.absent(),
+    this.gameLength = const Value.absent(),
   });
   ShowdownTeamsCompanion.insert({
     this.id = const Value.absent(),
@@ -357,7 +348,7 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
     this.createdAt = const Value.absent(),
     this.emailAddress = const Value.absent(),
     this.lastAccessed = const Value.absent(),
-    this.sessionsPerCycle = const Value.absent(),
+    this.gameLength = const Value.absent(),
   }) : name = Value(name);
   static Insertable<ShowdownTeam> custom({
     Expression<int>? id,
@@ -365,7 +356,7 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
     Expression<DateTime>? createdAt,
     Expression<String>? emailAddress,
     Expression<DateTime>? lastAccessed,
-    Expression<int>? sessionsPerCycle,
+    Expression<int>? gameLength,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -373,7 +364,7 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
       if (createdAt != null) 'created_at': createdAt,
       if (emailAddress != null) 'email_address': emailAddress,
       if (lastAccessed != null) 'last_accessed': lastAccessed,
-      if (sessionsPerCycle != null) 'sessions_per_cycle': sessionsPerCycle,
+      if (gameLength != null) 'game_length': gameLength,
     });
   }
 
@@ -383,7 +374,7 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
     Value<DateTime>? createdAt,
     Value<String>? emailAddress,
     Value<DateTime>? lastAccessed,
-    Value<int>? sessionsPerCycle,
+    Value<int>? gameLength,
   }) {
     return ShowdownTeamsCompanion(
       id: id ?? this.id,
@@ -391,7 +382,7 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
       createdAt: createdAt ?? this.createdAt,
       emailAddress: emailAddress ?? this.emailAddress,
       lastAccessed: lastAccessed ?? this.lastAccessed,
-      sessionsPerCycle: sessionsPerCycle ?? this.sessionsPerCycle,
+      gameLength: gameLength ?? this.gameLength,
     );
   }
 
@@ -413,8 +404,8 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
     if (lastAccessed.present) {
       map['last_accessed'] = Variable<DateTime>(lastAccessed.value);
     }
-    if (sessionsPerCycle.present) {
-      map['sessions_per_cycle'] = Variable<int>(sessionsPerCycle.value);
+    if (gameLength.present) {
+      map['game_length'] = Variable<int>(gameLength.value);
     }
     return map;
   }
@@ -427,7 +418,7 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
           ..write('createdAt: $createdAt, ')
           ..write('emailAddress: $emailAddress, ')
           ..write('lastAccessed: $lastAccessed, ')
-          ..write('sessionsPerCycle: $sessionsPerCycle')
+          ..write('gameLength: $gameLength')
           ..write(')'))
         .toString();
   }
@@ -1428,6 +1419,18 @@ class $ShowdownGamesTable extends ShowdownGames
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
   static const VerificationMeta _ladderNightIdMeta = const VerificationMeta(
     'ladderNightId',
   );
@@ -1473,6 +1476,7 @@ class $ShowdownGamesTable extends ShowdownGames
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    createdAt,
     ladderNightId,
     firstPlayerId,
     secondPlayerId,
@@ -1491,6 +1495,12 @@ class $ShowdownGamesTable extends ShowdownGames
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('ladder_night_id')) {
       context.handle(
@@ -1538,6 +1548,10 @@ class $ShowdownGamesTable extends ShowdownGames
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
       ladderNightId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}ladder_night_id'],
@@ -1563,6 +1577,9 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
   /// The primary key.
   final int id;
 
+  /// The date and time this row was created.
+  final DateTime createdAt;
+
   /// The ID of the night this game belongs to.
   final int ladderNightId;
 
@@ -1575,6 +1592,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
   final int secondPlayerId;
   const ShowdownGame({
     required this.id,
+    required this.createdAt,
     required this.ladderNightId,
     required this.firstPlayerId,
     required this.secondPlayerId,
@@ -1583,6 +1601,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
     map['ladder_night_id'] = Variable<int>(ladderNightId);
     map['first_player_id'] = Variable<int>(firstPlayerId);
     map['second_player_id'] = Variable<int>(secondPlayerId);
@@ -1592,6 +1611,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
   ShowdownGamesCompanion toCompanion(bool nullToAbsent) {
     return ShowdownGamesCompanion(
       id: Value(id),
+      createdAt: Value(createdAt),
       ladderNightId: Value(ladderNightId),
       firstPlayerId: Value(firstPlayerId),
       secondPlayerId: Value(secondPlayerId),
@@ -1605,6 +1625,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ShowdownGame(
       id: serializer.fromJson<int>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       ladderNightId: serializer.fromJson<int>(json['ladderNightId']),
       firstPlayerId: serializer.fromJson<int>(json['firstPlayerId']),
       secondPlayerId: serializer.fromJson<int>(json['secondPlayerId']),
@@ -1615,6 +1636,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
       'ladderNightId': serializer.toJson<int>(ladderNightId),
       'firstPlayerId': serializer.toJson<int>(firstPlayerId),
       'secondPlayerId': serializer.toJson<int>(secondPlayerId),
@@ -1623,11 +1645,13 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
 
   ShowdownGame copyWith({
     int? id,
+    DateTime? createdAt,
     int? ladderNightId,
     int? firstPlayerId,
     int? secondPlayerId,
   }) => ShowdownGame(
     id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
     ladderNightId: ladderNightId ?? this.ladderNightId,
     firstPlayerId: firstPlayerId ?? this.firstPlayerId,
     secondPlayerId: secondPlayerId ?? this.secondPlayerId,
@@ -1635,6 +1659,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
   ShowdownGame copyWithCompanion(ShowdownGamesCompanion data) {
     return ShowdownGame(
       id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       ladderNightId: data.ladderNightId.present
           ? data.ladderNightId.value
           : this.ladderNightId,
@@ -1651,6 +1676,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
   String toString() {
     return (StringBuffer('ShowdownGame(')
           ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
           ..write('ladderNightId: $ladderNightId, ')
           ..write('firstPlayerId: $firstPlayerId, ')
           ..write('secondPlayerId: $secondPlayerId')
@@ -1660,12 +1686,13 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
 
   @override
   int get hashCode =>
-      Object.hash(id, ladderNightId, firstPlayerId, secondPlayerId);
+      Object.hash(id, createdAt, ladderNightId, firstPlayerId, secondPlayerId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ShowdownGame &&
           other.id == this.id &&
+          other.createdAt == this.createdAt &&
           other.ladderNightId == this.ladderNightId &&
           other.firstPlayerId == this.firstPlayerId &&
           other.secondPlayerId == this.secondPlayerId);
@@ -1673,17 +1700,20 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
 
 class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
   final Value<int> id;
+  final Value<DateTime> createdAt;
   final Value<int> ladderNightId;
   final Value<int> firstPlayerId;
   final Value<int> secondPlayerId;
   const ShowdownGamesCompanion({
     this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
     this.ladderNightId = const Value.absent(),
     this.firstPlayerId = const Value.absent(),
     this.secondPlayerId = const Value.absent(),
   });
   ShowdownGamesCompanion.insert({
     this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
     required int ladderNightId,
     required int firstPlayerId,
     required int secondPlayerId,
@@ -1692,12 +1722,14 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
        secondPlayerId = Value(secondPlayerId);
   static Insertable<ShowdownGame> custom({
     Expression<int>? id,
+    Expression<DateTime>? createdAt,
     Expression<int>? ladderNightId,
     Expression<int>? firstPlayerId,
     Expression<int>? secondPlayerId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
       if (ladderNightId != null) 'ladder_night_id': ladderNightId,
       if (firstPlayerId != null) 'first_player_id': firstPlayerId,
       if (secondPlayerId != null) 'second_player_id': secondPlayerId,
@@ -1706,12 +1738,14 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
 
   ShowdownGamesCompanion copyWith({
     Value<int>? id,
+    Value<DateTime>? createdAt,
     Value<int>? ladderNightId,
     Value<int>? firstPlayerId,
     Value<int>? secondPlayerId,
   }) {
     return ShowdownGamesCompanion(
       id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
       ladderNightId: ladderNightId ?? this.ladderNightId,
       firstPlayerId: firstPlayerId ?? this.firstPlayerId,
       secondPlayerId: secondPlayerId ?? this.secondPlayerId,
@@ -1723,6 +1757,9 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (ladderNightId.present) {
       map['ladder_night_id'] = Variable<int>(ladderNightId.value);
@@ -1740,6 +1777,7 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
   String toString() {
     return (StringBuffer('ShowdownGamesCompanion(')
           ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
           ..write('ladderNightId: $ladderNightId, ')
           ..write('firstPlayerId: $firstPlayerId, ')
           ..write('secondPlayerId: $secondPlayerId')
@@ -2500,7 +2538,7 @@ typedef $$ShowdownTeamsTableCreateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<String> emailAddress,
       Value<DateTime> lastAccessed,
-      Value<int> sessionsPerCycle,
+      Value<int> gameLength,
     });
 typedef $$ShowdownTeamsTableUpdateCompanionBuilder =
     ShowdownTeamsCompanion Function({
@@ -2509,7 +2547,7 @@ typedef $$ShowdownTeamsTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<String> emailAddress,
       Value<DateTime> lastAccessed,
-      Value<int> sessionsPerCycle,
+      Value<int> gameLength,
     });
 
 final class $$ShowdownTeamsTableReferences
@@ -2617,8 +2655,8 @@ class $$ShowdownTeamsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get sessionsPerCycle => $composableBuilder(
-    column: $table.sessionsPerCycle,
+  ColumnFilters<int> get gameLength => $composableBuilder(
+    column: $table.gameLength,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2732,8 +2770,8 @@ class $$ShowdownTeamsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get sessionsPerCycle => $composableBuilder(
-    column: $table.sessionsPerCycle,
+  ColumnOrderings<int> get gameLength => $composableBuilder(
+    column: $table.gameLength,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -2766,8 +2804,8 @@ class $$ShowdownTeamsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get sessionsPerCycle => $composableBuilder(
-    column: $table.sessionsPerCycle,
+  GeneratedColumn<int> get gameLength => $composableBuilder(
+    column: $table.gameLength,
     builder: (column) => column,
   );
 
@@ -2886,14 +2924,14 @@ class $$ShowdownTeamsTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<String> emailAddress = const Value.absent(),
                 Value<DateTime> lastAccessed = const Value.absent(),
-                Value<int> sessionsPerCycle = const Value.absent(),
+                Value<int> gameLength = const Value.absent(),
               }) => ShowdownTeamsCompanion(
                 id: id,
                 name: name,
                 createdAt: createdAt,
                 emailAddress: emailAddress,
                 lastAccessed: lastAccessed,
-                sessionsPerCycle: sessionsPerCycle,
+                gameLength: gameLength,
               ),
           createCompanionCallback:
               ({
@@ -2902,14 +2940,14 @@ class $$ShowdownTeamsTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<String> emailAddress = const Value.absent(),
                 Value<DateTime> lastAccessed = const Value.absent(),
-                Value<int> sessionsPerCycle = const Value.absent(),
+                Value<int> gameLength = const Value.absent(),
               }) => ShowdownTeamsCompanion.insert(
                 id: id,
                 name: name,
                 createdAt: createdAt,
                 emailAddress: emailAddress,
                 lastAccessed: lastAccessed,
-                sessionsPerCycle: sessionsPerCycle,
+                gameLength: gameLength,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -4624,6 +4662,7 @@ typedef $$LadderNightsTableProcessedTableManager =
 typedef $$ShowdownGamesTableCreateCompanionBuilder =
     ShowdownGamesCompanion Function({
       Value<int> id,
+      Value<DateTime> createdAt,
       required int ladderNightId,
       required int firstPlayerId,
       required int secondPlayerId,
@@ -4631,6 +4670,7 @@ typedef $$ShowdownGamesTableCreateCompanionBuilder =
 typedef $$ShowdownGamesTableUpdateCompanionBuilder =
     ShowdownGamesCompanion Function({
       Value<int> id,
+      Value<DateTime> createdAt,
       Value<int> ladderNightId,
       Value<int> firstPlayerId,
       Value<int> secondPlayerId,
@@ -4738,6 +4778,11 @@ class $$ShowdownGamesTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4850,6 +4895,11 @@ class $$ShowdownGamesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$LadderNightsTableOrderingComposer get ladderNightId {
     final $$LadderNightsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -4931,6 +4981,9 @@ class $$ShowdownGamesTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
   $$LadderNightsTableAnnotationComposer get ladderNightId {
     final $$LadderNightsTableAnnotationComposer composer = $composerBuilder(
@@ -5063,11 +5116,13 @@ class $$ShowdownGamesTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
                 Value<int> ladderNightId = const Value.absent(),
                 Value<int> firstPlayerId = const Value.absent(),
                 Value<int> secondPlayerId = const Value.absent(),
               }) => ShowdownGamesCompanion(
                 id: id,
+                createdAt: createdAt,
                 ladderNightId: ladderNightId,
                 firstPlayerId: firstPlayerId,
                 secondPlayerId: secondPlayerId,
@@ -5075,11 +5130,13 @@ class $$ShowdownGamesTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
                 required int ladderNightId,
                 required int firstPlayerId,
                 required int secondPlayerId,
               }) => ShowdownGamesCompanion.insert(
                 id: id,
+                createdAt: createdAt,
                 ladderNightId: ladderNightId,
                 firstPlayerId: firstPlayerId,
                 secondPlayerId: secondPlayerId,

@@ -1,10 +1,10 @@
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/widgets.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
-import 'package:ladder/src/widgets/points_page.dart';
 
 /// The screen for showing a single showdown team.
 class TeamScreen extends ConsumerWidget {
@@ -96,9 +96,19 @@ class TeamScreen extends ConsumerWidget {
   /// Create a new ladder night.
   Future<void> _createLadderNight(final WidgetRef ref) async {
     final database = ref.read(databaseProvider);
-    await database.managers.ladderNights.createReturning(
-      (final o) => o(teamId: teamId),
+    final now = DateTime.now();
+    final night = await database.managers.ladderNights.createReturning(
+      (final o) => o(
+        teamId: teamId,
+        createdAt: Value(DateTime(now.year, now.month, now.day, 18)),
+      ),
     );
-    ref.invalidate(recentLadderNightsProvider(teamId));
+    ref.invalidate(ladderNightsProvider(teamId));
+    final context = ref.context;
+    if (context.mounted) {
+      await context.pushWidgetBuilder(
+        (_) => LadderNightScreen(ladderNightId: night.id),
+      );
+    }
   }
 }
