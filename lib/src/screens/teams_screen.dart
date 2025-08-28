@@ -95,9 +95,16 @@ class TeamsScreen extends ConsumerWidget {
                   autofocus: index == 0,
                   title: CustomText(text: team.name),
                   subtitle: CustomText(text: team.emailAddress),
-                  onTap: () => context.pushWidgetBuilder(
-                    (_) => TeamScreen(teamId: team.id),
-                  ),
+                  onTap: () {
+                    query
+                        .update(
+                          (final o) => o(lastAccessed: Value(DateTime.now())),
+                        )
+                        .then((_) => ref.invalidate(showdownTeamsProvider));
+                    context.pushWidgetBuilder(
+                      (_) => TeamScreen(teamId: team.id),
+                    );
+                  },
                 );
               },
               itemCount: teams.length,
