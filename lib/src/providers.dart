@@ -109,26 +109,33 @@ Future<List<TeamPlayer>> challengeablePlayers(
   final db = ref.watch(databaseProvider);
   final firstPlayer = await ref.watch(teamPlayerProvider(playerId).future);
   final team = await ref.watch(showdownTeamProvider(firstPlayer.teamId).future);
+  final players = db.alias(db.teamPlayers, 'players');
+  final absences = db.alias(db.ladderNightAbsences, 'absences');
+  final nights = db.alias(db.ladderNights, 'nights');
   final query =
-      await (db.select(db.teamPlayers).join([
+      await (db.select(players).join([
             innerJoin(
-              db.ladderNights,
-              db.teamPlayers.teamId.equalsExp(db.ladderNights.teamId),
+              nights,
+              nights.teamId.equals(firstPlayer.teamId),
+              useColumns: false,
             ),
             leftOuterJoin(
-              db.ladderNightAbsences,
-              db.ladderNightAbsences.teamPlayerId.equalsExp(db.teamPlayers.id) &
-                  db.ladderNightAbsences.ladderNightId.equals(ladderNightId),
+              absences,
+              absences.teamPlayerId.equalsExp(players.id) &
+                  absences.ladderNightId.equals(ladderNightId),
               useColumns: false,
             ),
           ])..where(
-            db.teamPlayers.points.isBetween(
-              Constant(firstPlayer.points - team.challengePoints),
-              Constant(firstPlayer.points + team.challengePoints),
-            ),
+            absences.id.isNull() &
+                players.teamId.equals(firstPlayer.teamId) &
+                players.points.isBetween(
+                  Constant(firstPlayer.points - team.challengePoints),
+                  Constant(firstPlayer.points + team.challengePoints),
+                ) &
+                players.id.isNotValue(firstPlayer.id),
           ))
           .get();
-  final results = query.map((final row) => row.readTable(db.teamPlayers));
+  final results = query.map((final row) => row.readTable(players));
   return results.toList();
 }
 
@@ -161,7 +168,7 @@ Future<List<TeamPlayer>> attendingTeamPlayers(
           db.ladderNightAbsences.ladderNightId.equals(ladderNightId),
       useColumns: false,
     ),
-  ])..where(db.ladderNightAbsences.id.equalsExp(const Constant(null)))).get();
+  ])..where(db.ladderNightAbsences.id.isNull())).get();
   final results = query.map((final row) => row.readTable(db.teamPlayers));
   return results.toList();
 }

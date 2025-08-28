@@ -79,38 +79,41 @@ class CreateGameScreenState extends ConsumerState<CreateGameScreen> {
             final value = ref.watch(
               challengeablePlayersProvider(firstPlayerId, night.id),
             );
-            return SimpleScaffold(
-              title: 'Select Second Player',
-              body: value.simpleWhen((final players) {
-                if (players.isEmpty) {
-                  return const CustomCenterText(
-                    text: 'There are no players which can be challenged.',
-                  );
-                }
-                return ListView.builder(
-                  itemBuilder: (final context, final index) {
-                    final player = players[index];
-                    return ListTile(
-                      autofocus: index == 0,
-                      title: CustomText(text: player.name),
-                      onTap: () async {
-                        context.pop();
-                        await database.managers.showdownGames.create(
-                          (final o) => o(
-                            firstPlayerId: firstPlayerId,
-                            secondPlayerId: player.id,
-                            ladderNightId: widget.ladderNightId,
-                            createdAt: Value(widget.gameStartTime),
-                          ),
-                        );
-                        ref.invalidate(gamesProvider(night.id));
-                      },
+            return CommonShortcuts(
+              backspaceCallback: () => setState(() => _firstPlayerId = null),
+              child: SimpleScaffold(
+                title: 'Select Second Player',
+                body: value.simpleWhen((final players) {
+                  if (players.isEmpty) {
+                    return const CustomCenterText(
+                      text: 'There are no players which can be challenged.',
                     );
-                  },
-                  itemCount: players.length,
-                  shrinkWrap: true,
-                );
-              }),
+                  }
+                  return ListView.builder(
+                    itemBuilder: (final context, final index) {
+                      final player = players[index];
+                      return ListTile(
+                        autofocus: index == 0,
+                        title: CustomText(text: player.name),
+                        onTap: () async {
+                          context.pop();
+                          await database.managers.showdownGames.create(
+                            (final o) => o(
+                              firstPlayerId: firstPlayerId,
+                              secondPlayerId: player.id,
+                              ladderNightId: widget.ladderNightId,
+                              createdAt: Value(widget.gameStartTime),
+                            ),
+                          );
+                          ref.invalidate(gamesProvider(night.id));
+                        },
+                      );
+                    },
+                    itemCount: players.length,
+                    shrinkWrap: true,
+                  );
+                }),
+              ),
             );
           },
           error: ErrorScreen.withPositional,
