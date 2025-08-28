@@ -1190,6 +1190,80 @@ final class GameSetsFamily extends $Family
   String toString() => r'gameSetsProvider';
 }
 
+/// Provide a single game set.
+@ProviderFor(gameSet)
+const gameSetProvider = GameSetFamily._();
+
+/// Provide a single game set.
+final class GameSetProvider
+    extends $FunctionalProvider<AsyncValue<GameSet>, GameSet, FutureOr<GameSet>>
+    with $FutureModifier<GameSet>, $FutureProvider<GameSet> {
+  /// Provide a single game set.
+  const GameSetProvider._({
+    required GameSetFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'gameSetProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$gameSetHash();
+
+  @override
+  String toString() {
+    return r'gameSetProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<GameSet> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<GameSet> create(Ref ref) {
+    final argument = this.argument as int;
+    return gameSet(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GameSetProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$gameSetHash() => r'ded36482de637a7802c8c24727f3f0fcf4948287';
+
+/// Provide a single game set.
+final class GameSetFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<GameSet>, int> {
+  const GameSetFamily._()
+    : super(
+        retry: null,
+        name: r'gameSetProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provide a single game set.
+  GameSetProvider call(int setId) =>
+      GameSetProvider._(argument: setId, from: this);
+
+  @override
+  String toString() => r'gameSetProvider';
+}
+
 /// Return the players who are involved in a given game.
 @ProviderFor(gamePlayers)
 const gamePlayersProvider = GamePlayersFamily._();

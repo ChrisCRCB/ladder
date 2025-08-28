@@ -230,6 +230,15 @@ Future<List<GameSet>> gameSets(final Ref ref, final int gameId) {
       .get();
 }
 
+/// Provide a single game set.
+@riverpod
+Future<GameSet> gameSet(final Ref ref, final int setId) {
+  final database = ref.watch(databaseProvider);
+  return database.managers.gameSets
+      .filter((final f) => f.id.equals(setId))
+      .getSingle();
+}
+
 /// Return the players who are involved in a given game.
 @riverpod
 Future<List<TeamPlayer>> gamePlayers(final Ref ref, final int gameId) async {
