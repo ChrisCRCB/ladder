@@ -46,7 +46,7 @@ class CreateGameScreenState extends ConsumerState<CreateGameScreen> {
           data: (final night) {
             final firstPlayerId = _firstPlayerId;
             if (firstPlayerId == null) {
-              final value = ref.watch(teamPlayersProvider(night.teamId));
+              final value = ref.watch(attendingTeamPlayersProvider(night.id));
               return SimpleScaffold(
                 title: 'Select First Player',
                 body: value.simpleWhen((final players) {
@@ -77,7 +77,7 @@ class CreateGameScreenState extends ConsumerState<CreateGameScreen> {
               );
             }
             final value = ref.watch(
-              challengeablePlayersProvider(firstPlayerId),
+              challengeablePlayersProvider(firstPlayerId, night.id),
             );
             return SimpleScaffold(
               title: 'Select Second Player',

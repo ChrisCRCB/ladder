@@ -2540,6 +2540,282 @@ class GamePointsCompanion extends UpdateCompanion<GamePoint> {
   }
 }
 
+class $LadderNightAbsencesTable extends LadderNightAbsences
+    with TableInfo<$LadderNightAbsencesTable, LadderNightAbsence> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LadderNightAbsencesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _teamPlayerIdMeta = const VerificationMeta(
+    'teamPlayerId',
+  );
+  @override
+  late final GeneratedColumn<int> teamPlayerId = GeneratedColumn<int>(
+    'team_player_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES team_players (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _ladderNightIdMeta = const VerificationMeta(
+    'ladderNightId',
+  );
+  @override
+  late final GeneratedColumn<int> ladderNightId = GeneratedColumn<int>(
+    'ladder_night_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES ladder_nights (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, teamPlayerId, ladderNightId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ladder_night_absences';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LadderNightAbsence> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('team_player_id')) {
+      context.handle(
+        _teamPlayerIdMeta,
+        teamPlayerId.isAcceptableOrUnknown(
+          data['team_player_id']!,
+          _teamPlayerIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_teamPlayerIdMeta);
+    }
+    if (data.containsKey('ladder_night_id')) {
+      context.handle(
+        _ladderNightIdMeta,
+        ladderNightId.isAcceptableOrUnknown(
+          data['ladder_night_id']!,
+          _ladderNightIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_ladderNightIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LadderNightAbsence map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LadderNightAbsence(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      teamPlayerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}team_player_id'],
+      )!,
+      ladderNightId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ladder_night_id'],
+      )!,
+    );
+  }
+
+  @override
+  $LadderNightAbsencesTable createAlias(String alias) {
+    return $LadderNightAbsencesTable(attachedDatabase, alias);
+  }
+}
+
+class LadderNightAbsence extends DataClass
+    implements Insertable<LadderNightAbsence> {
+  /// The primary key.
+  final int id;
+
+  /// The ID of the player whose absence will be recorded.
+  final int teamPlayerId;
+
+  /// The ID of the ladder night when the player will be absent.
+  final int ladderNightId;
+  const LadderNightAbsence({
+    required this.id,
+    required this.teamPlayerId,
+    required this.ladderNightId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['team_player_id'] = Variable<int>(teamPlayerId);
+    map['ladder_night_id'] = Variable<int>(ladderNightId);
+    return map;
+  }
+
+  LadderNightAbsencesCompanion toCompanion(bool nullToAbsent) {
+    return LadderNightAbsencesCompanion(
+      id: Value(id),
+      teamPlayerId: Value(teamPlayerId),
+      ladderNightId: Value(ladderNightId),
+    );
+  }
+
+  factory LadderNightAbsence.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LadderNightAbsence(
+      id: serializer.fromJson<int>(json['id']),
+      teamPlayerId: serializer.fromJson<int>(json['teamPlayerId']),
+      ladderNightId: serializer.fromJson<int>(json['ladderNightId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'teamPlayerId': serializer.toJson<int>(teamPlayerId),
+      'ladderNightId': serializer.toJson<int>(ladderNightId),
+    };
+  }
+
+  LadderNightAbsence copyWith({
+    int? id,
+    int? teamPlayerId,
+    int? ladderNightId,
+  }) => LadderNightAbsence(
+    id: id ?? this.id,
+    teamPlayerId: teamPlayerId ?? this.teamPlayerId,
+    ladderNightId: ladderNightId ?? this.ladderNightId,
+  );
+  LadderNightAbsence copyWithCompanion(LadderNightAbsencesCompanion data) {
+    return LadderNightAbsence(
+      id: data.id.present ? data.id.value : this.id,
+      teamPlayerId: data.teamPlayerId.present
+          ? data.teamPlayerId.value
+          : this.teamPlayerId,
+      ladderNightId: data.ladderNightId.present
+          ? data.ladderNightId.value
+          : this.ladderNightId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LadderNightAbsence(')
+          ..write('id: $id, ')
+          ..write('teamPlayerId: $teamPlayerId, ')
+          ..write('ladderNightId: $ladderNightId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, teamPlayerId, ladderNightId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LadderNightAbsence &&
+          other.id == this.id &&
+          other.teamPlayerId == this.teamPlayerId &&
+          other.ladderNightId == this.ladderNightId);
+}
+
+class LadderNightAbsencesCompanion extends UpdateCompanion<LadderNightAbsence> {
+  final Value<int> id;
+  final Value<int> teamPlayerId;
+  final Value<int> ladderNightId;
+  const LadderNightAbsencesCompanion({
+    this.id = const Value.absent(),
+    this.teamPlayerId = const Value.absent(),
+    this.ladderNightId = const Value.absent(),
+  });
+  LadderNightAbsencesCompanion.insert({
+    this.id = const Value.absent(),
+    required int teamPlayerId,
+    required int ladderNightId,
+  }) : teamPlayerId = Value(teamPlayerId),
+       ladderNightId = Value(ladderNightId);
+  static Insertable<LadderNightAbsence> custom({
+    Expression<int>? id,
+    Expression<int>? teamPlayerId,
+    Expression<int>? ladderNightId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (teamPlayerId != null) 'team_player_id': teamPlayerId,
+      if (ladderNightId != null) 'ladder_night_id': ladderNightId,
+    });
+  }
+
+  LadderNightAbsencesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? teamPlayerId,
+    Value<int>? ladderNightId,
+  }) {
+    return LadderNightAbsencesCompanion(
+      id: id ?? this.id,
+      teamPlayerId: teamPlayerId ?? this.teamPlayerId,
+      ladderNightId: ladderNightId ?? this.ladderNightId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (teamPlayerId.present) {
+      map['team_player_id'] = Variable<int>(teamPlayerId.value);
+    }
+    if (ladderNightId.present) {
+      map['ladder_night_id'] = Variable<int>(ladderNightId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LadderNightAbsencesCompanion(')
+          ..write('id: $id, ')
+          ..write('teamPlayerId: $teamPlayerId, ')
+          ..write('ladderNightId: $ladderNightId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$LadderDatabase extends GeneratedDatabase {
   _$LadderDatabase(QueryExecutor e) : super(e);
   $LadderDatabaseManager get managers => $LadderDatabaseManager(this);
@@ -2551,6 +2827,12 @@ abstract class _$LadderDatabase extends GeneratedDatabase {
   late final $ShowdownChallengesTable showdownChallenges =
       $ShowdownChallengesTable(this);
   late final $GamePointsTable gamePoints = $GamePointsTable(this);
+  late final $LadderNightAbsencesTable ladderNightAbsences =
+      $LadderNightAbsencesTable(this);
+  late final Index absenceIndex = Index(
+    'absence_index',
+    'CREATE UNIQUE INDEX absence_index ON ladder_night_absences (team_player_id, ladder_night_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2563,6 +2845,8 @@ abstract class _$LadderDatabase extends GeneratedDatabase {
     showdownGames,
     showdownChallenges,
     gamePoints,
+    ladderNightAbsences,
+    absenceIndex,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -2642,6 +2926,20 @@ abstract class _$LadderDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('game_points', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'team_players',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('ladder_night_absences', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'ladder_nights',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('ladder_night_absences', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -3744,6 +4042,33 @@ final class $$TeamPlayersTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $LadderNightAbsencesTable,
+    List<LadderNightAbsence>
+  >
+  _ladderNightAbsencesRefsTable(_$LadderDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ladderNightAbsences,
+        aliasName: $_aliasNameGenerator(
+          db.teamPlayers.id,
+          db.ladderNightAbsences.teamPlayerId,
+        ),
+      );
+
+  $$LadderNightAbsencesTableProcessedTableManager get ladderNightAbsencesRefs {
+    final manager = $$LadderNightAbsencesTableTableManager(
+      $_db,
+      $_db.ladderNightAbsences,
+    ).filter((f) => f.teamPlayerId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ladderNightAbsencesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$TeamPlayersTableFilterComposer
@@ -3919,6 +4244,31 @@ class $$TeamPlayersTableFilterComposer
           }) => $$GamePointsTableFilterComposer(
             $db: $db,
             $table: $db.gamePoints,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> ladderNightAbsencesRefs(
+    Expression<bool> Function($$LadderNightAbsencesTableFilterComposer f) f,
+  ) {
+    final $$LadderNightAbsencesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ladderNightAbsences,
+      getReferencedColumn: (t) => t.teamPlayerId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LadderNightAbsencesTableFilterComposer(
+            $db: $db,
+            $table: $db.ladderNightAbsences,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4162,6 +4512,32 @@ class $$TeamPlayersTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> ladderNightAbsencesRefs<T extends Object>(
+    Expression<T> Function($$LadderNightAbsencesTableAnnotationComposer a) f,
+  ) {
+    final $$LadderNightAbsencesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ladderNightAbsences,
+          getReferencedColumn: (t) => t.teamPlayerId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LadderNightAbsencesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ladderNightAbsences,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$TeamPlayersTableTableManager
@@ -4184,6 +4560,7 @@ class $$TeamPlayersTableTableManager
             bool challengesAsFirstPlayer,
             bool challengesAsSecondPlayer,
             bool gamePointsRefs,
+            bool ladderNightAbsencesRefs,
           })
         > {
   $$TeamPlayersTableTableManager(_$LadderDatabase db, $TeamPlayersTable table)
@@ -4245,6 +4622,7 @@ class $$TeamPlayersTableTableManager
                 challengesAsFirstPlayer = false,
                 challengesAsSecondPlayer = false,
                 gamePointsRefs = false,
+                ladderNightAbsencesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -4254,6 +4632,7 @@ class $$TeamPlayersTableTableManager
                     if (challengesAsFirstPlayer) db.showdownChallenges,
                     if (challengesAsSecondPlayer) db.showdownChallenges,
                     if (gamePointsRefs) db.gamePoints,
+                    if (ladderNightAbsencesRefs) db.ladderNightAbsences,
                   ],
                   addJoins:
                       <
@@ -4396,6 +4775,27 @@ class $$TeamPlayersTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (ladderNightAbsencesRefs)
+                        await $_getPrefetchedData<
+                          TeamPlayer,
+                          $TeamPlayersTable,
+                          LadderNightAbsence
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TeamPlayersTableReferences
+                              ._ladderNightAbsencesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TeamPlayersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ladderNightAbsencesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.teamPlayerId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -4423,6 +4823,7 @@ typedef $$TeamPlayersTableProcessedTableManager =
         bool challengesAsFirstPlayer,
         bool challengesAsSecondPlayer,
         bool gamePointsRefs,
+        bool ladderNightAbsencesRefs,
       })
     >;
 typedef $$LadderNightsTableCreateCompanionBuilder =
@@ -4477,6 +4878,33 @@ final class $$LadderNightsTableReferences
     ).filter((f) => f.ladderNightId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_showdownGamesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $LadderNightAbsencesTable,
+    List<LadderNightAbsence>
+  >
+  _ladderNightAbsencesRefsTable(_$LadderDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.ladderNightAbsences,
+        aliasName: $_aliasNameGenerator(
+          db.ladderNights.id,
+          db.ladderNightAbsences.ladderNightId,
+        ),
+      );
+
+  $$LadderNightAbsencesTableProcessedTableManager get ladderNightAbsencesRefs {
+    final manager = $$LadderNightAbsencesTableTableManager(
+      $_db,
+      $_db.ladderNightAbsences,
+    ).filter((f) => f.ladderNightId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _ladderNightAbsencesRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -4541,6 +4969,31 @@ class $$LadderNightsTableFilterComposer
           }) => $$ShowdownGamesTableFilterComposer(
             $db: $db,
             $table: $db.showdownGames,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> ladderNightAbsencesRefs(
+    Expression<bool> Function($$LadderNightAbsencesTableFilterComposer f) f,
+  ) {
+    final $$LadderNightAbsencesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.ladderNightAbsences,
+      getReferencedColumn: (t) => t.ladderNightId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LadderNightAbsencesTableFilterComposer(
+            $db: $db,
+            $table: $db.ladderNightAbsences,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4656,6 +5109,32 @@ class $$LadderNightsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> ladderNightAbsencesRefs<T extends Object>(
+    Expression<T> Function($$LadderNightAbsencesTableAnnotationComposer a) f,
+  ) {
+    final $$LadderNightAbsencesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.ladderNightAbsences,
+          getReferencedColumn: (t) => t.ladderNightId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LadderNightAbsencesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.ladderNightAbsences,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$LadderNightsTableTableManager
@@ -4671,7 +5150,11 @@ class $$LadderNightsTableTableManager
           $$LadderNightsTableUpdateCompanionBuilder,
           (LadderNight, $$LadderNightsTableReferences),
           LadderNight,
-          PrefetchHooks Function({bool teamId, bool showdownGamesRefs})
+          PrefetchHooks Function({
+            bool teamId,
+            bool showdownGamesRefs,
+            bool ladderNightAbsencesRefs,
+          })
         > {
   $$LadderNightsTableTableManager(_$LadderDatabase db, $LadderNightsTable table)
     : super(
@@ -4712,71 +5195,100 @@ class $$LadderNightsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({teamId = false, showdownGamesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (showdownGamesRefs) db.showdownGames,
-              ],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (teamId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.teamId,
-                                referencedTable: $$LadderNightsTableReferences
-                                    ._teamIdTable(db),
-                                referencedColumn: $$LadderNightsTableReferences
-                                    ._teamIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({
+                teamId = false,
+                showdownGamesRefs = false,
+                ladderNightAbsencesRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (showdownGamesRefs) db.showdownGames,
+                    if (ladderNightAbsencesRefs) db.ladderNightAbsences,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (teamId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.teamId,
+                                    referencedTable:
+                                        $$LadderNightsTableReferences
+                                            ._teamIdTable(db),
+                                    referencedColumn:
+                                        $$LadderNightsTableReferences
+                                            ._teamIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (showdownGamesRefs)
+                        await $_getPrefetchedData<
+                          LadderNight,
+                          $LadderNightsTable,
+                          ShowdownGame
+                        >(
+                          currentTable: table,
+                          referencedTable: $$LadderNightsTableReferences
+                              ._showdownGamesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$LadderNightsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).showdownGamesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.ladderNightId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (ladderNightAbsencesRefs)
+                        await $_getPrefetchedData<
+                          LadderNight,
+                          $LadderNightsTable,
+                          LadderNightAbsence
+                        >(
+                          currentTable: table,
+                          referencedTable: $$LadderNightsTableReferences
+                              ._ladderNightAbsencesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$LadderNightsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).ladderNightAbsencesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.ladderNightId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (showdownGamesRefs)
-                    await $_getPrefetchedData<
-                      LadderNight,
-                      $LadderNightsTable,
-                      ShowdownGame
-                    >(
-                      currentTable: table,
-                      referencedTable: $$LadderNightsTableReferences
-                          ._showdownGamesRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$LadderNightsTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).showdownGamesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.ladderNightId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -4793,7 +5305,11 @@ typedef $$LadderNightsTableProcessedTableManager =
       $$LadderNightsTableUpdateCompanionBuilder,
       (LadderNight, $$LadderNightsTableReferences),
       LadderNight,
-      PrefetchHooks Function({bool teamId, bool showdownGamesRefs})
+      PrefetchHooks Function({
+        bool teamId,
+        bool showdownGamesRefs,
+        bool ladderNightAbsencesRefs,
+      })
     >;
 typedef $$ShowdownGamesTableCreateCompanionBuilder =
     ShowdownGamesCompanion Function({
@@ -6309,6 +6825,397 @@ typedef $$GamePointsTableProcessedTableManager =
       GamePoint,
       PrefetchHooks Function({bool playerId, bool gameId, bool pointId})
     >;
+typedef $$LadderNightAbsencesTableCreateCompanionBuilder =
+    LadderNightAbsencesCompanion Function({
+      Value<int> id,
+      required int teamPlayerId,
+      required int ladderNightId,
+    });
+typedef $$LadderNightAbsencesTableUpdateCompanionBuilder =
+    LadderNightAbsencesCompanion Function({
+      Value<int> id,
+      Value<int> teamPlayerId,
+      Value<int> ladderNightId,
+    });
+
+final class $$LadderNightAbsencesTableReferences
+    extends
+        BaseReferences<
+          _$LadderDatabase,
+          $LadderNightAbsencesTable,
+          LadderNightAbsence
+        > {
+  $$LadderNightAbsencesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $TeamPlayersTable _teamPlayerIdTable(_$LadderDatabase db) =>
+      db.teamPlayers.createAlias(
+        $_aliasNameGenerator(
+          db.ladderNightAbsences.teamPlayerId,
+          db.teamPlayers.id,
+        ),
+      );
+
+  $$TeamPlayersTableProcessedTableManager get teamPlayerId {
+    final $_column = $_itemColumn<int>('team_player_id')!;
+
+    final manager = $$TeamPlayersTableTableManager(
+      $_db,
+      $_db.teamPlayers,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_teamPlayerIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $LadderNightsTable _ladderNightIdTable(_$LadderDatabase db) =>
+      db.ladderNights.createAlias(
+        $_aliasNameGenerator(
+          db.ladderNightAbsences.ladderNightId,
+          db.ladderNights.id,
+        ),
+      );
+
+  $$LadderNightsTableProcessedTableManager get ladderNightId {
+    final $_column = $_itemColumn<int>('ladder_night_id')!;
+
+    final manager = $$LadderNightsTableTableManager(
+      $_db,
+      $_db.ladderNights,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_ladderNightIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$LadderNightAbsencesTableFilterComposer
+    extends Composer<_$LadderDatabase, $LadderNightAbsencesTable> {
+  $$LadderNightAbsencesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TeamPlayersTableFilterComposer get teamPlayerId {
+    final $$TeamPlayersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.teamPlayerId,
+      referencedTable: $db.teamPlayers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TeamPlayersTableFilterComposer(
+            $db: $db,
+            $table: $db.teamPlayers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LadderNightsTableFilterComposer get ladderNightId {
+    final $$LadderNightsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ladderNightId,
+      referencedTable: $db.ladderNights,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LadderNightsTableFilterComposer(
+            $db: $db,
+            $table: $db.ladderNights,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LadderNightAbsencesTableOrderingComposer
+    extends Composer<_$LadderDatabase, $LadderNightAbsencesTable> {
+  $$LadderNightAbsencesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TeamPlayersTableOrderingComposer get teamPlayerId {
+    final $$TeamPlayersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.teamPlayerId,
+      referencedTable: $db.teamPlayers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TeamPlayersTableOrderingComposer(
+            $db: $db,
+            $table: $db.teamPlayers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LadderNightsTableOrderingComposer get ladderNightId {
+    final $$LadderNightsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ladderNightId,
+      referencedTable: $db.ladderNights,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LadderNightsTableOrderingComposer(
+            $db: $db,
+            $table: $db.ladderNights,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LadderNightAbsencesTableAnnotationComposer
+    extends Composer<_$LadderDatabase, $LadderNightAbsencesTable> {
+  $$LadderNightAbsencesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  $$TeamPlayersTableAnnotationComposer get teamPlayerId {
+    final $$TeamPlayersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.teamPlayerId,
+      referencedTable: $db.teamPlayers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TeamPlayersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.teamPlayers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$LadderNightsTableAnnotationComposer get ladderNightId {
+    final $$LadderNightsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.ladderNightId,
+      referencedTable: $db.ladderNights,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LadderNightsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ladderNights,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LadderNightAbsencesTableTableManager
+    extends
+        RootTableManager<
+          _$LadderDatabase,
+          $LadderNightAbsencesTable,
+          LadderNightAbsence,
+          $$LadderNightAbsencesTableFilterComposer,
+          $$LadderNightAbsencesTableOrderingComposer,
+          $$LadderNightAbsencesTableAnnotationComposer,
+          $$LadderNightAbsencesTableCreateCompanionBuilder,
+          $$LadderNightAbsencesTableUpdateCompanionBuilder,
+          (LadderNightAbsence, $$LadderNightAbsencesTableReferences),
+          LadderNightAbsence,
+          PrefetchHooks Function({bool teamPlayerId, bool ladderNightId})
+        > {
+  $$LadderNightAbsencesTableTableManager(
+    _$LadderDatabase db,
+    $LadderNightAbsencesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LadderNightAbsencesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LadderNightAbsencesTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$LadderNightAbsencesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> teamPlayerId = const Value.absent(),
+                Value<int> ladderNightId = const Value.absent(),
+              }) => LadderNightAbsencesCompanion(
+                id: id,
+                teamPlayerId: teamPlayerId,
+                ladderNightId: ladderNightId,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int teamPlayerId,
+                required int ladderNightId,
+              }) => LadderNightAbsencesCompanion.insert(
+                id: id,
+                teamPlayerId: teamPlayerId,
+                ladderNightId: ladderNightId,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$LadderNightAbsencesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({teamPlayerId = false, ladderNightId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (teamPlayerId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.teamPlayerId,
+                                    referencedTable:
+                                        $$LadderNightAbsencesTableReferences
+                                            ._teamPlayerIdTable(db),
+                                    referencedColumn:
+                                        $$LadderNightAbsencesTableReferences
+                                            ._teamPlayerIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (ladderNightId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.ladderNightId,
+                                    referencedTable:
+                                        $$LadderNightAbsencesTableReferences
+                                            ._ladderNightIdTable(db),
+                                    referencedColumn:
+                                        $$LadderNightAbsencesTableReferences
+                                            ._ladderNightIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$LadderNightAbsencesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$LadderDatabase,
+      $LadderNightAbsencesTable,
+      LadderNightAbsence,
+      $$LadderNightAbsencesTableFilterComposer,
+      $$LadderNightAbsencesTableOrderingComposer,
+      $$LadderNightAbsencesTableAnnotationComposer,
+      $$LadderNightAbsencesTableCreateCompanionBuilder,
+      $$LadderNightAbsencesTableUpdateCompanionBuilder,
+      (LadderNightAbsence, $$LadderNightAbsencesTableReferences),
+      LadderNightAbsence,
+      PrefetchHooks Function({bool teamPlayerId, bool ladderNightId})
+    >;
 
 class $LadderDatabaseManager {
   final _$LadderDatabase _db;
@@ -6327,4 +7234,6 @@ class $LadderDatabaseManager {
       $$ShowdownChallengesTableTableManager(_db, _db.showdownChallenges);
   $$GamePointsTableTableManager get gamePoints =>
       $$GamePointsTableTableManager(_db, _db.gamePoints);
+  $$LadderNightAbsencesTableTableManager get ladderNightAbsences =>
+      $$LadderNightAbsencesTableTableManager(_db, _db.ladderNightAbsences);
 }

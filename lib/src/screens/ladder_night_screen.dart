@@ -1,8 +1,6 @@
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
-import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
-import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
@@ -18,114 +16,32 @@ class LadderNightScreen extends ConsumerWidget {
 
   /// Build the widget.
   @override
-  Widget build(final BuildContext context, final WidgetRef ref) {
-    final database = ref.watch(databaseProvider);
-    final gamesValue = ref.watch(gamesProvider(ladderNightId));
-    return FontShortcuts(
-      child: Cancel(
-        child: gamesValue.when(
-          data: (final games) {
-            final ladderNightValue = ref.watch(
-              ladderNightProvider(ladderNightId),
-            );
-            return ladderNightValue.simpleWhen((final night) {
-              final teamValue = ref.watch(showdownTeamProvider(night.teamId));
-              return CommonShortcuts(
-                newCallback: () => _createGame(ref),
-                child: SimpleScaffold(
-                  title: 'Games',
-                  body: teamValue.simpleWhen((final team) {
-                    if (games.isEmpty) {
-                      return const CustomCenterText(
-                        text: 'There are no games for this night.',
-                      );
-                    }
-                    return ListView.builder(
-                      itemBuilder: (final context, final index) {
-                        final game = games[index];
-                        final query = database.managers.showdownGames.filter(
-                          (final f) => f.id.equals(game.id),
-                        );
-                        final previousSlot =
-                            game.createdAt - team.gameLength.minutes;
-                        final nextSlot =
-                            game.createdAt + team.gameLength.minutes;
-                        return PerformableActionsListTile(
-                          actions: [
-                            PerformableAction(
-                              name: 'Move game forward',
-                              activator: moveUpShortcut,
-                              invoke: () async {
-                                await query.update(
-                                  (final o) => o(createdAt: Value(nextSlot)),
-                                );
-                                ref.invalidate(gamesProvider(night.id));
-                              },
-                            ),
-                            if (previousSlot.isAfter(night.createdAt) ||
-                                previousSlot.isAtSameHourAs(night.createdAt))
-                              PerformableAction(
-                                name: 'Move game back',
-                                activator: moveDownShortcut,
-                                invoke: () async {
-                                  await query.update(
-                                    (final o) =>
-                                        o(createdAt: Value(previousSlot)),
-                                  );
-                                  ref.invalidate(gamesProvider(night.id));
-                                },
-                              ),
-                            PerformableAction(
-                              name: 'Delete game',
-                              activator: deleteShortcut,
-                              invoke: () async {
-                                final points = await ref.read(
-                                  gamePointsProvider(game.id).future,
-                                );
-                                if (points.isNotEmpty) {
-                                  if (context.mounted) {
-                                    await context.showMessage(
-                                      message:
-                                          // ignore: lines_longer_than_80_chars
-                                          'You cannot delete this game as it has attached results.',
-                                    );
-                                  }
-                                  return;
-                                }
-                                await query.delete();
-                                ref.invalidate(gamesProvider(night.id));
-                              },
-                            ),
-                          ],
-                          autofocus: index == 0,
-                          title: PlayersCustomText(
-                            firstPlayerId: game.firstPlayerId,
-                            secondPlayerId: game.secondPlayerId,
-                          ),
-                          subtitle: CustomText(
-                            text: timeFormat.format(game.createdAt),
-                          ),
-                          onTap: () {},
-                        );
-                      },
-                      itemCount: games.length,
-                      shrinkWrap: true,
-                    );
-                  }),
-                  floatingActionButton: NewButton(
-                    onPressed: () => _createGame(ref),
-                    tooltip: 'New game',
-                  ),
+  Widget build(final BuildContext context, final WidgetRef ref) =>
+      FontShortcuts(
+        child: Cancel(
+          child: TabbedScaffold(
+            tabs: [
+              TabbedScaffoldTab(
+                title: 'Games',
+                icon: const Icon(Icons.emoji_events),
+                child: CommonShortcuts(
+                  child: GamesPage(ladderNightId: ladderNightId),
+                  newCallback: () => _createGame(ref),
                 ),
-              );
-            });
-          },
-          error: ErrorScreen.withPositional,
-          loading: LoadingScreen.new,
+                floatingActionButton: NewButton(
+                  onPressed: () => _createGame(ref),
+                  tooltip: 'New game',
+                ),
+              ),
+              TabbedScaffoldTab(
+                title: 'Players',
+                icon: const Icon(Icons.group),
+                child: PlayerAttendancePage(ladderNightId: ladderNightId),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 
   /// Create a new game.
   Future<void> _createGame(final WidgetRef ref) async {

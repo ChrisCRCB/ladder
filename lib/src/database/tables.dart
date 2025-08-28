@@ -144,3 +144,25 @@ class ShowdownChallenges extends Table with IdMixin, CreatedAtMixin {
     onDelete: KeyAction.cascade,
   )();
 }
+
+/// The ladder night absences table.
+@TableIndex(
+  name: 'absence_index',
+  columns: {#teamPlayerId, #ladderNightId},
+  unique: true,
+)
+class LadderNightAbsences extends Table with IdMixin {
+  /// The ID of the player whose absence will be recorded.
+  late final teamPlayerId = integer().references(
+    TeamPlayers,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+
+  /// The ID of the ladder night when the player will be absent.
+  late final ladderNightId = integer().references(
+    LadderNights,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+}

@@ -47,6 +47,7 @@ Future<List<TeamPlayer>> teamPlayers(final Ref ref, final int teamId) {
   final database = ref.watch(databaseProvider);
   return database.managers.teamPlayers
       .filter((final f) => f.teamId.id.equals(teamId))
+      .orderBy((final o) => o.points.desc())
       .orderBy((final o) => o.name.asc())
       .get();
 }
@@ -103,20 +104,32 @@ Future<List<ShowdownGame>> games(final Ref ref, final int ladderNightId) {
 Future<List<TeamPlayer>> challengeablePlayers(
   final Ref ref,
   final int playerId,
+  final int ladderNightId,
 ) async {
-  final database = ref.watch(databaseProvider);
-  final player = await ref.watch(teamPlayerProvider(playerId).future);
-  final team = await ref.watch(showdownTeamProvider(player.teamId).future);
-  return database.managers.teamPlayers
-      .filter(
-        (final f) =>
-            f.teamId.id.equals(player.teamId) &
-            f.id.not.equals(playerId) &
-            f.points.isBiggerOrEqualTo(player.points - team.challengePoints) &
-            f.points.isSmallerOrEqualTo(player.points + team.challengePoints),
-      )
-      .orderBy((final o) => o.name.asc())
-      .get();
+  final db = ref.watch(databaseProvider);
+  final firstPlayer = await ref.watch(teamPlayerProvider(playerId).future);
+  final team = await ref.watch(showdownTeamProvider(firstPlayer.teamId).future);
+  final query =
+      await (db.select(db.teamPlayers).join([
+            innerJoin(
+              db.ladderNights,
+              db.teamPlayers.teamId.equalsExp(db.ladderNights.teamId),
+            ),
+            leftOuterJoin(
+              db.ladderNightAbsences,
+              db.ladderNightAbsences.teamPlayerId.equalsExp(db.teamPlayers.id) &
+                  db.ladderNightAbsences.ladderNightId.equals(ladderNightId),
+              useColumns: false,
+            ),
+          ])..where(
+            db.teamPlayers.points.isBetween(
+              Constant(firstPlayer.points - team.challengePoints),
+              Constant(firstPlayer.points + team.challengePoints),
+            ),
+          ))
+          .get();
+  final results = query.map((final row) => row.readTable(db.teamPlayers));
+  return results.toList();
 }
 
 /// Provide all the points for the given game.
@@ -127,4 +140,57 @@ Future<List<GamePoint>> gamePoints(final Ref ref, final int gameId) {
       .filter((final f) => f.gameId.id.equals(gameId))
       .orderBy((final o) => o.createdAt.asc())
       .get();
+}
+
+/// Provide all the players who are attending the given ladder night.
+@riverpod
+Future<List<TeamPlayer>> attendingTeamPlayers(
+  final Ref ref,
+  final int ladderNightId,
+) async {
+  final db = ref.watch(databaseProvider);
+  final query = await (db.select(db.teamPlayers).join([
+    innerJoin(
+      db.ladderNights,
+      db.ladderNights.teamId.equalsExp(db.teamPlayers.teamId),
+      useColumns: false,
+    ),
+    leftOuterJoin(
+      db.ladderNightAbsences,
+      db.teamPlayers.id.equalsExp(db.ladderNightAbsences.teamPlayerId) &
+          db.ladderNightAbsences.ladderNightId.equals(ladderNightId),
+      useColumns: false,
+    ),
+  ])..where(db.ladderNightAbsences.id.equalsExp(const Constant(null)))).get();
+  final results = query.map((final row) => row.readTable(db.teamPlayers));
+  return results.toList();
+}
+
+/// Provide a list of player attendances for the given ladder night.
+@riverpod
+Future<List<PlayerAttendance>> playerAttendance(
+  final Ref ref,
+  final int ladderNightId,
+) async {
+  final db = ref.watch(databaseProvider);
+  final query = db.select(db.teamPlayers).join([
+    innerJoin(
+      db.ladderNights,
+      db.teamPlayers.teamId.equalsExp(db.ladderNights.teamId),
+    ),
+    leftOuterJoin(
+      db.ladderNightAbsences,
+      db.ladderNightAbsences.ladderNightId.equals(ladderNightId) &
+          db.ladderNightAbsences.teamPlayerId.equalsExp(db.teamPlayers.id),
+    ),
+  ]);
+  final results = await query.get();
+  return results
+      .map(
+        (final row) => PlayerAttendance(
+          player: row.readTable(db.teamPlayers),
+          absence: row.readTableOrNull(db.ladderNightAbsences),
+        ),
+      )
+      .toList();
 }

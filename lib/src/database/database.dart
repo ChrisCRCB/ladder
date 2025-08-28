@@ -18,6 +18,7 @@ part 'database.g.dart';
     ShowdownGames,
     ShowdownChallenges,
     GamePoints,
+    LadderNightAbsences,
   ],
 )
 class LadderDatabase extends _$LadderDatabase {
@@ -33,7 +34,7 @@ class LadderDatabase extends _$LadderDatabase {
 
   /// The schema version to use.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   /// The migration strategy to use.
   @override
@@ -43,6 +44,9 @@ class LadderDatabase extends _$LadderDatabase {
     onUpgrade: (final m, final from, final to) async {
       if (from < 2) {
         await m.addColumn(gamePoints, gamePoints.createdAt);
+      }
+      if (from < 3) {
+        await m.createTable(ladderNightAbsences);
       }
     },
   );
