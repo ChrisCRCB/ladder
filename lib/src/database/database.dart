@@ -16,7 +16,6 @@ part 'database.g.dart';
     TeamPlayers,
     LadderNights,
     ShowdownGames,
-    ShowdownChallenges,
     GamePoints,
     LadderNightAbsences,
   ],
@@ -34,20 +33,13 @@ class LadderDatabase extends _$LadderDatabase {
 
   /// The schema version to use.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 1;
 
   /// The migration strategy to use.
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (final m) => m.createAll(),
     beforeOpen: (final details) => customStatement('PRAGMA foreign_keys = ON'),
-    onUpgrade: (final m, final from, final to) async {
-      if (from < 2) {
-        await m.addColumn(gamePoints, gamePoints.createdAt);
-      }
-      if (from < 3) {
-        await m.createTable(ladderNightAbsences);
-      }
-    },
+    onUpgrade: (final m, final from, final to) async {},
   );
 }

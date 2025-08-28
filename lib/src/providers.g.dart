@@ -704,6 +704,85 @@ final class GamesFamily extends $Family
   String toString() => r'gamesProvider';
 }
 
+/// Provide a single game.
+@ProviderFor(game)
+const gameProvider = GameFamily._();
+
+/// Provide a single game.
+final class GameProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<ShowdownGame>,
+          ShowdownGame,
+          FutureOr<ShowdownGame>
+        >
+    with $FutureModifier<ShowdownGame>, $FutureProvider<ShowdownGame> {
+  /// Provide a single game.
+  const GameProvider._({
+    required GameFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'gameProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$gameHash();
+
+  @override
+  String toString() {
+    return r'gameProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<ShowdownGame> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<ShowdownGame> create(Ref ref) {
+    final argument = this.argument as int;
+    return game(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GameProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$gameHash() => r'1bc450e0263796d6d03064be8f95ce14c7dcf99b';
+
+/// Provide a single game.
+final class GameFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<ShowdownGame>, int> {
+  const GameFamily._()
+    : super(
+        retry: null,
+        name: r'gameProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provide a single game.
+  GameProvider call(int gameId) => GameProvider._(argument: gameId, from: this);
+
+  @override
+  String toString() => r'gameProvider';
+}
+
 /// Provide all the players which the given player can challenge.
 @ProviderFor(challengeablePlayers)
 const challengeablePlayersProvider = ChallengeablePlayersFamily._();
@@ -763,7 +842,7 @@ final class ChallengeablePlayersProvider
 }
 
 String _$challengeablePlayersHash() =>
-    r'282578eeed3917433f19eec4595c71d76eb88920';
+    r'f155ed6087ae0c1ae7283b0e2ce60ee8e8be180d';
 
 /// Provide all the players which the given player can challenge.
 final class ChallengeablePlayersFamily extends $Family
@@ -788,12 +867,12 @@ final class ChallengeablePlayersFamily extends $Family
   String toString() => r'challengeablePlayersProvider';
 }
 
-/// Provide all the points for the given game.
-@ProviderFor(gamePoints)
-const gamePointsProvider = GamePointsFamily._();
+/// Provide all the points for the given set.
+@ProviderFor(setPoints)
+const setPointsProvider = SetPointsFamily._();
 
-/// Provide all the points for the given game.
-final class GamePointsProvider
+/// Provide all the points for the given set.
+final class SetPointsProvider
     extends
         $FunctionalProvider<
           AsyncValue<List<GamePoint>>,
@@ -801,24 +880,24 @@ final class GamePointsProvider
           FutureOr<List<GamePoint>>
         >
     with $FutureModifier<List<GamePoint>>, $FutureProvider<List<GamePoint>> {
-  /// Provide all the points for the given game.
-  const GamePointsProvider._({
-    required GamePointsFamily super.from,
+  /// Provide all the points for the given set.
+  const SetPointsProvider._({
+    required SetPointsFamily super.from,
     required int super.argument,
   }) : super(
          retry: null,
-         name: r'gamePointsProvider',
+         name: r'setPointsProvider',
          isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
 
   @override
-  String debugGetCreateSourceHash() => _$gamePointsHash();
+  String debugGetCreateSourceHash() => _$setPointsHash();
 
   @override
   String toString() {
-    return r'gamePointsProvider'
+    return r'setPointsProvider'
         ''
         '($argument)';
   }
@@ -832,12 +911,12 @@ final class GamePointsProvider
   @override
   FutureOr<List<GamePoint>> create(Ref ref) {
     final argument = this.argument as int;
-    return gamePoints(ref, argument);
+    return setPoints(ref, argument);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is GamePointsProvider && other.argument == argument;
+    return other is SetPointsProvider && other.argument == argument;
   }
 
   @override
@@ -846,26 +925,26 @@ final class GamePointsProvider
   }
 }
 
-String _$gamePointsHash() => r'e469058eb969ab195c609a03604cd6527d40dd47';
+String _$setPointsHash() => r'1c434816e563efb0409a222e3c404525976dc0d1';
 
-/// Provide all the points for the given game.
-final class GamePointsFamily extends $Family
+/// Provide all the points for the given set.
+final class SetPointsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<GamePoint>>, int> {
-  const GamePointsFamily._()
+  const SetPointsFamily._()
     : super(
         retry: null,
-        name: r'gamePointsProvider',
+        name: r'setPointsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
-  /// Provide all the points for the given game.
-  GamePointsProvider call(int gameId) =>
-      GamePointsProvider._(argument: gameId, from: this);
+  /// Provide all the points for the given set.
+  SetPointsProvider call(int setId) =>
+      SetPointsProvider._(argument: setId, from: this);
 
   @override
-  String toString() => r'gamePointsProvider';
+  String toString() => r'setPointsProvider';
 }
 
 /// Provide all the players who are attending the given ladder night.
@@ -1029,6 +1108,86 @@ final class PlayerAttendanceFamily extends $Family
 
   @override
   String toString() => r'playerAttendanceProvider';
+}
+
+/// Provide the sets in a given game.
+@ProviderFor(gameSets)
+const gameSetsProvider = GameSetsFamily._();
+
+/// Provide the sets in a given game.
+final class GameSetsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<GameSet>>,
+          List<GameSet>,
+          FutureOr<List<GameSet>>
+        >
+    with $FutureModifier<List<GameSet>>, $FutureProvider<List<GameSet>> {
+  /// Provide the sets in a given game.
+  const GameSetsProvider._({
+    required GameSetsFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'gameSetsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$gameSetsHash();
+
+  @override
+  String toString() {
+    return r'gameSetsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<GameSet>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<GameSet>> create(Ref ref) {
+    final argument = this.argument as int;
+    return gameSets(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GameSetsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$gameSetsHash() => r'5d1093d019ad7e5976bcaf5b2b498cc6ab7bbadd';
+
+/// Provide the sets in a given game.
+final class GameSetsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<GameSet>>, int> {
+  const GameSetsFamily._()
+    : super(
+        retry: null,
+        name: r'gameSetsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provide the sets in a given game.
+  GameSetsProvider call(int gameId) =>
+      GameSetsProvider._(argument: gameId, from: this);
+
+  @override
+  String toString() => r'gameSetsProvider';
 }
 
 // ignore_for_file: type=lint

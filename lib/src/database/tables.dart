@@ -100,6 +100,23 @@ class ShowdownGames extends Table with IdMixin, CreatedAtMixin {
   )();
 }
 
+/// A set in a [ShowdownGame].
+class GameSets extends Table with IdMixin {
+  /// The ID of the first player to serve.
+  late final startingPlayerId = integer().references(
+    TeamPlayers,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+
+  /// The ID of the game which this set is part of.
+  late final gameId = integer().references(
+    ShowdownGames,
+    #id,
+    onDelete: KeyAction.cascade,
+  )();
+}
+
 /// A point which has been awarded in a [ShowdownGame].
 class GamePoints extends Table with IdMixin, CreatedAtMixin {
   /// The ID of the player who was awarded the points.
@@ -109,9 +126,9 @@ class GamePoints extends Table with IdMixin, CreatedAtMixin {
     onDelete: KeyAction.cascade,
   )();
 
-  /// The ID of the game in which the points were awarded.
-  late final gameId = integer().references(
-    ShowdownGames,
+  /// The ID of the [GameSet] in which the points were awarded.
+  late final gameSetId = integer().references(
+    GameSets,
     #id,
     onDelete: KeyAction.cascade,
   )();
@@ -119,27 +136,6 @@ class GamePoints extends Table with IdMixin, CreatedAtMixin {
   /// The ID of the point that was awarded.
   late final pointId = integer().references(
     ShowdownPoints,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
-}
-
-/// A challenge between two players.
-class ShowdownChallenges extends Table with IdMixin, CreatedAtMixin {
-  /// The ID of the first player.
-  ///
-  /// The first player is the one who initiated the challenge.
-  @ReferenceName('challengesAsFirstPlayer')
-  late final firstPlayerId = integer().references(
-    TeamPlayers,
-    #id,
-    onDelete: KeyAction.cascade,
-  )();
-
-  /// The ID of the second player.
-  @ReferenceName('challengesAsSecondPlayer')
-  late final secondPlayerId = integer().references(
-    TeamPlayers,
     #id,
     onDelete: KeyAction.cascade,
   )();

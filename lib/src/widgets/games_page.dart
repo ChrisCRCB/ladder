@@ -66,15 +66,15 @@ class GamesPage extends ConsumerWidget {
                     name: 'Delete game',
                     activator: deleteShortcut,
                     invoke: () async {
-                      final points = await ref.read(
-                        gamePointsProvider(game.id).future,
+                      final sets = await ref.read(
+                        gameSetsProvider(game.id).future,
                       );
-                      if (points.isNotEmpty) {
+                      if (sets.isNotEmpty) {
                         if (context.mounted) {
                           await context.showMessage(
                             message:
                                 // ignore: lines_longer_than_80_chars
-                                'You cannot delete this game as it has attached results.',
+                                'You cannot delete this game as it has at least 1 set.',
                           );
                         }
                         return;
@@ -90,7 +90,9 @@ class GamesPage extends ConsumerWidget {
                   secondPlayerId: game.secondPlayerId,
                 ),
                 subtitle: CustomText(text: timeFormat.format(game.createdAt)),
-                onTap: () {},
+                onTap: () => context.pushWidgetBuilder(
+                  (_) => EditGameScreen(gameId: game.id),
+                ),
               );
             },
             itemCount: games.length,

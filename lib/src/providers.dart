@@ -99,6 +99,15 @@ Future<List<ShowdownGame>> games(final Ref ref, final int ladderNightId) {
       .get();
 }
 
+/// Provide a single game.
+@riverpod
+Future<ShowdownGame> game(final Ref ref, final int gameId) {
+  final database = ref.watch(databaseProvider);
+  return database.managers.showdownGames
+      .filter((final f) => f.id.equals(gameId))
+      .getSingle();
+}
+
 /// Provide all the players which the given player can challenge.
 @riverpod
 Future<List<TeamPlayer>> challengeablePlayers(
@@ -132,19 +141,29 @@ Future<List<TeamPlayer>> challengeablePlayers(
                   Constant(firstPlayer.points - team.challengePoints),
                   Constant(firstPlayer.points + team.challengePoints),
                 ) &
-                players.id.isNotValue(firstPlayer.id),
+                players.id.isNotValue(firstPlayer.id) &
+                notExistsQuery(
+                  db.select(db.showdownGames)..where(
+                    (final g) =>
+                        g.ladderNightId.equals(ladderNightId) &
+                        ((g.firstPlayerId.equals(firstPlayer.id) &
+                                g.secondPlayerId.equalsExp(players.id)) |
+                            (g.secondPlayerId.equals(firstPlayer.id) &
+                                g.firstPlayerId.equalsExp(players.id))),
+                  ),
+                ),
           ))
           .get();
   final results = query.map((final row) => row.readTable(players));
   return results.toList();
 }
 
-/// Provide all the points for the given game.
+/// Provide all the points for the given set.
 @riverpod
-Future<List<GamePoint>> gamePoints(final Ref ref, final int gameId) {
+Future<List<GamePoint>> setPoints(final Ref ref, final int setId) async {
   final database = ref.watch(databaseProvider);
   return database.managers.gamePoints
-      .filter((final f) => f.gameId.id.equals(gameId))
+      .filter((final f) => f.gameSetId.id.equals(setId))
       .orderBy((final o) => o.createdAt.asc())
       .get();
 }
@@ -200,4 +219,13 @@ Future<List<PlayerAttendance>> playerAttendance(
         ),
       )
       .toList();
+}
+
+/// Provide the sets in a given game.
+@riverpod
+Future<List<GameSet>> gameSets(final Ref ref, final int gameId) {
+  final database = ref.watch(databaseProvider);
+  return database.managers.gameSets
+      .filter((final f) => f.gameId.id.equals(gameId))
+      .get();
 }
