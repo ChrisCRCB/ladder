@@ -118,3 +118,13 @@ Future<List<TeamPlayer>> challengeablePlayers(
       .orderBy((final o) => o.name.asc())
       .get();
 }
+
+/// Provide all the points for the given game.
+@riverpod
+Future<List<GamePoint>> gamePoints(final Ref ref, final int gameId) {
+  final database = ref.watch(databaseProvider);
+  return database.managers.gamePoints
+      .filter((final f) => f.gameId.id.equals(gameId))
+      .orderBy((final o) => o.createdAt.asc())
+      .get();
+}

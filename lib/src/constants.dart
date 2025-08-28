@@ -22,3 +22,6 @@ const defaultPoints = <String, int>{
 
 /// The date format to use.
 final dateFormat = DateFormat('EEEE d MMMM y HH:mm');
+
+/// The format for times.
+final timeFormat = DateFormat('HH:mm');

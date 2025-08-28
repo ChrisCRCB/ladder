@@ -2193,6 +2193,18 @@ class $GamePointsTable extends GamePoints
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
   static const VerificationMeta _playerIdMeta = const VerificationMeta(
     'playerId',
   );
@@ -2234,7 +2246,13 @@ class $GamePointsTable extends GamePoints
     ),
   );
   @override
-  List<GeneratedColumn> get $columns => [id, playerId, gameId, pointId];
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    playerId,
+    gameId,
+    pointId,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2249,6 +2267,12 @@ class $GamePointsTable extends GamePoints
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     if (data.containsKey('player_id')) {
       context.handle(
@@ -2287,6 +2311,10 @@ class $GamePointsTable extends GamePoints
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
       playerId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}player_id'],
@@ -2312,6 +2340,9 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
   /// The primary key.
   final int id;
 
+  /// The date and time this row was created.
+  final DateTime createdAt;
+
   /// The ID of the player who was awarded the points.
   final int playerId;
 
@@ -2322,6 +2353,7 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
   final int pointId;
   const GamePoint({
     required this.id,
+    required this.createdAt,
     required this.playerId,
     required this.gameId,
     required this.pointId,
@@ -2330,6 +2362,7 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
     map['player_id'] = Variable<int>(playerId);
     map['game_id'] = Variable<int>(gameId);
     map['point_id'] = Variable<int>(pointId);
@@ -2339,6 +2372,7 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
   GamePointsCompanion toCompanion(bool nullToAbsent) {
     return GamePointsCompanion(
       id: Value(id),
+      createdAt: Value(createdAt),
       playerId: Value(playerId),
       gameId: Value(gameId),
       pointId: Value(pointId),
@@ -2352,6 +2386,7 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return GamePoint(
       id: serializer.fromJson<int>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       playerId: serializer.fromJson<int>(json['playerId']),
       gameId: serializer.fromJson<int>(json['gameId']),
       pointId: serializer.fromJson<int>(json['pointId']),
@@ -2362,22 +2397,30 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
       'playerId': serializer.toJson<int>(playerId),
       'gameId': serializer.toJson<int>(gameId),
       'pointId': serializer.toJson<int>(pointId),
     };
   }
 
-  GamePoint copyWith({int? id, int? playerId, int? gameId, int? pointId}) =>
-      GamePoint(
-        id: id ?? this.id,
-        playerId: playerId ?? this.playerId,
-        gameId: gameId ?? this.gameId,
-        pointId: pointId ?? this.pointId,
-      );
+  GamePoint copyWith({
+    int? id,
+    DateTime? createdAt,
+    int? playerId,
+    int? gameId,
+    int? pointId,
+  }) => GamePoint(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    playerId: playerId ?? this.playerId,
+    gameId: gameId ?? this.gameId,
+    pointId: pointId ?? this.pointId,
+  );
   GamePoint copyWithCompanion(GamePointsCompanion data) {
     return GamePoint(
       id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       playerId: data.playerId.present ? data.playerId.value : this.playerId,
       gameId: data.gameId.present ? data.gameId.value : this.gameId,
       pointId: data.pointId.present ? data.pointId.value : this.pointId,
@@ -2388,6 +2431,7 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
   String toString() {
     return (StringBuffer('GamePoint(')
           ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
           ..write('playerId: $playerId, ')
           ..write('gameId: $gameId, ')
           ..write('pointId: $pointId')
@@ -2396,12 +2440,13 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
   }
 
   @override
-  int get hashCode => Object.hash(id, playerId, gameId, pointId);
+  int get hashCode => Object.hash(id, createdAt, playerId, gameId, pointId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is GamePoint &&
           other.id == this.id &&
+          other.createdAt == this.createdAt &&
           other.playerId == this.playerId &&
           other.gameId == this.gameId &&
           other.pointId == this.pointId);
@@ -2409,17 +2454,20 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
 
 class GamePointsCompanion extends UpdateCompanion<GamePoint> {
   final Value<int> id;
+  final Value<DateTime> createdAt;
   final Value<int> playerId;
   final Value<int> gameId;
   final Value<int> pointId;
   const GamePointsCompanion({
     this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
     this.playerId = const Value.absent(),
     this.gameId = const Value.absent(),
     this.pointId = const Value.absent(),
   });
   GamePointsCompanion.insert({
     this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
     required int playerId,
     required int gameId,
     required int pointId,
@@ -2428,12 +2476,14 @@ class GamePointsCompanion extends UpdateCompanion<GamePoint> {
        pointId = Value(pointId);
   static Insertable<GamePoint> custom({
     Expression<int>? id,
+    Expression<DateTime>? createdAt,
     Expression<int>? playerId,
     Expression<int>? gameId,
     Expression<int>? pointId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
       if (playerId != null) 'player_id': playerId,
       if (gameId != null) 'game_id': gameId,
       if (pointId != null) 'point_id': pointId,
@@ -2442,12 +2492,14 @@ class GamePointsCompanion extends UpdateCompanion<GamePoint> {
 
   GamePointsCompanion copyWith({
     Value<int>? id,
+    Value<DateTime>? createdAt,
     Value<int>? playerId,
     Value<int>? gameId,
     Value<int>? pointId,
   }) {
     return GamePointsCompanion(
       id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
       playerId: playerId ?? this.playerId,
       gameId: gameId ?? this.gameId,
       pointId: pointId ?? this.pointId,
@@ -2459,6 +2511,9 @@ class GamePointsCompanion extends UpdateCompanion<GamePoint> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
     }
     if (playerId.present) {
       map['player_id'] = Variable<int>(playerId.value);
@@ -2476,6 +2531,7 @@ class GamePointsCompanion extends UpdateCompanion<GamePoint> {
   String toString() {
     return (StringBuffer('GamePointsCompanion(')
           ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
           ..write('playerId: $playerId, ')
           ..write('gameId: $gameId, ')
           ..write('pointId: $pointId')
@@ -5763,6 +5819,7 @@ typedef $$ShowdownChallengesTableProcessedTableManager =
 typedef $$GamePointsTableCreateCompanionBuilder =
     GamePointsCompanion Function({
       Value<int> id,
+      Value<DateTime> createdAt,
       required int playerId,
       required int gameId,
       required int pointId,
@@ -5770,6 +5827,7 @@ typedef $$GamePointsTableCreateCompanionBuilder =
 typedef $$GamePointsTableUpdateCompanionBuilder =
     GamePointsCompanion Function({
       Value<int> id,
+      Value<DateTime> createdAt,
       Value<int> playerId,
       Value<int> gameId,
       Value<int> pointId,
@@ -5848,6 +5906,11 @@ class $$GamePointsTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5935,6 +5998,11 @@ class $$GamePointsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$TeamPlayersTableOrderingComposer get playerId {
     final $$TeamPlayersTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -6016,6 +6084,9 @@ class $$GamePointsTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
   $$TeamPlayersTableAnnotationComposer get playerId {
     final $$TeamPlayersTableAnnotationComposer composer = $composerBuilder(
@@ -6116,11 +6187,13 @@ class $$GamePointsTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
                 Value<int> playerId = const Value.absent(),
                 Value<int> gameId = const Value.absent(),
                 Value<int> pointId = const Value.absent(),
               }) => GamePointsCompanion(
                 id: id,
+                createdAt: createdAt,
                 playerId: playerId,
                 gameId: gameId,
                 pointId: pointId,
@@ -6128,11 +6201,13 @@ class $$GamePointsTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
                 required int playerId,
                 required int gameId,
                 required int pointId,
               }) => GamePointsCompanion.insert(
                 id: id,
+                createdAt: createdAt,
                 playerId: playerId,
                 gameId: gameId,
                 pointId: pointId,

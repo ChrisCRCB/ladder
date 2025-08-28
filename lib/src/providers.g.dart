@@ -785,5 +785,85 @@ final class ChallengeablePlayersFamily extends $Family
   String toString() => r'challengeablePlayersProvider';
 }
 
+/// Provide all the points for the given game.
+@ProviderFor(gamePoints)
+const gamePointsProvider = GamePointsFamily._();
+
+/// Provide all the points for the given game.
+final class GamePointsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<GamePoint>>,
+          List<GamePoint>,
+          FutureOr<List<GamePoint>>
+        >
+    with $FutureModifier<List<GamePoint>>, $FutureProvider<List<GamePoint>> {
+  /// Provide all the points for the given game.
+  const GamePointsProvider._({
+    required GamePointsFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'gamePointsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$gamePointsHash();
+
+  @override
+  String toString() {
+    return r'gamePointsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<GamePoint>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<GamePoint>> create(Ref ref) {
+    final argument = this.argument as int;
+    return gamePoints(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GamePointsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$gamePointsHash() => r'e469058eb969ab195c609a03604cd6527d40dd47';
+
+/// Provide all the points for the given game.
+final class GamePointsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<GamePoint>>, int> {
+  const GamePointsFamily._()
+    : super(
+        retry: null,
+        name: r'gamePointsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provide all the points for the given game.
+  GamePointsProvider call(int gameId) =>
+      GamePointsProvider._(argument: gameId, from: this);
+
+  @override
+  String toString() => r'gamePointsProvider';
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

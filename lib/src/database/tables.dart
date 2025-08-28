@@ -101,7 +101,7 @@ class ShowdownGames extends Table with IdMixin, CreatedAtMixin {
 }
 
 /// A point which has been awarded in a [ShowdownGame].
-class GamePoints extends Table with IdMixin {
+class GamePoints extends Table with IdMixin, CreatedAtMixin {
   /// The ID of the player who was awarded the points.
   late final playerId = integer().references(
     TeamPlayers,
