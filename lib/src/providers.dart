@@ -229,3 +229,16 @@ Future<List<GameSet>> gameSets(final Ref ref, final int gameId) {
       .filter((final f) => f.gameId.id.equals(gameId))
       .get();
 }
+
+/// Return the players who are involved in a given game.
+@riverpod
+Future<List<TeamPlayer>> gamePlayers(final Ref ref, final int gameId) async {
+  final database = ref.watch(databaseProvider);
+  final game = await ref.watch(gameProvider(gameId).future);
+  return database.managers.teamPlayers
+      .filter(
+        (final f) =>
+            f.id.equals(game.firstPlayerId) | f.id.equals(game.secondPlayerId),
+      )
+      .get();
+}

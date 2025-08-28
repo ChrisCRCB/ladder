@@ -1190,5 +1190,85 @@ final class GameSetsFamily extends $Family
   String toString() => r'gameSetsProvider';
 }
 
+/// Return the players who are involved in a given game.
+@ProviderFor(gamePlayers)
+const gamePlayersProvider = GamePlayersFamily._();
+
+/// Return the players who are involved in a given game.
+final class GamePlayersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<TeamPlayer>>,
+          List<TeamPlayer>,
+          FutureOr<List<TeamPlayer>>
+        >
+    with $FutureModifier<List<TeamPlayer>>, $FutureProvider<List<TeamPlayer>> {
+  /// Return the players who are involved in a given game.
+  const GamePlayersProvider._({
+    required GamePlayersFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'gamePlayersProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$gamePlayersHash();
+
+  @override
+  String toString() {
+    return r'gamePlayersProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<TeamPlayer>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<TeamPlayer>> create(Ref ref) {
+    final argument = this.argument as int;
+    return gamePlayers(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GamePlayersProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$gamePlayersHash() => r'7f8b5cca0210351f8ad0eef9ecd8e15473efe00c';
+
+/// Return the players who are involved in a given game.
+final class GamePlayersFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<TeamPlayer>>, int> {
+  const GamePlayersFamily._()
+    : super(
+        retry: null,
+        name: r'gamePlayersProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Return the players who are involved in a given game.
+  GamePlayersProvider call(int gameId) =>
+      GamePlayersProvider._(argument: gameId, from: this);
+
+  @override
+  String toString() => r'gamePlayersProvider';
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
