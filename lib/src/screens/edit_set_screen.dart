@@ -33,8 +33,8 @@ class EditSetScreen extends ConsumerWidget {
               title: 'Set #$setNumber',
               body: value.simpleWhen((final players) {
                 final value = ref.watch(setPointsProvider(setId));
-                return value.when(
-                  data: (final points) => ListView(
+                return value.simpleWhen(
+                  (final points) => ListView(
                     shrinkWrap: true,
                     children: [
                       ...players.map(
@@ -44,39 +44,29 @@ class EditSetScreen extends ConsumerWidget {
                             playerId: player.id,
                             points: _getPoints(points, player),
                           ),
+                          onTap: () => context.pushWidgetBuilder(
+                            (_) => CreateGamePointScreen(
+                              setId: setId,
+                              playerId: player.id,
+                            ),
+                          ),
                         ),
                       ),
-                      ...points.map((final point) {
-                        final player = players.firstWhere(
-                          (final player) => player.id == point.playerId,
-                        );
+                      ...points.map((final pointContext) {
+                        final playerId = pointContext.gamePoint.playerId;
+                        final point = pointContext.showdownPoint;
                         return ListTile(
                           title: PlayerCustomText(
-                            playerId: point.playerId,
-                            points: _getPoints(points, player),
+                            playerId: playerId,
+                            showPoints: false,
+                          ),
+                          subtitle: CustomText(
+                            text: '${point.name} (${point.value})',
                           ),
                           onTap: () {},
                         );
                       }),
                     ],
-                  ),
-                  error: ErrorListView.withPositional,
-                  loading: () => ListView.builder(
-                    itemBuilder: (final context, final index) {
-                      final player = players[index];
-                      return ListTile(
-                        autofocus: index == 0,
-                        title: PlayerCustomText(playerId: player.id, points: 0),
-                        onTap: () => context.pushWidgetBuilder(
-                          (_) => CreateGamePointScreen(
-                            setId: setId,
-                            playerId: player.id,
-                          ),
-                        ),
-                      );
-                    },
-                    itemCount: players.length,
-                    shrinkWrap: true,
                   ),
                 );
               }),
@@ -90,14 +80,20 @@ class EditSetScreen extends ConsumerWidget {
   }
 
   /// Get the points for the given [player].
-  int _getPoints(final List<GamePoint> points, final TeamPlayer player) {
-    var i = 0;
-    for (final point in points) {
-      if ((point.playerId == player.id && point.value > 0) ||
-          (point.playerId != player.id && point.value < 0)) {
-        i += point.value;
-      }
+  int _getPoints(final List<GamePointContext> points, final TeamPlayer player) {
+    if (points.isEmpty) {
+      return 0;
     }
-    return i;
+    return points
+        .map<int>((final gamePointContext) {
+          final point = gamePointContext.showdownPoint;
+          final playerId = gamePointContext.gamePoint.playerId;
+          if ((playerId == player.id && point.value > 0) ||
+              (playerId != player.id && point.value < 0)) {
+            return point.value.abs();
+          }
+          return 0;
+        })
+        .reduce((final value, final element) => value + element);
   }
 }

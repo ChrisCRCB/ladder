@@ -160,12 +160,23 @@ Future<List<TeamPlayer>> challengeablePlayers(
 
 /// Provide all the points for the given set.
 @riverpod
-Future<List<GamePoint>> setPoints(final Ref ref, final int setId) async {
-  final database = ref.watch(databaseProvider);
-  return database.managers.gamePoints
-      .filter((final f) => f.gameSetId.id.equals(setId))
-      .orderBy((final o) => o.createdAt.asc())
-      .get();
+Future<List<GamePointContext>> setPoints(final Ref ref, final int setId) async {
+  final db = ref.watch(databaseProvider);
+  final query = db.select(db.gamePoints).join([
+    innerJoin(
+      db.showdownPoints,
+      db.showdownPoints.id.equalsExp(db.gamePoints.pointId),
+    ),
+  ])..where(db.gamePoints.gameSetId.equals(setId));
+  final results = await query.get();
+  return results
+      .map(
+        (final row) => GamePointContext(
+          gamePoint: row.readTable(db.gamePoints),
+          showdownPoint: row.readTable(db.showdownPoints),
+        ),
+      )
+      .toList();
 }
 
 /// Provide all the players who are attending the given ladder night.

@@ -1,6 +1,7 @@
 export 'src/constants.dart';
 export 'src/database/_DATABASE.dart';
 export 'src/extensions.dart';
+export 'src/game_point_context.dart';
 export 'src/json/_json.dart';
 export 'src/player_attendance.dart';
 export 'src/providers.dart';

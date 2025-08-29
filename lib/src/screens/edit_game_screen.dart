@@ -105,11 +105,15 @@ class EditGameScreen extends ConsumerWidget {
                           },
                         ),
                       ],
-                      title: CustomText(text: 'Set ${index + 1}'),
+                      title: CustomText(text: 'Set #${index + 1}'),
                       subtitle: PlayerCustomText(
                         playerId: set.startingPlayerId,
+                        showPoints: false,
                       ),
-                      onTap: () {},
+                      onTap: () => context.pushWidgetBuilder(
+                        (_) =>
+                            EditSetScreen(setId: set.id, setNumber: index + 1),
+                      ),
                     );
                   },
                   itemCount: sets.length,

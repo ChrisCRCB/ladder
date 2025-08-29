@@ -21,6 +21,18 @@ class TeamScreen extends ConsumerWidget {
       child: TabbedScaffold(
         tabs: [
           TabbedScaffoldTab(
+            title: 'Ladder Nights',
+            icon: const Icon(Icons.calendar_month),
+            child: CommonShortcuts(
+              child: LadderNightsPage(teamId: teamId),
+              newCallback: () => _createLadderNight(ref),
+            ),
+            floatingActionButton: NewButton(
+              onPressed: () => _createLadderNight(ref),
+              tooltip: 'New ladder night',
+            ),
+          ),
+          TabbedScaffoldTab(
             title: 'Players',
             icon: const Icon(Icons.people),
             child: CommonShortcuts(
@@ -42,18 +54,6 @@ class TeamScreen extends ConsumerWidget {
             floatingActionButton: NewButton(
               onPressed: () => _createPoint(ref),
               tooltip: 'Create point',
-            ),
-          ),
-          TabbedScaffoldTab(
-            title: 'Ladder Nights',
-            icon: const Icon(Icons.calendar_month),
-            child: CommonShortcuts(
-              child: LadderNightsPage(teamId: teamId),
-              newCallback: () => _createLadderNight(ref),
-            ),
-            floatingActionButton: NewButton(
-              onPressed: () => _createLadderNight(ref),
-              tooltip: 'New ladder night',
             ),
           ),
         ],
