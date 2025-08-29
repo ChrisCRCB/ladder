@@ -1090,7 +1090,7 @@ final class PlayerAttendanceProvider
   }
 }
 
-String _$playerAttendanceHash() => r'5d644e9693d367ab742ef657901864fcc5ff2d79';
+String _$playerAttendanceHash() => r'791dcf3c1d302804494f452ea4d26648b7aae4f2';
 
 /// Provide a list of player attendances for the given ladder night.
 final class PlayerAttendanceFamily extends $Family
@@ -1324,7 +1324,7 @@ final class GamePlayersProvider
   }
 }
 
-String _$gamePlayersHash() => r'7f8b5cca0210351f8ad0eef9ecd8e15473efe00c';
+String _$gamePlayersHash() => r'41d1761acd3fa1a8bb8bfa28f348dc2c98bb94e6';
 
 /// Return the players who are involved in a given game.
 final class GamePlayersFamily extends $Family
@@ -1346,12 +1346,12 @@ final class GamePlayersFamily extends $Family
   String toString() => r'gamePlayersProvider';
 }
 
-/// Provide the winner of a given set.
-@ProviderFor(setWinner)
-const setWinnerProvider = SetWinnerFamily._();
+/// Provide the result of a given set.
+@ProviderFor(setResults)
+const setResultsProvider = SetResultsFamily._();
 
-/// Provide the winner of a given set.
-final class SetWinnerProvider
+/// Provide the result of a given set.
+final class SetResultsProvider
     extends
         $FunctionalProvider<
           AsyncValue<SetResults>,
@@ -1359,24 +1359,24 @@ final class SetWinnerProvider
           FutureOr<SetResults>
         >
     with $FutureModifier<SetResults>, $FutureProvider<SetResults> {
-  /// Provide the winner of a given set.
-  const SetWinnerProvider._({
-    required SetWinnerFamily super.from,
+  /// Provide the result of a given set.
+  const SetResultsProvider._({
+    required SetResultsFamily super.from,
     required int super.argument,
   }) : super(
          retry: null,
-         name: r'setWinnerProvider',
+         name: r'setResultsProvider',
          isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
 
   @override
-  String debugGetCreateSourceHash() => _$setWinnerHash();
+  String debugGetCreateSourceHash() => _$setResultsHash();
 
   @override
   String toString() {
-    return r'setWinnerProvider'
+    return r'setResultsProvider'
         ''
         '($argument)';
   }
@@ -1389,12 +1389,12 @@ final class SetWinnerProvider
   @override
   FutureOr<SetResults> create(Ref ref) {
     final argument = this.argument as int;
-    return setWinner(ref, argument);
+    return setResults(ref, argument);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is SetWinnerProvider && other.argument == argument;
+    return other is SetResultsProvider && other.argument == argument;
   }
 
   @override
@@ -1403,26 +1403,26 @@ final class SetWinnerProvider
   }
 }
 
-String _$setWinnerHash() => r'bf81c51f441212ab37fe4223cf60a6017a51f981';
+String _$setResultsHash() => r'4cab2c019d62ac03fd4a4b41abf15353a5f277e2';
 
-/// Provide the winner of a given set.
-final class SetWinnerFamily extends $Family
+/// Provide the result of a given set.
+final class SetResultsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<SetResults>, int> {
-  const SetWinnerFamily._()
+  const SetResultsFamily._()
     : super(
         retry: null,
-        name: r'setWinnerProvider',
+        name: r'setResultsProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
-  /// Provide the winner of a given set.
-  SetWinnerProvider call(int setId) =>
-      SetWinnerProvider._(argument: setId, from: this);
+  /// Provide the result of a given set.
+  SetResultsProvider call(int setId) =>
+      SetResultsProvider._(argument: setId, from: this);
 
   @override
-  String toString() => r'setWinnerProvider';
+  String toString() => r'setResultsProvider';
 }
 
 // ignore_for_file: type=lint

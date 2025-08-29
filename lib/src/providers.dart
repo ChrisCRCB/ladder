@@ -223,17 +223,26 @@ Future<List<PlayerAttendance>> playerAttendance(
   final int ladderNightId,
 ) async {
   final db = ref.watch(databaseProvider);
-  final query = db.select(db.teamPlayers).join([
-    innerJoin(
-      db.ladderNights,
-      db.teamPlayers.teamId.equalsExp(db.ladderNights.teamId),
-    ),
-    leftOuterJoin(
-      db.ladderNightAbsences,
-      db.ladderNightAbsences.ladderNightId.equals(ladderNightId) &
-          db.ladderNightAbsences.teamPlayerId.equalsExp(db.teamPlayers.id),
-    ),
-  ]);
+  final night = await ref.watch(ladderNightProvider(ladderNightId).future);
+  final query =
+      db.select(db.teamPlayers).join([
+          innerJoin(
+            db.ladderNights,
+            db.teamPlayers.teamId.equalsExp(db.ladderNights.teamId),
+          ),
+          leftOuterJoin(
+            db.ladderNightAbsences,
+            db.ladderNightAbsences.ladderNightId.equals(ladderNightId) &
+                db.ladderNightAbsences.teamPlayerId.equalsExp(
+                  db.teamPlayers.id,
+                ),
+          ),
+        ])
+        ..where(db.teamPlayers.teamId.equals(night.teamId))
+        ..orderBy([
+          OrderingTerm.desc(db.teamPlayers.points),
+          OrderingTerm.asc(db.teamPlayers.name),
+        ]);
   final results = await query.get();
   return results
       .map(
@@ -266,19 +275,19 @@ Future<GameSet> gameSet(final Ref ref, final int setId) {
 /// Return the players who are involved in a given game.
 @riverpod
 Future<List<TeamPlayer>> gamePlayers(final Ref ref, final int gameId) async {
-  final database = ref.watch(databaseProvider);
   final game = await ref.watch(gameProvider(gameId).future);
-  return database.managers.teamPlayers
-      .filter(
-        (final f) =>
-            f.id.equals(game.firstPlayerId) | f.id.equals(game.secondPlayerId),
-      )
-      .get();
+  final firstPlayer = await ref.watch(
+    teamPlayerProvider(game.firstPlayerId).future,
+  );
+  final secondPlayer = await ref.watch(
+    teamPlayerProvider(game.secondPlayerId).future,
+  );
+  return [firstPlayer, secondPlayer];
 }
 
-/// Provide the winner of a given set.
+/// Provide the result of a given set.
 @riverpod
-Future<SetResults> setWinner(final Ref ref, final int setId) async {
+Future<SetResults> setResults(final Ref ref, final int setId) async {
   final set = await ref.watch(gameSetProvider(setId).future);
   final points = await ref.watch(setPointsProvider(setId).future);
   final players = await ref.watch(gamePlayersProvider(set.gameId).future);

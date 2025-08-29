@@ -20,7 +20,7 @@ class SetWinnerCustomText extends ConsumerWidget {
   /// Build the widget.
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
-    final value = ref.watch(setWinnerProvider(setId));
+    final value = ref.watch(setResultsProvider(setId));
     return value.when(
       data: (final results) {
         switch (results) {

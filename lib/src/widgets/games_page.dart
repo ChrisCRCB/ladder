@@ -88,9 +88,11 @@ class GamesPage extends ConsumerWidget {
                               }
                               return;
                             }
+                            var firstPlayerWins = 0;
+                            var secondPlayerWins = 0;
                             for (final set in sets) {
                               final results = await ref.read(
-                                setWinnerProvider(set.id).future,
+                                setResultsProvider(set.id).future,
                               );
                               switch (results) {
                                 case UndecidedSetResults():
@@ -104,16 +106,31 @@ class GamesPage extends ConsumerWidget {
                                   return;
                                 case DecidedSetResults():
                                   final winner = results.winner;
-                                  await database.managers.teamPlayers
-                                      .filter(
-                                        (final f) => f.id.equals(winner.id),
-                                      )
-                                      .update(
-                                        (final o) =>
-                                            o(points: Value(winner.points + 1)),
-                                      );
-                                  ref.invalidate(teamPlayerProvider(winner.id));
+                                  if (winner.id == game.firstPlayerId) {
+                                    firstPlayerWins += 1;
+                                  } else {
+                                    secondPlayerWins += 1;
+                                  }
                               }
+                            }
+                            for (final id in [
+                              game.firstPlayerId,
+                              game.secondPlayerId,
+                            ]) {
+                              final query = database.managers.teamPlayers
+                                  .filter((final f) => f.id.equals(id));
+                              final player = await query.getSingle();
+                              await query.update(
+                                (final o) => o(
+                                  points: Value(
+                                    player.points +
+                                        (id == game.firstPlayerId
+                                            ? firstPlayerWins
+                                            : secondPlayerWins),
+                                  ),
+                                ),
+                              );
+                              ref.invalidate(teamPlayerProvider(id));
                             }
                             ref.invalidate(teamPlayersProvider);
                             await query.update(
