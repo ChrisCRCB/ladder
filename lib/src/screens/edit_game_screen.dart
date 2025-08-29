@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
-import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,39 +71,20 @@ class EditGameScreen extends ConsumerWidget {
                 return ListView.builder(
                   itemBuilder: (final context, final index) {
                     final set = sets[index];
-                    return PerformableActionsListTile(
+                    return ListTile(
                       autofocus: index == 0,
-                      actions: [
-                        PerformableAction(
-                          name: 'Delete',
-                          activator: deleteShortcut,
-                          invoke: () async {
-                            final points = await ref.read(
-                              setPointsProvider(set.id).future,
-                            );
-                            if (points.isEmpty) {
-                              await database.managers.gameSets
-                                  .filter((final f) => f.id.equals(set.id))
-                                  .delete();
-                              ref.invalidate(gameSetsProvider(gameId));
-                            } else if (context.mounted) {
-                              await context.showMessage(
-                                message:
-                                    // ignore: lines_longer_than_80_chars
-                                    'You cannot delete a set which contains points.',
-                              );
-                            }
-                          },
-                        ),
-                      ],
                       title: CustomText(text: 'Set #${index + 1}'),
                       subtitle: PlayerCustomText(
                         playerId: set.startingPlayerId,
                         showPoints: false,
                       ),
+                      trailing: SetWinnerCustomText(setId: set.id),
                       onTap: () => context.pushWidgetBuilder(
-                        (_) =>
-                            EditSetScreen(setId: set.id, setNumber: index + 1),
+                        (_) => EditSetScreen(
+                          setId: set.id,
+                          setNumber: index + 1,
+                          readOnly: readOnly,
+                        ),
                       ),
                     );
                   },

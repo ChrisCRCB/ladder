@@ -37,6 +37,31 @@ class EditSetScreen extends ConsumerWidget {
           data: (final set) {
             final value = ref.watch(gamePlayersProvider(set.gameId));
             return SimpleScaffold(
+              actions: [
+                if (!readOnly)
+                  IconButton(
+                    onPressed: () async {
+                      final points = await ref.read(
+                        setPointsProvider(setId).future,
+                      );
+                      if (points.isEmpty) {
+                        await database.managers.gameSets
+                            .filter((final f) => f.id.equals(setId))
+                            .delete();
+                        ref.invalidate(gameSetProvider(setId));
+                        if (context.mounted) {
+                          context.pop();
+                        }
+                      } else if (context.mounted) {
+                        await context.showMessage(
+                          message: 'You can only delete empty sets.',
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.delete),
+                    tooltip: 'Delete set',
+                  ),
+              ],
               title: 'Set #$setNumber',
               body: value.simpleWhen((final players) {
                 final value = ref.watch(setPointsProvider(setId));
@@ -49,7 +74,7 @@ class EditSetScreen extends ConsumerWidget {
                           autofocus: player.id == players.first.id,
                           title: PlayerCustomText(
                             playerId: player.id,
-                            points: _getPoints(points, player),
+                            points: getPoints(points, player),
                           ),
                           onTap: () {
                             if (readOnly) {
@@ -150,23 +175,5 @@ class EditSetScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  /// Get the points for the given [player].
-  int _getPoints(final List<SetPointContext> points, final TeamPlayer player) {
-    if (points.isEmpty) {
-      return 0;
-    }
-    return points
-        .map<int>((final gamePointContext) {
-          final point = gamePointContext.showdownPoint;
-          final playerId = gamePointContext.setPoint.playerId;
-          if ((playerId == player.id && point.value > 0) ||
-              (playerId != player.id && point.value < 0)) {
-            return point.value.abs();
-          }
-          return 0;
-        })
-        .reduce((final value, final element) => value + element);
   }
 }

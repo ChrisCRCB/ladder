@@ -9,3 +9,4 @@ export 'player_custom_text.dart';
 export 'players_custom_text.dart';
 export 'players_page.dart';
 export 'points_page.dart';
+export 'set_winner_custom_text.dart';

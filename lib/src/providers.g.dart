@@ -1346,5 +1346,85 @@ final class GamePlayersFamily extends $Family
   String toString() => r'gamePlayersProvider';
 }
 
+/// Provide the winner of a given set.
+@ProviderFor(setWinner)
+const setWinnerProvider = SetWinnerFamily._();
+
+/// Provide the winner of a given set.
+final class SetWinnerProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<TeamPlayer?>,
+          TeamPlayer?,
+          FutureOr<TeamPlayer?>
+        >
+    with $FutureModifier<TeamPlayer?>, $FutureProvider<TeamPlayer?> {
+  /// Provide the winner of a given set.
+  const SetWinnerProvider._({
+    required SetWinnerFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'setWinnerProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$setWinnerHash();
+
+  @override
+  String toString() {
+    return r'setWinnerProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<TeamPlayer?> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<TeamPlayer?> create(Ref ref) {
+    final argument = this.argument as int;
+    return setWinner(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SetWinnerProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$setWinnerHash() => r'e8887eb994918ea5011ab3dfc8158d13427ec4e4';
+
+/// Provide the winner of a given set.
+final class SetWinnerFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<TeamPlayer?>, int> {
+  const SetWinnerFamily._()
+    : super(
+        retry: null,
+        name: r'setWinnerProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provide the winner of a given set.
+  SetWinnerProvider call(int setId) =>
+      SetWinnerProvider._(argument: setId, from: this);
+
+  @override
+  String toString() => r'setWinnerProvider';
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

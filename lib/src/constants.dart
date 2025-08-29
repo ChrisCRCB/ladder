@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:ladder/ladder.dart';
 
 /// The title to use for delete confirmation dialogues.
 const deleteConfirmationTitle = 'Confirm Delete';
@@ -25,3 +26,21 @@ final dateFormat = DateFormat('EEEE d MMMM y HH:mm');
 
 /// The format for times.
 final timeFormat = DateFormat('HH:mm');
+
+/// Calculate the [points] for the given [player].
+int getPoints(final List<SetPointContext> points, final TeamPlayer player) {
+  if (points.isEmpty) {
+    return 0;
+  }
+  return points
+      .map<int>((final gamePointContext) {
+        final point = gamePointContext.showdownPoint;
+        final playerId = gamePointContext.setPoint.playerId;
+        if ((playerId == player.id && point.value > 0) ||
+            (playerId != player.id && point.value < 0)) {
+          return point.value.abs();
+        }
+        return 0;
+      })
+      .reduce((final value, final element) => value + element);
+}

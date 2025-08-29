@@ -262,3 +262,25 @@ Future<List<TeamPlayer>> gamePlayers(final Ref ref, final int gameId) async {
       )
       .get();
 }
+
+/// Provide the winner of a given set.
+@riverpod
+Future<TeamPlayer?> setWinner(final Ref ref, final int setId) async {
+  final set = await ref.watch(gameSetProvider(setId).future);
+  final points = await ref.watch(setPointsProvider(setId).future);
+  final players = await ref.watch(gamePlayersProvider(set.gameId).future);
+  final firstPlayer = players.first;
+  final secondPlayer = players.last;
+  final player1Points = getPoints(points, firstPlayer);
+  final player2Points = getPoints(points, secondPlayer);
+  final team = await ref.watch(showdownTeamProvider(firstPlayer.teamId).future);
+  if (player1Points >= team.winningPoints &&
+      (player1Points - player2Points) >= team.clearPoints) {
+    return firstPlayer;
+  }
+  if (player2Points >= team.winningPoints &&
+      (player2Points - player1Points) >= team.clearPoints) {
+    return secondPlayer;
+  }
+  return null;
+}
