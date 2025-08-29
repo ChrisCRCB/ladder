@@ -79,29 +79,23 @@ class EditSetScreen extends ConsumerWidget {
                                 },
                               ),
                             ),
-                            PerformableAction(
-                              name: 'delete',
-                              activator: deleteShortcut,
-                              invoke: () async {
-                                if (gamePoint.id != points.last.gamePoint.id) {
-                                  return context.showMessage(
+                            if (gamePoint.id == points.last.gamePoint.id)
+                              PerformableAction(
+                                name: 'delete',
+                                activator: deleteShortcut,
+                                invoke: () {
+                                  context.showConfirmMessage(
                                     message:
                                         // ignore: lines_longer_than_80_chars
-                                        'You can only delete the most recent point.',
+                                        'Are you sure you want to delete this point?',
+                                    title: deleteConfirmationTitle,
+                                    yesCallback: () async {
+                                      await query.delete();
+                                      ref.invalidate(setPointsProvider(setId));
+                                    },
                                   );
-                                }
-                                await context.showConfirmMessage(
-                                  message:
-                                      // ignore: lines_longer_than_80_chars
-                                      'Are you sure you want to delete this point?',
-                                  title: deleteConfirmationTitle,
-                                  yesCallback: () async {
-                                    await query.delete();
-                                    ref.invalidate(setPointsProvider(setId));
-                                  },
-                                );
-                              },
-                            ),
+                                },
+                              ),
                           ],
                           title: PlayerCustomText(
                             playerId: playerId,
