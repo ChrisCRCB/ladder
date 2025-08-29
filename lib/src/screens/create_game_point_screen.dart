@@ -30,7 +30,7 @@ class CreateGamePointScreen extends ConsumerWidget {
           data: (final player) => SelectShowdownPointScreen(
             teamId: player.teamId,
             onChanged: (final point) async {
-              await database.managers.gamePoints.create(
+              await database.managers.setPoints.create(
                 (final f) =>
                     f(gameSetId: setId, playerId: playerId, pointId: point.id),
               );

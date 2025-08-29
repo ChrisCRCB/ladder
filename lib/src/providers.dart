@@ -160,19 +160,19 @@ Future<List<TeamPlayer>> challengeablePlayers(
 
 /// Provide all the points for the given set.
 @riverpod
-Future<List<GamePointContext>> setPoints(final Ref ref, final int setId) async {
+Future<List<SetPointContext>> setPoints(final Ref ref, final int setId) async {
   final db = ref.watch(databaseProvider);
-  final query = db.select(db.gamePoints).join([
+  final query = db.select(db.setPoints).join([
     innerJoin(
       db.showdownPoints,
-      db.showdownPoints.id.equalsExp(db.gamePoints.pointId),
+      db.showdownPoints.id.equalsExp(db.setPoints.pointId),
     ),
-  ])..where(db.gamePoints.gameSetId.equals(setId));
+  ])..where(db.setPoints.gameSetId.equals(setId));
   final results = await query.get();
   return results
       .map(
-        (final row) => GamePointContext(
-          gamePoint: row.readTable(db.gamePoints),
+        (final row) => SetPointContext(
+          setPoint: row.readTable(db.setPoints),
           showdownPoint: row.readTable(db.showdownPoints),
         ),
       )

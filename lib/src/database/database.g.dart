@@ -2108,12 +2108,12 @@ class GameSetsCompanion extends UpdateCompanion<GameSet> {
   }
 }
 
-class $GamePointsTable extends GamePoints
-    with TableInfo<$GamePointsTable, GamePoint> {
+class $SetPointsTable extends SetPoints
+    with TableInfo<$SetPointsTable, SetPoint> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $GamePointsTable(this.attachedDatabase, [this._alias]);
+  $SetPointsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -2193,10 +2193,10 @@ class $GamePointsTable extends GamePoints
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'game_points';
+  static const String $name = 'set_points';
   @override
   VerificationContext validateIntegrity(
-    Insertable<GamePoint> instance, {
+    Insertable<SetPoint> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2240,9 +2240,9 @@ class $GamePointsTable extends GamePoints
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  GamePoint map(Map<String, dynamic> data, {String? tablePrefix}) {
+  SetPoint map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return GamePoint(
+    return SetPoint(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -2267,12 +2267,12 @@ class $GamePointsTable extends GamePoints
   }
 
   @override
-  $GamePointsTable createAlias(String alias) {
-    return $GamePointsTable(attachedDatabase, alias);
+  $SetPointsTable createAlias(String alias) {
+    return $SetPointsTable(attachedDatabase, alias);
   }
 }
 
-class GamePoint extends DataClass implements Insertable<GamePoint> {
+class SetPoint extends DataClass implements Insertable<SetPoint> {
   /// The primary key.
   final int id;
 
@@ -2287,7 +2287,7 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
 
   /// The ID of the point that was awarded.
   final int pointId;
-  const GamePoint({
+  const SetPoint({
     required this.id,
     required this.createdAt,
     required this.playerId,
@@ -2305,8 +2305,8 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
     return map;
   }
 
-  GamePointsCompanion toCompanion(bool nullToAbsent) {
-    return GamePointsCompanion(
+  SetPointsCompanion toCompanion(bool nullToAbsent) {
+    return SetPointsCompanion(
       id: Value(id),
       createdAt: Value(createdAt),
       playerId: Value(playerId),
@@ -2315,12 +2315,12 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
     );
   }
 
-  factory GamePoint.fromJson(
+  factory SetPoint.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return GamePoint(
+    return SetPoint(
       id: serializer.fromJson<int>(json['id']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       playerId: serializer.fromJson<int>(json['playerId']),
@@ -2340,21 +2340,21 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
     };
   }
 
-  GamePoint copyWith({
+  SetPoint copyWith({
     int? id,
     DateTime? createdAt,
     int? playerId,
     int? gameSetId,
     int? pointId,
-  }) => GamePoint(
+  }) => SetPoint(
     id: id ?? this.id,
     createdAt: createdAt ?? this.createdAt,
     playerId: playerId ?? this.playerId,
     gameSetId: gameSetId ?? this.gameSetId,
     pointId: pointId ?? this.pointId,
   );
-  GamePoint copyWithCompanion(GamePointsCompanion data) {
-    return GamePoint(
+  SetPoint copyWithCompanion(SetPointsCompanion data) {
+    return SetPoint(
       id: data.id.present ? data.id.value : this.id,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       playerId: data.playerId.present ? data.playerId.value : this.playerId,
@@ -2365,7 +2365,7 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
 
   @override
   String toString() {
-    return (StringBuffer('GamePoint(')
+    return (StringBuffer('SetPoint(')
           ..write('id: $id, ')
           ..write('createdAt: $createdAt, ')
           ..write('playerId: $playerId, ')
@@ -2380,7 +2380,7 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is GamePoint &&
+      (other is SetPoint &&
           other.id == this.id &&
           other.createdAt == this.createdAt &&
           other.playerId == this.playerId &&
@@ -2388,20 +2388,20 @@ class GamePoint extends DataClass implements Insertable<GamePoint> {
           other.pointId == this.pointId);
 }
 
-class GamePointsCompanion extends UpdateCompanion<GamePoint> {
+class SetPointsCompanion extends UpdateCompanion<SetPoint> {
   final Value<int> id;
   final Value<DateTime> createdAt;
   final Value<int> playerId;
   final Value<int> gameSetId;
   final Value<int> pointId;
-  const GamePointsCompanion({
+  const SetPointsCompanion({
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.playerId = const Value.absent(),
     this.gameSetId = const Value.absent(),
     this.pointId = const Value.absent(),
   });
-  GamePointsCompanion.insert({
+  SetPointsCompanion.insert({
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
     required int playerId,
@@ -2410,7 +2410,7 @@ class GamePointsCompanion extends UpdateCompanion<GamePoint> {
   }) : playerId = Value(playerId),
        gameSetId = Value(gameSetId),
        pointId = Value(pointId);
-  static Insertable<GamePoint> custom({
+  static Insertable<SetPoint> custom({
     Expression<int>? id,
     Expression<DateTime>? createdAt,
     Expression<int>? playerId,
@@ -2426,14 +2426,14 @@ class GamePointsCompanion extends UpdateCompanion<GamePoint> {
     });
   }
 
-  GamePointsCompanion copyWith({
+  SetPointsCompanion copyWith({
     Value<int>? id,
     Value<DateTime>? createdAt,
     Value<int>? playerId,
     Value<int>? gameSetId,
     Value<int>? pointId,
   }) {
-    return GamePointsCompanion(
+    return SetPointsCompanion(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       playerId: playerId ?? this.playerId,
@@ -2465,7 +2465,7 @@ class GamePointsCompanion extends UpdateCompanion<GamePoint> {
 
   @override
   String toString() {
-    return (StringBuffer('GamePointsCompanion(')
+    return (StringBuffer('SetPointsCompanion(')
           ..write('id: $id, ')
           ..write('createdAt: $createdAt, ')
           ..write('playerId: $playerId, ')
@@ -2761,7 +2761,7 @@ abstract class _$LadderDatabase extends GeneratedDatabase {
   late final $LadderNightsTable ladderNights = $LadderNightsTable(this);
   late final $ShowdownGamesTable showdownGames = $ShowdownGamesTable(this);
   late final $GameSetsTable gameSets = $GameSetsTable(this);
-  late final $GamePointsTable gamePoints = $GamePointsTable(this);
+  late final $SetPointsTable setPoints = $SetPointsTable(this);
   late final $LadderNightAbsencesTable ladderNightAbsences =
       $LadderNightAbsencesTable(this);
   late final Index absenceIndex = Index(
@@ -2779,7 +2779,7 @@ abstract class _$LadderDatabase extends GeneratedDatabase {
     ladderNights,
     showdownGames,
     gameSets,
-    gamePoints,
+    setPoints,
     ladderNightAbsences,
     absenceIndex,
   ];
@@ -2846,21 +2846,21 @@ abstract class _$LadderDatabase extends GeneratedDatabase {
         'team_players',
         limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('game_points', kind: UpdateKind.delete)],
+      result: [TableUpdate('set_points', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'game_sets',
         limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('game_points', kind: UpdateKind.delete)],
+      result: [TableUpdate('set_points', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'showdown_points',
         limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('game_points', kind: UpdateKind.delete)],
+      result: [TableUpdate('set_points', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
@@ -3474,22 +3474,19 @@ final class $$ShowdownPointsTableReferences
     );
   }
 
-  static MultiTypedResultKey<$GamePointsTable, List<GamePoint>>
-  _gamePointsRefsTable(_$LadderDatabase db) => MultiTypedResultKey.fromTable(
-    db.gamePoints,
-    aliasName: $_aliasNameGenerator(
-      db.showdownPoints.id,
-      db.gamePoints.pointId,
-    ),
+  static MultiTypedResultKey<$SetPointsTable, List<SetPoint>>
+  _setPointsRefsTable(_$LadderDatabase db) => MultiTypedResultKey.fromTable(
+    db.setPoints,
+    aliasName: $_aliasNameGenerator(db.showdownPoints.id, db.setPoints.pointId),
   );
 
-  $$GamePointsTableProcessedTableManager get gamePointsRefs {
-    final manager = $$GamePointsTableTableManager(
+  $$SetPointsTableProcessedTableManager get setPointsRefs {
+    final manager = $$SetPointsTableTableManager(
       $_db,
-      $_db.gamePoints,
+      $_db.setPoints,
     ).filter((f) => f.pointId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_gamePointsRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_setPointsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3543,22 +3540,22 @@ class $$ShowdownPointsTableFilterComposer
     return composer;
   }
 
-  Expression<bool> gamePointsRefs(
-    Expression<bool> Function($$GamePointsTableFilterComposer f) f,
+  Expression<bool> setPointsRefs(
+    Expression<bool> Function($$SetPointsTableFilterComposer f) f,
   ) {
-    final $$GamePointsTableFilterComposer composer = $composerBuilder(
+    final $$SetPointsTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.gamePoints,
+      referencedTable: $db.setPoints,
       getReferencedColumn: (t) => t.pointId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$GamePointsTableFilterComposer(
+          }) => $$SetPointsTableFilterComposer(
             $db: $db,
-            $table: $db.gamePoints,
+            $table: $db.setPoints,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3658,22 +3655,22 @@ class $$ShowdownPointsTableAnnotationComposer
     return composer;
   }
 
-  Expression<T> gamePointsRefs<T extends Object>(
-    Expression<T> Function($$GamePointsTableAnnotationComposer a) f,
+  Expression<T> setPointsRefs<T extends Object>(
+    Expression<T> Function($$SetPointsTableAnnotationComposer a) f,
   ) {
-    final $$GamePointsTableAnnotationComposer composer = $composerBuilder(
+    final $$SetPointsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.gamePoints,
+      referencedTable: $db.setPoints,
       getReferencedColumn: (t) => t.pointId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$GamePointsTableAnnotationComposer(
+          }) => $$SetPointsTableAnnotationComposer(
             $db: $db,
-            $table: $db.gamePoints,
+            $table: $db.setPoints,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3697,7 +3694,7 @@ class $$ShowdownPointsTableTableManager
           $$ShowdownPointsTableUpdateCompanionBuilder,
           (ShowdownPoint, $$ShowdownPointsTableReferences),
           ShowdownPoint,
-          PrefetchHooks Function({bool teamId, bool gamePointsRefs})
+          PrefetchHooks Function({bool teamId, bool setPointsRefs})
         > {
   $$ShowdownPointsTableTableManager(
     _$LadderDatabase db,
@@ -3744,10 +3741,10 @@ class $$ShowdownPointsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({teamId = false, gamePointsRefs = false}) {
+          prefetchHooksCallback: ({teamId = false, setPointsRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (gamePointsRefs) db.gamePoints],
+              explicitlyWatchedTables: [if (setPointsRefs) db.setPoints],
               addJoins:
                   <
                     T extends TableManagerState<
@@ -3783,21 +3780,21 @@ class $$ShowdownPointsTableTableManager
                   },
               getPrefetchedDataCallback: (items) async {
                 return [
-                  if (gamePointsRefs)
+                  if (setPointsRefs)
                     await $_getPrefetchedData<
                       ShowdownPoint,
                       $ShowdownPointsTable,
-                      GamePoint
+                      SetPoint
                     >(
                       currentTable: table,
                       referencedTable: $$ShowdownPointsTableReferences
-                          ._gamePointsRefsTable(db),
+                          ._setPointsRefsTable(db),
                       managerFromTypedResult: (p0) =>
                           $$ShowdownPointsTableReferences(
                             db,
                             table,
                             p0,
-                          ).gamePointsRefs,
+                          ).setPointsRefs,
                       referencedItemsForCurrentItem: (item, referencedItems) =>
                           referencedItems.where((e) => e.pointId == item.id),
                       typedResults: items,
@@ -3822,7 +3819,7 @@ typedef $$ShowdownPointsTableProcessedTableManager =
       $$ShowdownPointsTableUpdateCompanionBuilder,
       (ShowdownPoint, $$ShowdownPointsTableReferences),
       ShowdownPoint,
-      PrefetchHooks Function({bool teamId, bool gamePointsRefs})
+      PrefetchHooks Function({bool teamId, bool setPointsRefs})
     >;
 typedef $$TeamPlayersTableCreateCompanionBuilder =
     TeamPlayersCompanion Function({
@@ -3934,19 +3931,19 @@ final class $$TeamPlayersTableReferences
     );
   }
 
-  static MultiTypedResultKey<$GamePointsTable, List<GamePoint>>
-  _gamePointsRefsTable(_$LadderDatabase db) => MultiTypedResultKey.fromTable(
-    db.gamePoints,
-    aliasName: $_aliasNameGenerator(db.teamPlayers.id, db.gamePoints.playerId),
+  static MultiTypedResultKey<$SetPointsTable, List<SetPoint>>
+  _setPointsRefsTable(_$LadderDatabase db) => MultiTypedResultKey.fromTable(
+    db.setPoints,
+    aliasName: $_aliasNameGenerator(db.teamPlayers.id, db.setPoints.playerId),
   );
 
-  $$GamePointsTableProcessedTableManager get gamePointsRefs {
-    final manager = $$GamePointsTableTableManager(
+  $$SetPointsTableProcessedTableManager get setPointsRefs {
+    final manager = $$SetPointsTableTableManager(
       $_db,
-      $_db.gamePoints,
+      $_db.setPoints,
     ).filter((f) => f.playerId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_gamePointsRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_setPointsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -4112,22 +4109,22 @@ class $$TeamPlayersTableFilterComposer
     return f(composer);
   }
 
-  Expression<bool> gamePointsRefs(
-    Expression<bool> Function($$GamePointsTableFilterComposer f) f,
+  Expression<bool> setPointsRefs(
+    Expression<bool> Function($$SetPointsTableFilterComposer f) f,
   ) {
-    final $$GamePointsTableFilterComposer composer = $composerBuilder(
+    final $$SetPointsTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.gamePoints,
+      referencedTable: $db.setPoints,
       getReferencedColumn: (t) => t.playerId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$GamePointsTableFilterComposer(
+          }) => $$SetPointsTableFilterComposer(
             $db: $db,
-            $table: $db.gamePoints,
+            $table: $db.setPoints,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4345,22 +4342,22 @@ class $$TeamPlayersTableAnnotationComposer
     return f(composer);
   }
 
-  Expression<T> gamePointsRefs<T extends Object>(
-    Expression<T> Function($$GamePointsTableAnnotationComposer a) f,
+  Expression<T> setPointsRefs<T extends Object>(
+    Expression<T> Function($$SetPointsTableAnnotationComposer a) f,
   ) {
-    final $$GamePointsTableAnnotationComposer composer = $composerBuilder(
+    final $$SetPointsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.gamePoints,
+      referencedTable: $db.setPoints,
       getReferencedColumn: (t) => t.playerId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$GamePointsTableAnnotationComposer(
+          }) => $$SetPointsTableAnnotationComposer(
             $db: $db,
-            $table: $db.gamePoints,
+            $table: $db.setPoints,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4415,7 +4412,7 @@ class $$TeamPlayersTableTableManager
             bool gamesAsFirstPlayer,
             bool gamesAsSecondPlayer,
             bool gameSetsRefs,
-            bool gamePointsRefs,
+            bool setPointsRefs,
             bool ladderNightAbsencesRefs,
           })
         > {
@@ -4476,7 +4473,7 @@ class $$TeamPlayersTableTableManager
                 gamesAsFirstPlayer = false,
                 gamesAsSecondPlayer = false,
                 gameSetsRefs = false,
-                gamePointsRefs = false,
+                setPointsRefs = false,
                 ladderNightAbsencesRefs = false,
               }) {
                 return PrefetchHooks(
@@ -4485,7 +4482,7 @@ class $$TeamPlayersTableTableManager
                     if (gamesAsFirstPlayer) db.showdownGames,
                     if (gamesAsSecondPlayer) db.showdownGames,
                     if (gameSetsRefs) db.gameSets,
-                    if (gamePointsRefs) db.gamePoints,
+                    if (setPointsRefs) db.setPoints,
                     if (ladderNightAbsencesRefs) db.ladderNightAbsences,
                   ],
                   addJoins:
@@ -4587,21 +4584,21 @@ class $$TeamPlayersTableTableManager
                               ),
                           typedResults: items,
                         ),
-                      if (gamePointsRefs)
+                      if (setPointsRefs)
                         await $_getPrefetchedData<
                           TeamPlayer,
                           $TeamPlayersTable,
-                          GamePoint
+                          SetPoint
                         >(
                           currentTable: table,
                           referencedTable: $$TeamPlayersTableReferences
-                              ._gamePointsRefsTable(db),
+                              ._setPointsRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$TeamPlayersTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).gamePointsRefs,
+                              ).setPointsRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.playerId == item.id,
@@ -4654,7 +4651,7 @@ typedef $$TeamPlayersTableProcessedTableManager =
         bool gamesAsFirstPlayer,
         bool gamesAsSecondPlayer,
         bool gameSetsRefs,
-        bool gamePointsRefs,
+        bool setPointsRefs,
         bool ladderNightAbsencesRefs,
       })
     >;
@@ -5813,19 +5810,19 @@ final class $$GameSetsTableReferences
     );
   }
 
-  static MultiTypedResultKey<$GamePointsTable, List<GamePoint>>
-  _gamePointsRefsTable(_$LadderDatabase db) => MultiTypedResultKey.fromTable(
-    db.gamePoints,
-    aliasName: $_aliasNameGenerator(db.gameSets.id, db.gamePoints.gameSetId),
+  static MultiTypedResultKey<$SetPointsTable, List<SetPoint>>
+  _setPointsRefsTable(_$LadderDatabase db) => MultiTypedResultKey.fromTable(
+    db.setPoints,
+    aliasName: $_aliasNameGenerator(db.gameSets.id, db.setPoints.gameSetId),
   );
 
-  $$GamePointsTableProcessedTableManager get gamePointsRefs {
-    final manager = $$GamePointsTableTableManager(
+  $$SetPointsTableProcessedTableManager get setPointsRefs {
+    final manager = $$SetPointsTableTableManager(
       $_db,
-      $_db.gamePoints,
+      $_db.setPoints,
     ).filter((f) => f.gameSetId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_gamePointsRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_setPointsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5892,22 +5889,22 @@ class $$GameSetsTableFilterComposer
     return composer;
   }
 
-  Expression<bool> gamePointsRefs(
-    Expression<bool> Function($$GamePointsTableFilterComposer f) f,
+  Expression<bool> setPointsRefs(
+    Expression<bool> Function($$SetPointsTableFilterComposer f) f,
   ) {
-    final $$GamePointsTableFilterComposer composer = $composerBuilder(
+    final $$SetPointsTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.gamePoints,
+      referencedTable: $db.setPoints,
       getReferencedColumn: (t) => t.gameSetId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$GamePointsTableFilterComposer(
+          }) => $$SetPointsTableFilterComposer(
             $db: $db,
-            $table: $db.gamePoints,
+            $table: $db.setPoints,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6037,22 +6034,22 @@ class $$GameSetsTableAnnotationComposer
     return composer;
   }
 
-  Expression<T> gamePointsRefs<T extends Object>(
-    Expression<T> Function($$GamePointsTableAnnotationComposer a) f,
+  Expression<T> setPointsRefs<T extends Object>(
+    Expression<T> Function($$SetPointsTableAnnotationComposer a) f,
   ) {
-    final $$GamePointsTableAnnotationComposer composer = $composerBuilder(
+    final $$SetPointsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.gamePoints,
+      referencedTable: $db.setPoints,
       getReferencedColumn: (t) => t.gameSetId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$GamePointsTableAnnotationComposer(
+          }) => $$SetPointsTableAnnotationComposer(
             $db: $db,
-            $table: $db.gamePoints,
+            $table: $db.setPoints,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -6079,7 +6076,7 @@ class $$GameSetsTableTableManager
           PrefetchHooks Function({
             bool startingPlayerId,
             bool gameId,
-            bool gamePointsRefs,
+            bool setPointsRefs,
           })
         > {
   $$GameSetsTableTableManager(_$LadderDatabase db, $GameSetsTable table)
@@ -6125,11 +6122,11 @@ class $$GameSetsTableTableManager
               ({
                 startingPlayerId = false,
                 gameId = false,
-                gamePointsRefs = false,
+                setPointsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
-                  explicitlyWatchedTables: [if (gamePointsRefs) db.gamePoints],
+                  explicitlyWatchedTables: [if (setPointsRefs) db.setPoints],
                   addJoins:
                       <
                         T extends TableManagerState<
@@ -6177,21 +6174,21 @@ class $$GameSetsTableTableManager
                       },
                   getPrefetchedDataCallback: (items) async {
                     return [
-                      if (gamePointsRefs)
+                      if (setPointsRefs)
                         await $_getPrefetchedData<
                           GameSet,
                           $GameSetsTable,
-                          GamePoint
+                          SetPoint
                         >(
                           currentTable: table,
                           referencedTable: $$GameSetsTableReferences
-                              ._gamePointsRefsTable(db),
+                              ._setPointsRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$GameSetsTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).gamePointsRefs,
+                              ).setPointsRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.gameSetId == item.id,
@@ -6221,19 +6218,19 @@ typedef $$GameSetsTableProcessedTableManager =
       PrefetchHooks Function({
         bool startingPlayerId,
         bool gameId,
-        bool gamePointsRefs,
+        bool setPointsRefs,
       })
     >;
-typedef $$GamePointsTableCreateCompanionBuilder =
-    GamePointsCompanion Function({
+typedef $$SetPointsTableCreateCompanionBuilder =
+    SetPointsCompanion Function({
       Value<int> id,
       Value<DateTime> createdAt,
       required int playerId,
       required int gameSetId,
       required int pointId,
     });
-typedef $$GamePointsTableUpdateCompanionBuilder =
-    GamePointsCompanion Function({
+typedef $$SetPointsTableUpdateCompanionBuilder =
+    SetPointsCompanion Function({
       Value<int> id,
       Value<DateTime> createdAt,
       Value<int> playerId,
@@ -6241,13 +6238,13 @@ typedef $$GamePointsTableUpdateCompanionBuilder =
       Value<int> pointId,
     });
 
-final class $$GamePointsTableReferences
-    extends BaseReferences<_$LadderDatabase, $GamePointsTable, GamePoint> {
-  $$GamePointsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$SetPointsTableReferences
+    extends BaseReferences<_$LadderDatabase, $SetPointsTable, SetPoint> {
+  $$SetPointsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $TeamPlayersTable _playerIdTable(_$LadderDatabase db) =>
       db.teamPlayers.createAlias(
-        $_aliasNameGenerator(db.gamePoints.playerId, db.teamPlayers.id),
+        $_aliasNameGenerator(db.setPoints.playerId, db.teamPlayers.id),
       );
 
   $$TeamPlayersTableProcessedTableManager get playerId {
@@ -6266,7 +6263,7 @@ final class $$GamePointsTableReferences
 
   static $GameSetsTable _gameSetIdTable(_$LadderDatabase db) =>
       db.gameSets.createAlias(
-        $_aliasNameGenerator(db.gamePoints.gameSetId, db.gameSets.id),
+        $_aliasNameGenerator(db.setPoints.gameSetId, db.gameSets.id),
       );
 
   $$GameSetsTableProcessedTableManager get gameSetId {
@@ -6285,7 +6282,7 @@ final class $$GamePointsTableReferences
 
   static $ShowdownPointsTable _pointIdTable(_$LadderDatabase db) =>
       db.showdownPoints.createAlias(
-        $_aliasNameGenerator(db.gamePoints.pointId, db.showdownPoints.id),
+        $_aliasNameGenerator(db.setPoints.pointId, db.showdownPoints.id),
       );
 
   $$ShowdownPointsTableProcessedTableManager get pointId {
@@ -6303,9 +6300,9 @@ final class $$GamePointsTableReferences
   }
 }
 
-class $$GamePointsTableFilterComposer
-    extends Composer<_$LadderDatabase, $GamePointsTable> {
-  $$GamePointsTableFilterComposer({
+class $$SetPointsTableFilterComposer
+    extends Composer<_$LadderDatabase, $SetPointsTable> {
+  $$SetPointsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -6392,9 +6389,9 @@ class $$GamePointsTableFilterComposer
   }
 }
 
-class $$GamePointsTableOrderingComposer
-    extends Composer<_$LadderDatabase, $GamePointsTable> {
-  $$GamePointsTableOrderingComposer({
+class $$SetPointsTableOrderingComposer
+    extends Composer<_$LadderDatabase, $SetPointsTable> {
+  $$SetPointsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -6481,9 +6478,9 @@ class $$GamePointsTableOrderingComposer
   }
 }
 
-class $$GamePointsTableAnnotationComposer
-    extends Composer<_$LadderDatabase, $GamePointsTable> {
-  $$GamePointsTableAnnotationComposer({
+class $$SetPointsTableAnnotationComposer
+    extends Composer<_$LadderDatabase, $SetPointsTable> {
+  $$SetPointsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -6566,32 +6563,32 @@ class $$GamePointsTableAnnotationComposer
   }
 }
 
-class $$GamePointsTableTableManager
+class $$SetPointsTableTableManager
     extends
         RootTableManager<
           _$LadderDatabase,
-          $GamePointsTable,
-          GamePoint,
-          $$GamePointsTableFilterComposer,
-          $$GamePointsTableOrderingComposer,
-          $$GamePointsTableAnnotationComposer,
-          $$GamePointsTableCreateCompanionBuilder,
-          $$GamePointsTableUpdateCompanionBuilder,
-          (GamePoint, $$GamePointsTableReferences),
-          GamePoint,
+          $SetPointsTable,
+          SetPoint,
+          $$SetPointsTableFilterComposer,
+          $$SetPointsTableOrderingComposer,
+          $$SetPointsTableAnnotationComposer,
+          $$SetPointsTableCreateCompanionBuilder,
+          $$SetPointsTableUpdateCompanionBuilder,
+          (SetPoint, $$SetPointsTableReferences),
+          SetPoint,
           PrefetchHooks Function({bool playerId, bool gameSetId, bool pointId})
         > {
-  $$GamePointsTableTableManager(_$LadderDatabase db, $GamePointsTable table)
+  $$SetPointsTableTableManager(_$LadderDatabase db, $SetPointsTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$GamePointsTableFilterComposer($db: db, $table: table),
+              $$SetPointsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$GamePointsTableOrderingComposer($db: db, $table: table),
+              $$SetPointsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$GamePointsTableAnnotationComposer($db: db, $table: table),
+              $$SetPointsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
@@ -6599,7 +6596,7 @@ class $$GamePointsTableTableManager
                 Value<int> playerId = const Value.absent(),
                 Value<int> gameSetId = const Value.absent(),
                 Value<int> pointId = const Value.absent(),
-              }) => GamePointsCompanion(
+              }) => SetPointsCompanion(
                 id: id,
                 createdAt: createdAt,
                 playerId: playerId,
@@ -6613,7 +6610,7 @@ class $$GamePointsTableTableManager
                 required int playerId,
                 required int gameSetId,
                 required int pointId,
-              }) => GamePointsCompanion.insert(
+              }) => SetPointsCompanion.insert(
                 id: id,
                 createdAt: createdAt,
                 playerId: playerId,
@@ -6624,7 +6621,7 @@ class $$GamePointsTableTableManager
               .map(
                 (e) => (
                   e.readTable(table),
-                  $$GamePointsTableReferences(db, table, e),
+                  $$SetPointsTableReferences(db, table, e),
                 ),
               )
               .toList(),
@@ -6654,12 +6651,11 @@ class $$GamePointsTableTableManager
                               state.withJoin(
                                     currentTable: table,
                                     currentColumn: table.playerId,
-                                    referencedTable: $$GamePointsTableReferences
+                                    referencedTable: $$SetPointsTableReferences
                                         ._playerIdTable(db),
-                                    referencedColumn:
-                                        $$GamePointsTableReferences
-                                            ._playerIdTable(db)
-                                            .id,
+                                    referencedColumn: $$SetPointsTableReferences
+                                        ._playerIdTable(db)
+                                        .id,
                                   )
                                   as T;
                         }
@@ -6668,12 +6664,11 @@ class $$GamePointsTableTableManager
                               state.withJoin(
                                     currentTable: table,
                                     currentColumn: table.gameSetId,
-                                    referencedTable: $$GamePointsTableReferences
+                                    referencedTable: $$SetPointsTableReferences
                                         ._gameSetIdTable(db),
-                                    referencedColumn:
-                                        $$GamePointsTableReferences
-                                            ._gameSetIdTable(db)
-                                            .id,
+                                    referencedColumn: $$SetPointsTableReferences
+                                        ._gameSetIdTable(db)
+                                        .id,
                                   )
                                   as T;
                         }
@@ -6682,12 +6677,11 @@ class $$GamePointsTableTableManager
                               state.withJoin(
                                     currentTable: table,
                                     currentColumn: table.pointId,
-                                    referencedTable: $$GamePointsTableReferences
+                                    referencedTable: $$SetPointsTableReferences
                                         ._pointIdTable(db),
-                                    referencedColumn:
-                                        $$GamePointsTableReferences
-                                            ._pointIdTable(db)
-                                            .id,
+                                    referencedColumn: $$SetPointsTableReferences
+                                        ._pointIdTable(db)
+                                        .id,
                                   )
                                   as T;
                         }
@@ -6703,18 +6697,18 @@ class $$GamePointsTableTableManager
       );
 }
 
-typedef $$GamePointsTableProcessedTableManager =
+typedef $$SetPointsTableProcessedTableManager =
     ProcessedTableManager<
       _$LadderDatabase,
-      $GamePointsTable,
-      GamePoint,
-      $$GamePointsTableFilterComposer,
-      $$GamePointsTableOrderingComposer,
-      $$GamePointsTableAnnotationComposer,
-      $$GamePointsTableCreateCompanionBuilder,
-      $$GamePointsTableUpdateCompanionBuilder,
-      (GamePoint, $$GamePointsTableReferences),
-      GamePoint,
+      $SetPointsTable,
+      SetPoint,
+      $$SetPointsTableFilterComposer,
+      $$SetPointsTableOrderingComposer,
+      $$SetPointsTableAnnotationComposer,
+      $$SetPointsTableCreateCompanionBuilder,
+      $$SetPointsTableUpdateCompanionBuilder,
+      (SetPoint, $$SetPointsTableReferences),
+      SetPoint,
       PrefetchHooks Function({bool playerId, bool gameSetId, bool pointId})
     >;
 typedef $$LadderNightAbsencesTableCreateCompanionBuilder =
@@ -7124,8 +7118,8 @@ class $LadderDatabaseManager {
       $$ShowdownGamesTableTableManager(_db, _db.showdownGames);
   $$GameSetsTableTableManager get gameSets =>
       $$GameSetsTableTableManager(_db, _db.gameSets);
-  $$GamePointsTableTableManager get gamePoints =>
-      $$GamePointsTableTableManager(_db, _db.gamePoints);
+  $$SetPointsTableTableManager get setPoints =>
+      $$SetPointsTableTableManager(_db, _db.setPoints);
   $$LadderNightAbsencesTableTableManager get ladderNightAbsences =>
       $$LadderNightAbsencesTableTableManager(_db, _db.ladderNightAbsences);
 }

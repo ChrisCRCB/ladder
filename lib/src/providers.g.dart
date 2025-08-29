@@ -875,13 +875,13 @@ const setPointsProvider = SetPointsFamily._();
 final class SetPointsProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<GamePointContext>>,
-          List<GamePointContext>,
-          FutureOr<List<GamePointContext>>
+          AsyncValue<List<SetPointContext>>,
+          List<SetPointContext>,
+          FutureOr<List<SetPointContext>>
         >
     with
-        $FutureModifier<List<GamePointContext>>,
-        $FutureProvider<List<GamePointContext>> {
+        $FutureModifier<List<SetPointContext>>,
+        $FutureProvider<List<SetPointContext>> {
   /// Provide all the points for the given set.
   const SetPointsProvider._({
     required SetPointsFamily super.from,
@@ -906,12 +906,12 @@ final class SetPointsProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<GamePointContext>> $createElement(
+  $FutureProviderElement<List<SetPointContext>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<GamePointContext>> create(Ref ref) {
+  FutureOr<List<SetPointContext>> create(Ref ref) {
     final argument = this.argument as int;
     return setPoints(ref, argument);
   }
@@ -927,11 +927,11 @@ final class SetPointsProvider
   }
 }
 
-String _$setPointsHash() => r'9432a596661aadd7d39b8d47b8c159a9983a62cd';
+String _$setPointsHash() => r'a25fd262e309594dadf25a650b354f8b9305fee1';
 
 /// Provide all the points for the given set.
 final class SetPointsFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<List<GamePointContext>>, int> {
+    with $FunctionalFamilyOverride<FutureOr<List<SetPointContext>>, int> {
   const SetPointsFamily._()
     : super(
         retry: null,

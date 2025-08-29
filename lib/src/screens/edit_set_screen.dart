@@ -56,13 +56,13 @@ class EditSetScreen extends ConsumerWidget {
                         ),
                       ),
                       ...points.map((final pointContext) {
-                        final gamePoint = pointContext.gamePoint;
+                        final gamePoint = pointContext.setPoint;
                         final playerId = gamePoint.playerId;
                         final player = players.firstWhere(
                           (final p) => p.id == playerId,
                         );
                         final point = pointContext.showdownPoint;
-                        final query = database.managers.gamePoints.filter(
+                        final query = database.managers.setPoints.filter(
                           (final f) => f.id.equals(gamePoint.id),
                         );
                         return PerformableActionsListTile(
@@ -79,7 +79,7 @@ class EditSetScreen extends ConsumerWidget {
                                 },
                               ),
                             ),
-                            if (gamePoint.id == points.last.gamePoint.id)
+                            if (gamePoint.id == points.last.setPoint.id)
                               PerformableAction(
                                 name: 'delete',
                                 activator: deleteShortcut,
@@ -132,14 +132,14 @@ class EditSetScreen extends ConsumerWidget {
   }
 
   /// Get the points for the given [player].
-  int _getPoints(final List<GamePointContext> points, final TeamPlayer player) {
+  int _getPoints(final List<SetPointContext> points, final TeamPlayer player) {
     if (points.isEmpty) {
       return 0;
     }
     return points
         .map<int>((final gamePointContext) {
           final point = gamePointContext.showdownPoint;
-          final playerId = gamePointContext.gamePoint.playerId;
+          final playerId = gamePointContext.setPoint.playerId;
           if ((playerId == player.id && point.value > 0) ||
               (playerId != player.id && point.value < 0)) {
             return point.value.abs();

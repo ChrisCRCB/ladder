@@ -16,7 +16,7 @@ part 'database.g.dart';
     TeamPlayers,
     LadderNights,
     ShowdownGames,
-    GamePoints,
+    SetPoints,
     LadderNightAbsences,
     GameSets,
   ],
