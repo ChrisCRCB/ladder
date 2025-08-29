@@ -1,6 +1,8 @@
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
+import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
@@ -23,6 +25,7 @@ class EditSetScreen extends ConsumerWidget {
   /// Build the widget.
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
+    final database = ref.watch(databaseProvider);
     final value = ref.watch(gameSetProvider(setId));
     return Cancel(
       child: FontShortcuts(
@@ -53,9 +56,53 @@ class EditSetScreen extends ConsumerWidget {
                         ),
                       ),
                       ...points.map((final pointContext) {
-                        final playerId = pointContext.gamePoint.playerId;
+                        final gamePoint = pointContext.gamePoint;
+                        final playerId = gamePoint.playerId;
+                        final player = players.firstWhere(
+                          (final p) => p.id == playerId,
+                        );
                         final point = pointContext.showdownPoint;
-                        return ListTile(
+                        final query = database.managers.gamePoints.filter(
+                          (final f) => f.id.equals(gamePoint.id),
+                        );
+                        return PerformableActionsListTile(
+                          actions: [
+                            ...players.map(
+                              (final player) => PerformableAction(
+                                name: player.name,
+                                checked: player.id == playerId,
+                                invoke: () async {
+                                  await query.update(
+                                    (final o) => o(playerId: Value(player.id)),
+                                  );
+                                  ref.invalidate(setPointsProvider(setId));
+                                },
+                              ),
+                            ),
+                            PerformableAction(
+                              name: 'delete',
+                              activator: deleteShortcut,
+                              invoke: () async {
+                                if (gamePoint.id != points.last.gamePoint.id) {
+                                  return context.showMessage(
+                                    message:
+                                        // ignore: lines_longer_than_80_chars
+                                        'You can only delete the most recent point.',
+                                  );
+                                }
+                                await context.showConfirmMessage(
+                                  message:
+                                      // ignore: lines_longer_than_80_chars
+                                      'Are you sure you want to delete this point?',
+                                  title: deleteConfirmationTitle,
+                                  yesCallback: () async {
+                                    await query.delete();
+                                    ref.invalidate(setPointsProvider(setId));
+                                  },
+                                );
+                              },
+                            ),
+                          ],
                           title: PlayerCustomText(
                             playerId: playerId,
                             showPoints: false,
@@ -63,7 +110,18 @@ class EditSetScreen extends ConsumerWidget {
                           subtitle: CustomText(
                             text: '${point.name} (${point.value})',
                           ),
-                          onTap: () {},
+                          onTap: () => context.pushWidgetBuilder(
+                            (_) => SelectShowdownPointScreen(
+                              teamId: player.teamId,
+                              onChanged: (final showdownPoint) async {
+                                await query.update(
+                                  (final o) =>
+                                      o(pointId: Value(showdownPoint.id)),
+                                );
+                                ref.invalidate(setPointsProvider(setId));
+                              },
+                            ),
+                          ),
                         );
                       }),
                     ],

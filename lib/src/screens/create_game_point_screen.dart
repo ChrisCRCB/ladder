@@ -1,4 +1,3 @@
-import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -27,36 +26,19 @@ class CreateGamePointScreen extends ConsumerWidget {
     final value = ref.watch(teamPlayerProvider(playerId));
     return Cancel(
       child: FontShortcuts(
-        child: SimpleScaffold(
-          title: 'Select Point',
-          body: value.simpleWhen((final player) {
-            final value = ref.watch(showdownPointsProvider(player.teamId));
-            return value.simpleWhen(
-              (final points) => ListView.builder(
-                itemBuilder: (final context, final index) {
-                  final point = points[index];
-                  return ListTile(
-                    autofocus: index == 0,
-                    title: CustomText(text: point.name),
-                    subtitle: CustomText(text: '${point.value}'),
-                    onTap: () async {
-                      context.pop();
-                      await database.managers.gamePoints.create(
-                        (final f) => f(
-                          gameSetId: setId,
-                          playerId: playerId,
-                          pointId: point.id,
-                        ),
-                      );
-                      ref.invalidate(setPointsProvider(setId));
-                    },
-                  );
-                },
-                itemCount: points.length,
-                shrinkWrap: true,
-              ),
-            );
-          }),
+        child: value.when(
+          data: (final player) => SelectShowdownPointScreen(
+            teamId: player.teamId,
+            onChanged: (final point) async {
+              await database.managers.gamePoints.create(
+                (final f) =>
+                    f(gameSetId: setId, playerId: playerId, pointId: point.id),
+              );
+              ref.invalidate(setPointsProvider(setId));
+            },
+          ),
+          error: ErrorScreen.withPositional,
+          loading: LoadingScreen.new,
         ),
       ),
     );
