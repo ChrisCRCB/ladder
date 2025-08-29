@@ -88,7 +88,7 @@ class LadderNightScreen extends ConsumerWidget {
             );
             ref
               ..invalidate(teamPlayersProvider(night.teamId))
-              ..invalidate(attendingTeamPlayersProvider(ladderNightId));
+              ..invalidate(ladderNightProvider(ladderNightId));
           },
           labelText: 'Player name',
           title: 'Create Player',
