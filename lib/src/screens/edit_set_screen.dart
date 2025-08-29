@@ -48,7 +48,7 @@ class EditSetScreen extends ConsumerWidget {
                         await database.managers.gameSets
                             .filter((final f) => f.id.equals(setId))
                             .delete();
-                        ref.invalidate(gameSetProvider(setId));
+                        ref.invalidate(gameSetsProvider(set.gameId));
                         if (context.mounted) {
                           context.pop();
                         }

@@ -53,13 +53,20 @@ class EditGameScreen extends ConsumerWidget {
                           autofocus: index == 0,
                           title: PlayerCustomText(playerId: player.id),
                           onTap: () async {
-                            await database.managers.gameSets.create(
-                              (final o) => o(
-                                gameId: gameId,
-                                startingPlayerId: player.id,
-                              ),
-                            );
+                            final set = await database.managers.gameSets
+                                .createReturning(
+                                  (final o) => o(
+                                    gameId: gameId,
+                                    startingPlayerId: player.id,
+                                  ),
+                                );
                             ref.invalidate(gameSetsProvider(gameId));
+                            if (context.mounted) {
+                              await context.pushWidgetBuilder(
+                                (_) =>
+                                    EditSetScreen(setId: set.id, setNumber: 1),
+                              );
+                            }
                           },
                         );
                       },
