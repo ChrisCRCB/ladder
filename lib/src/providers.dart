@@ -123,36 +123,38 @@ Future<List<TeamPlayer>> challengeablePlayers(
   final nights = db.alias(db.ladderNights, 'nights');
   final query =
       await (db.select(players).join([
-            innerJoin(
-              nights,
-              nights.teamId.equals(firstPlayer.teamId),
-              useColumns: false,
-            ),
-            leftOuterJoin(
-              absences,
-              absences.teamPlayerId.equalsExp(players.id) &
-                  absences.ladderNightId.equals(ladderNightId),
-              useColumns: false,
-            ),
-          ])..where(
-            absences.id.isNull() &
-                players.teamId.equals(firstPlayer.teamId) &
-                players.points.isBetween(
-                  Constant(firstPlayer.points - team.challengePoints),
-                  Constant(firstPlayer.points + team.challengePoints),
-                ) &
-                players.id.isNotValue(firstPlayer.id) &
-                notExistsQuery(
-                  db.select(db.showdownGames)..where(
-                    (final g) =>
-                        g.ladderNightId.equals(ladderNightId) &
-                        ((g.firstPlayerId.equals(firstPlayer.id) &
-                                g.secondPlayerId.equalsExp(players.id)) |
-                            (g.secondPlayerId.equals(firstPlayer.id) &
-                                g.firstPlayerId.equalsExp(players.id))),
+              innerJoin(
+                nights,
+                nights.teamId.equals(firstPlayer.teamId),
+                useColumns: false,
+              ),
+              leftOuterJoin(
+                absences,
+                absences.teamPlayerId.equalsExp(players.id) &
+                    absences.ladderNightId.equals(ladderNightId),
+                useColumns: false,
+              ),
+            ])
+            ..where(
+              absences.id.isNull() &
+                  players.teamId.equals(firstPlayer.teamId) &
+                  players.points.isBetween(
+                    Constant(firstPlayer.points - team.challengePoints),
+                    Constant(firstPlayer.points + team.challengePoints),
+                  ) &
+                  players.id.isNotValue(firstPlayer.id) &
+                  notExistsQuery(
+                    db.select(db.showdownGames)..where(
+                      (final g) =>
+                          g.ladderNightId.equals(ladderNightId) &
+                          ((g.firstPlayerId.equals(firstPlayer.id) &
+                                  g.secondPlayerId.equalsExp(players.id)) |
+                              (g.secondPlayerId.equals(firstPlayer.id) &
+                                  g.firstPlayerId.equalsExp(players.id))),
+                    ),
                   ),
-                ),
-          ))
+            )
+            ..orderBy([OrderingTerm.asc(players.name)]))
           .get();
   final results = query.map((final row) => row.readTable(players));
   return results.toList();
@@ -186,19 +188,25 @@ Future<List<TeamPlayer>> attendingTeamPlayers(
   final int ladderNightId,
 ) async {
   final db = ref.watch(databaseProvider);
-  final query = await (db.select(db.teamPlayers).join([
-    innerJoin(
-      db.ladderNights,
-      db.ladderNights.teamId.equalsExp(db.teamPlayers.teamId),
-      useColumns: false,
-    ),
-    leftOuterJoin(
-      db.ladderNightAbsences,
-      db.teamPlayers.id.equalsExp(db.ladderNightAbsences.teamPlayerId) &
-          db.ladderNightAbsences.ladderNightId.equals(ladderNightId),
-      useColumns: false,
-    ),
-  ])..where(db.ladderNightAbsences.id.isNull())).get();
+  final query =
+      await (db.select(db.teamPlayers).join([
+              innerJoin(
+                db.ladderNights,
+                db.ladderNights.teamId.equalsExp(db.teamPlayers.teamId),
+                useColumns: false,
+              ),
+              leftOuterJoin(
+                db.ladderNightAbsences,
+                db.teamPlayers.id.equalsExp(
+                      db.ladderNightAbsences.teamPlayerId,
+                    ) &
+                    db.ladderNightAbsences.ladderNightId.equals(ladderNightId),
+                useColumns: false,
+              ),
+            ])
+            ..where(db.ladderNightAbsences.id.isNull())
+            ..orderBy([OrderingTerm.asc(db.teamPlayers.name)]))
+          .get();
   final results = query.map((final row) => row.readTable(db.teamPlayers));
   return results.toList();
 }
