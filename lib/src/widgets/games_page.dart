@@ -3,6 +3,7 @@ import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
 import 'package:time/time.dart';
@@ -38,60 +39,106 @@ class GamesPage extends ConsumerWidget {
               );
               final previousSlot = game.createdAt - team.gameLength.minutes;
               final nextSlot = game.createdAt + team.gameLength.minutes;
-              return PerformableActionsListTile(
-                actions: [
-                  PerformableAction(
-                    name: 'Move game forward',
-                    activator: moveUpShortcut,
-                    invoke: () async {
-                      await query.update(
-                        (final o) => o(createdAt: Value(nextSlot)),
-                      );
-                      ref.invalidate(gamesProvider(ladderNightId));
-                    },
-                  ),
-                  if (previousSlot.isAfter(night.createdAt) ||
-                      previousSlot.isAtSameHourAs(night.createdAt))
+              if (game.lockedOn == null) {
+                return PerformableActionsListTile(
+                  actions: [
                     PerformableAction(
-                      name: 'Move game back',
-                      activator: moveDownShortcut,
+                      name: 'Move game forward',
+                      activator: moveUpShortcut,
                       invoke: () async {
                         await query.update(
-                          (final o) => o(createdAt: Value(previousSlot)),
+                          (final o) => o(createdAt: Value(nextSlot)),
                         );
+                        ref.invalidate(gamesProvider(ladderNightId));
+                      },
+                    ),
+                    if (previousSlot.isAfter(night.createdAt) ||
+                        previousSlot.isAtSameHourAs(night.createdAt))
+                      PerformableAction(
+                        name: 'Move game back',
+                        activator: moveDownShortcut,
+                        invoke: () async {
+                          await query.update(
+                            (final o) => o(createdAt: Value(previousSlot)),
+                          );
+                          ref.invalidate(gamesProvider(night.id));
+                        },
+                      ),
+                    PerformableAction(
+                      name: 'Lock',
+                      activator: CrossPlatformSingleActivator(
+                        LogicalKeyboardKey.keyL,
+                      ),
+                      invoke: () {
+                        context.showConfirmMessage(
+                          message:
+                              // ignore: lines_longer_than_80_chars
+                              'Locking this game will prevent further edits. Are you sure?',
+                          yesCallback: () async {
+                            final sets = await ref.read(
+                              gameSetsProvider(game.id).future,
+                            );
+                            if (sets.isEmpty) {
+                              if (context.mounted) {
+                                await context.showMessage(
+                                  message:
+                                      // ignore: lines_longer_than_80_chars
+                                      'This game cannot be locked without any sets.',
+                                );
+                              }
+                              return;
+                            }
+                            await query.update(
+                              (final o) => o(lockedOn: Value(DateTime.now())),
+                            );
+                            ref.invalidate(gamesProvider(ladderNightId));
+                          },
+                        );
+                      },
+                    ),
+                    PerformableAction(
+                      name: 'Delete game',
+                      activator: deleteShortcut,
+                      invoke: () async {
+                        final sets = await ref.read(
+                          gameSetsProvider(game.id).future,
+                        );
+                        if (sets.isNotEmpty) {
+                          if (context.mounted) {
+                            await context.showMessage(
+                              message:
+                                  // ignore: lines_longer_than_80_chars
+                                  'You cannot delete this game as it has at least 1 set.',
+                            );
+                          }
+                          return;
+                        }
+                        await query.delete();
                         ref.invalidate(gamesProvider(night.id));
                       },
                     ),
-                  PerformableAction(
-                    name: 'Delete game',
-                    activator: deleteShortcut,
-                    invoke: () async {
-                      final sets = await ref.read(
-                        gameSetsProvider(game.id).future,
-                      );
-                      if (sets.isNotEmpty) {
-                        if (context.mounted) {
-                          await context.showMessage(
-                            message:
-                                // ignore: lines_longer_than_80_chars
-                                'You cannot delete this game as it has at least 1 set.',
-                          );
-                        }
-                        return;
-                      }
-                      await query.delete();
-                      ref.invalidate(gamesProvider(night.id));
-                    },
+                  ],
+                  autofocus: index == 0,
+                  title: PlayersCustomText(
+                    firstPlayerId: game.firstPlayerId,
+                    secondPlayerId: game.secondPlayerId,
                   ),
-                ],
+                  subtitle: CustomText(text: timeFormat.format(game.createdAt)),
+                  onTap: () => context.pushWidgetBuilder(
+                    (_) => EditGameScreen(gameId: game.id),
+                  ),
+                );
+              }
+              return ListTile(
                 autofocus: index == 0,
                 title: PlayersCustomText(
                   firstPlayerId: game.firstPlayerId,
                   secondPlayerId: game.secondPlayerId,
                 ),
                 subtitle: CustomText(text: timeFormat.format(game.createdAt)),
+                trailing: const Icon(Icons.lock, semanticLabel: 'Locked'),
                 onTap: () => context.pushWidgetBuilder(
-                  (_) => EditGameScreen(gameId: game.id),
+                  (_) => EditGameScreen(gameId: game.id, readOnly: true),
                 ),
               );
             },

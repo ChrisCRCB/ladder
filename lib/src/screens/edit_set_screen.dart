@@ -13,6 +13,7 @@ class EditSetScreen extends ConsumerWidget {
   const EditSetScreen({
     required this.setId,
     required this.setNumber,
+    this.readOnly = false,
     super.key,
   });
 
@@ -21,6 +22,9 @@ class EditSetScreen extends ConsumerWidget {
 
   /// The number of this set.
   final int setNumber;
+
+  /// Whether this set is read only.
+  final bool readOnly;
 
   /// Build the widget.
   @override
@@ -47,12 +51,17 @@ class EditSetScreen extends ConsumerWidget {
                             playerId: player.id,
                             points: _getPoints(points, player),
                           ),
-                          onTap: () => context.pushWidgetBuilder(
-                            (_) => CreateGamePointScreen(
-                              setId: setId,
-                              playerId: player.id,
-                            ),
-                          ),
+                          onTap: () {
+                            if (readOnly) {
+                              return;
+                            }
+                            context.pushWidgetBuilder(
+                              (_) => CreateGamePointScreen(
+                                setId: setId,
+                                playerId: player.id,
+                              ),
+                            );
+                          },
                         ),
                       ),
                       ...points.map((final pointContext) {
@@ -65,6 +74,18 @@ class EditSetScreen extends ConsumerWidget {
                         final query = database.managers.setPoints.filter(
                           (final f) => f.id.equals(gamePoint.id),
                         );
+                        if (readOnly) {
+                          return ListTile(
+                            title: PlayerCustomText(
+                              playerId: playerId,
+                              showPoints: false,
+                            ),
+                            subtitle: CustomText(
+                              text: '${point.name} (${point.value})',
+                            ),
+                            onTap: () {},
+                          );
+                        }
                         return PerformableActionsListTile(
                           actions: [
                             ...players.map(

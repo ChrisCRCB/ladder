@@ -15,23 +15,15 @@ class EditGameScreen extends ConsumerWidget {
   /// Create an instance.
   const EditGameScreen({
     required this.gameId,
-    this.winningPoints = 11,
-    this.clearPoints = 2,
-    this.numberOfServes = 2,
+    this.readOnly = false,
     super.key,
   });
 
   /// The ID of the game to show.
   final int gameId;
 
-  /// The number of points needed to win.
-  final int winningPoints;
-
-  /// The number of clear points needed to win.
-  final int clearPoints;
-
-  /// The number of serves each player gets.
-  final int numberOfServes;
+  /// Whether this screen should be read only.
+  final bool readOnly;
 
   /// Build the widget.
   @override
@@ -43,7 +35,7 @@ class EditGameScreen extends ConsumerWidget {
         final setsValue = ref.watch(gameSetsProvider(game.id));
         return Cancel(
           child: CommonShortcuts(
-            newCallback: () => _createSet(ref),
+            newCallback: readOnly ? null : () => _createSet(ref),
             child: Scaffold(
               appBar: AppBar(
                 title: PlayersCustomText(
@@ -120,10 +112,12 @@ class EditGameScreen extends ConsumerWidget {
                   shrinkWrap: true,
                 );
               }),
-              floatingActionButton: NewButton(
-                onPressed: () => _createSet(ref),
-                tooltip: 'Create set',
-              ),
+              floatingActionButton: readOnly
+                  ? null
+                  : NewButton(
+                      onPressed: () => _createSet(ref),
+                      tooltip: 'Create set',
+                    ),
             ),
           ),
         );

@@ -98,6 +98,9 @@ class ShowdownGames extends Table with IdMixin, CreatedAtMixin {
     #id,
     onDelete: KeyAction.cascade,
   )();
+
+  /// The date this game was locked on.
+  late final lockedOn = dateTime().nullable()();
 }
 
 /// A set in a [ShowdownGame].
