@@ -75,6 +75,24 @@ class LadderNightsPage extends ConsumerWidget {
                   ref.invalidate(ladderNightsProvider(teamId));
                 },
               ),
+              PerformableAction(
+                name: 'Delete',
+                activator: deleteShortcut,
+                invoke: () async {
+                  final games = await ref.read(gamesProvider(night.id).future);
+                  if (games.isEmpty) {
+                    await query.delete();
+
+                    ref.invalidate(ladderNightsProvider(teamId));
+                  } else if (context.mounted) {
+                    await context.showMessage(
+                      message:
+                          // ignore: lines_longer_than_80_chars
+                          'You cannot delete this night because games are scheduled.',
+                    );
+                  }
+                },
+              ),
             ],
             title: CustomText(text: dateFormat.format(night.createdAt)),
             onTap: () => context.pushWidgetBuilder(

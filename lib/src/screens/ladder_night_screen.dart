@@ -36,7 +36,14 @@ class LadderNightScreen extends ConsumerWidget {
               TabbedScaffoldTab(
                 title: 'Players',
                 icon: const Icon(Icons.group),
-                child: PlayerAttendancePage(ladderNightId: ladderNightId),
+                child: CommonShortcuts(
+                  newCallback: () => _createPlayer(ref),
+                  child: PlayerAttendancePage(ladderNightId: ladderNightId),
+                ),
+                floatingActionButton: NewButton(
+                  onPressed: () => _createPlayer(ref),
+                  tooltip: 'New player',
+                ),
               ),
             ],
           ),
@@ -65,4 +72,26 @@ class LadderNightScreen extends ConsumerWidget {
       );
     }
   }
+
+  /// Create a new player from inside the night screen.
+  Future<void> _createPlayer(final WidgetRef ref) =>
+      ref.context.pushWidgetBuilder(
+        (final innerContext) => GetText(
+          onDone: (final name) async {
+            innerContext.pop();
+            final database = ref.read(databaseProvider);
+            final night = await ref.read(
+              ladderNightProvider(ladderNightId).future,
+            );
+            await database.managers.teamPlayers.create(
+              (final o) => o(name: name, teamId: night.teamId),
+            );
+            ref
+              ..invalidate(teamPlayersProvider(night.teamId))
+              ..invalidate(attendingTeamPlayersProvider(ladderNightId));
+          },
+          labelText: 'Player name',
+          title: 'Create Player',
+        ),
+      );
 }
