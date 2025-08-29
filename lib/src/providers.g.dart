@@ -520,7 +520,7 @@ final class LadderNightsProvider
   }
 }
 
-String _$ladderNightsHash() => r'965ff8f5542dbb540d3d95b982b13cb6cbe92bc8';
+String _$ladderNightsHash() => r'9ff53ad4f3dbb17c6da2c13533e0fa635a19a87e';
 
 /// Provide the recent ladder nights.
 final class LadderNightsFamily extends $Family
@@ -1008,7 +1008,7 @@ final class AttendingTeamPlayersProvider
 }
 
 String _$attendingTeamPlayersHash() =>
-    r'baf0171055f9f9b61af43308a182ca1d7f0ab485';
+    r'74f3e2d92d63a83f7a6d2ff541439ca41d1677e4';
 
 /// Provide all the players who are attending the given ladder night.
 final class AttendingTeamPlayersFamily extends $Family
@@ -1354,11 +1354,11 @@ const setWinnerProvider = SetWinnerFamily._();
 final class SetWinnerProvider
     extends
         $FunctionalProvider<
-          AsyncValue<TeamPlayer?>,
-          TeamPlayer?,
-          FutureOr<TeamPlayer?>
+          AsyncValue<SetResults>,
+          SetResults,
+          FutureOr<SetResults>
         >
-    with $FutureModifier<TeamPlayer?>, $FutureProvider<TeamPlayer?> {
+    with $FutureModifier<SetResults>, $FutureProvider<SetResults> {
   /// Provide the winner of a given set.
   const SetWinnerProvider._({
     required SetWinnerFamily super.from,
@@ -1383,12 +1383,11 @@ final class SetWinnerProvider
 
   @$internal
   @override
-  $FutureProviderElement<TeamPlayer?> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
+  $FutureProviderElement<SetResults> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
 
   @override
-  FutureOr<TeamPlayer?> create(Ref ref) {
+  FutureOr<SetResults> create(Ref ref) {
     final argument = this.argument as int;
     return setWinner(ref, argument);
   }
@@ -1404,11 +1403,11 @@ final class SetWinnerProvider
   }
 }
 
-String _$setWinnerHash() => r'e8887eb994918ea5011ab3dfc8158d13427ec4e4';
+String _$setWinnerHash() => r'bf81c51f441212ab37fe4223cf60a6017a51f981';
 
 /// Provide the winner of a given set.
 final class SetWinnerFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<TeamPlayer?>, int> {
+    with $FunctionalFamilyOverride<FutureOr<SetResults>, int> {
   const SetWinnerFamily._()
     : super(
         retry: null,

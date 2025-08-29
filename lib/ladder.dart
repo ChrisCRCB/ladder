@@ -6,5 +6,6 @@ export 'src/player_attendance.dart';
 export 'src/providers.dart';
 export 'src/screens/_screens.dart';
 export 'src/set_point_context.dart';
+export 'src/set_results.dart';
 export 'src/shortcuts.dart';
 export 'src/widgets/_widgets.dart';

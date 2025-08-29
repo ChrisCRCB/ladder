@@ -22,8 +22,18 @@ class SetWinnerCustomText extends ConsumerWidget {
   Widget build(final BuildContext context, final WidgetRef ref) {
     final value = ref.watch(setWinnerProvider(setId));
     return value.when(
-      data: (final winner) =>
-          CustomText(text: winner?.name ?? undecidedMessage),
+      data: (final results) {
+        switch (results) {
+          case UndecidedSetResults():
+            return CustomText(text: undecidedMessage);
+          case DecidedSetResults():
+            return CustomText(
+              text:
+                  // ignore: lines_longer_than_80_chars
+                  '${results.winner.name} (${results.winningPoints}:${results.losingPoints})',
+            );
+        }
+      },
       error: ErrorText.withPositional,
       loading: () => CustomText(text: undecidedMessage),
     );

@@ -89,26 +89,30 @@ class GamesPage extends ConsumerWidget {
                               return;
                             }
                             for (final set in sets) {
-                              final winner = await ref.read(
+                              final results = await ref.read(
                                 setWinnerProvider(set.id).future,
                               );
-                              if (winner == null) {
-                                if (context.mounted) {
-                                  await context.showMessage(
-                                    message:
-                                        // ignore: lines_longer_than_80_chars
-                                        'This game cannot be locked until all sets have a winner.',
-                                  );
-                                }
-                                return;
-                              } else {
-                                await database.managers.teamPlayers
-                                    .filter((final f) => f.id.equals(winner.id))
-                                    .update(
-                                      (final o) =>
-                                          o(points: Value(winner.points + 1)),
+                              switch (results) {
+                                case UndecidedSetResults():
+                                  if (context.mounted) {
+                                    await context.showMessage(
+                                      message:
+                                          // ignore: lines_longer_than_80_chars
+                                          'This game cannot be locked until all sets have a winner.',
                                     );
-                                ref.invalidate(teamPlayerProvider(winner.id));
+                                  }
+                                  return;
+                                case DecidedSetResults():
+                                  final winner = results.winner;
+                                  await database.managers.teamPlayers
+                                      .filter(
+                                        (final f) => f.id.equals(winner.id),
+                                      )
+                                      .update(
+                                        (final o) =>
+                                            o(points: Value(winner.points + 1)),
+                                      );
+                                  ref.invalidate(teamPlayerProvider(winner.id));
                               }
                             }
                             ref.invalidate(teamPlayersProvider);

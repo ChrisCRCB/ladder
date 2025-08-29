@@ -76,6 +76,7 @@ Future<List<ShowdownPoint>> showdownPoints(final Ref ref, final int teamId) {
 Future<List<LadderNight>> ladderNights(final Ref ref, final int teamId) async {
   final database = ref.watch(databaseProvider);
   return database.managers.ladderNights
+      .filter((final f) => f.teamId.id.equals(teamId))
       .orderBy((final o) => o.createdAt.desc())
       .get();
 }
@@ -188,6 +189,7 @@ Future<List<TeamPlayer>> attendingTeamPlayers(
   final int ladderNightId,
 ) async {
   final db = ref.watch(databaseProvider);
+  final night = await ref.watch(ladderNightProvider(ladderNightId).future);
   final query =
       await (db.select(db.teamPlayers).join([
               innerJoin(
@@ -204,7 +206,10 @@ Future<List<TeamPlayer>> attendingTeamPlayers(
                 useColumns: false,
               ),
             ])
-            ..where(db.ladderNightAbsences.id.isNull())
+            ..where(
+              db.ladderNightAbsences.id.isNull() &
+                  db.teamPlayers.teamId.equals(night.teamId),
+            )
             ..orderBy([OrderingTerm.asc(db.teamPlayers.name)]))
           .get();
   final results = query.map((final row) => row.readTable(db.teamPlayers));
@@ -273,7 +278,7 @@ Future<List<TeamPlayer>> gamePlayers(final Ref ref, final int gameId) async {
 
 /// Provide the winner of a given set.
 @riverpod
-Future<TeamPlayer?> setWinner(final Ref ref, final int setId) async {
+Future<SetResults> setWinner(final Ref ref, final int setId) async {
   final set = await ref.watch(gameSetProvider(setId).future);
   final points = await ref.watch(setPointsProvider(setId).future);
   final players = await ref.watch(gamePlayersProvider(set.gameId).future);
@@ -284,11 +289,21 @@ Future<TeamPlayer?> setWinner(final Ref ref, final int setId) async {
   final team = await ref.watch(showdownTeamProvider(firstPlayer.teamId).future);
   if (player1Points >= team.winningPoints &&
       (player1Points - player2Points) >= team.clearPoints) {
-    return firstPlayer;
+    return DecidedSetResults(
+      winner: firstPlayer,
+      winningPoints: player1Points,
+      loser: secondPlayer,
+      losingPoints: player2Points,
+    );
   }
   if (player2Points >= team.winningPoints &&
       (player2Points - player1Points) >= team.clearPoints) {
-    return secondPlayer;
+    return DecidedSetResults(
+      winner: secondPlayer,
+      winningPoints: player2Points,
+      loser: firstPlayer,
+      losingPoints: player1Points,
+    );
   }
-  return null;
+  return const UndecidedSetResults();
 }
