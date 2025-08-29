@@ -99,6 +99,30 @@ class $ShowdownTeamsTable extends ShowdownTeams
     requiredDuringInsert: false,
     defaultValue: const Constant(5),
   );
+  static const VerificationMeta _winningPointsMeta = const VerificationMeta(
+    'winningPoints',
+  );
+  @override
+  late final GeneratedColumn<int> winningPoints = GeneratedColumn<int>(
+    'winning_points',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(11),
+  );
+  static const VerificationMeta _clearPointsMeta = const VerificationMeta(
+    'clearPoints',
+  );
+  @override
+  late final GeneratedColumn<int> clearPoints = GeneratedColumn<int>(
+    'clear_points',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(2),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -108,6 +132,8 @@ class $ShowdownTeamsTable extends ShowdownTeams
     lastAccessed,
     gameLength,
     challengePoints,
+    winningPoints,
+    clearPoints,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -171,6 +197,24 @@ class $ShowdownTeamsTable extends ShowdownTeams
         ),
       );
     }
+    if (data.containsKey('winning_points')) {
+      context.handle(
+        _winningPointsMeta,
+        winningPoints.isAcceptableOrUnknown(
+          data['winning_points']!,
+          _winningPointsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('clear_points')) {
+      context.handle(
+        _clearPointsMeta,
+        clearPoints.isAcceptableOrUnknown(
+          data['clear_points']!,
+          _clearPointsMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -208,6 +252,14 @@ class $ShowdownTeamsTable extends ShowdownTeams
         DriftSqlType.int,
         data['${effectivePrefix}challenge_points'],
       )!,
+      winningPoints: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}winning_points'],
+      )!,
+      clearPoints: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}clear_points'],
+      )!,
     );
   }
 
@@ -238,6 +290,12 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
 
   /// The points difference before a challenge can be made.
   final int challengePoints;
+
+  /// The number of points to win a game.
+  final int winningPoints;
+
+  /// The number of clear points.
+  final int clearPoints;
   const ShowdownTeam({
     required this.id,
     required this.name,
@@ -246,6 +304,8 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
     required this.lastAccessed,
     required this.gameLength,
     required this.challengePoints,
+    required this.winningPoints,
+    required this.clearPoints,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -257,6 +317,8 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
     map['last_accessed'] = Variable<DateTime>(lastAccessed);
     map['game_length'] = Variable<int>(gameLength);
     map['challenge_points'] = Variable<int>(challengePoints);
+    map['winning_points'] = Variable<int>(winningPoints);
+    map['clear_points'] = Variable<int>(clearPoints);
     return map;
   }
 
@@ -269,6 +331,8 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
       lastAccessed: Value(lastAccessed),
       gameLength: Value(gameLength),
       challengePoints: Value(challengePoints),
+      winningPoints: Value(winningPoints),
+      clearPoints: Value(clearPoints),
     );
   }
 
@@ -285,6 +349,8 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
       lastAccessed: serializer.fromJson<DateTime>(json['lastAccessed']),
       gameLength: serializer.fromJson<int>(json['gameLength']),
       challengePoints: serializer.fromJson<int>(json['challengePoints']),
+      winningPoints: serializer.fromJson<int>(json['winningPoints']),
+      clearPoints: serializer.fromJson<int>(json['clearPoints']),
     );
   }
   @override
@@ -298,6 +364,8 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
       'lastAccessed': serializer.toJson<DateTime>(lastAccessed),
       'gameLength': serializer.toJson<int>(gameLength),
       'challengePoints': serializer.toJson<int>(challengePoints),
+      'winningPoints': serializer.toJson<int>(winningPoints),
+      'clearPoints': serializer.toJson<int>(clearPoints),
     };
   }
 
@@ -309,6 +377,8 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
     DateTime? lastAccessed,
     int? gameLength,
     int? challengePoints,
+    int? winningPoints,
+    int? clearPoints,
   }) => ShowdownTeam(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -317,6 +387,8 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
     lastAccessed: lastAccessed ?? this.lastAccessed,
     gameLength: gameLength ?? this.gameLength,
     challengePoints: challengePoints ?? this.challengePoints,
+    winningPoints: winningPoints ?? this.winningPoints,
+    clearPoints: clearPoints ?? this.clearPoints,
   );
   ShowdownTeam copyWithCompanion(ShowdownTeamsCompanion data) {
     return ShowdownTeam(
@@ -335,6 +407,12 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
       challengePoints: data.challengePoints.present
           ? data.challengePoints.value
           : this.challengePoints,
+      winningPoints: data.winningPoints.present
+          ? data.winningPoints.value
+          : this.winningPoints,
+      clearPoints: data.clearPoints.present
+          ? data.clearPoints.value
+          : this.clearPoints,
     );
   }
 
@@ -347,7 +425,9 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
           ..write('emailAddress: $emailAddress, ')
           ..write('lastAccessed: $lastAccessed, ')
           ..write('gameLength: $gameLength, ')
-          ..write('challengePoints: $challengePoints')
+          ..write('challengePoints: $challengePoints, ')
+          ..write('winningPoints: $winningPoints, ')
+          ..write('clearPoints: $clearPoints')
           ..write(')'))
         .toString();
   }
@@ -361,6 +441,8 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
     lastAccessed,
     gameLength,
     challengePoints,
+    winningPoints,
+    clearPoints,
   );
   @override
   bool operator ==(Object other) =>
@@ -372,7 +454,9 @@ class ShowdownTeam extends DataClass implements Insertable<ShowdownTeam> {
           other.emailAddress == this.emailAddress &&
           other.lastAccessed == this.lastAccessed &&
           other.gameLength == this.gameLength &&
-          other.challengePoints == this.challengePoints);
+          other.challengePoints == this.challengePoints &&
+          other.winningPoints == this.winningPoints &&
+          other.clearPoints == this.clearPoints);
 }
 
 class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
@@ -383,6 +467,8 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
   final Value<DateTime> lastAccessed;
   final Value<int> gameLength;
   final Value<int> challengePoints;
+  final Value<int> winningPoints;
+  final Value<int> clearPoints;
   const ShowdownTeamsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -391,6 +477,8 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
     this.lastAccessed = const Value.absent(),
     this.gameLength = const Value.absent(),
     this.challengePoints = const Value.absent(),
+    this.winningPoints = const Value.absent(),
+    this.clearPoints = const Value.absent(),
   });
   ShowdownTeamsCompanion.insert({
     this.id = const Value.absent(),
@@ -400,6 +488,8 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
     this.lastAccessed = const Value.absent(),
     this.gameLength = const Value.absent(),
     this.challengePoints = const Value.absent(),
+    this.winningPoints = const Value.absent(),
+    this.clearPoints = const Value.absent(),
   }) : name = Value(name);
   static Insertable<ShowdownTeam> custom({
     Expression<int>? id,
@@ -409,6 +499,8 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
     Expression<DateTime>? lastAccessed,
     Expression<int>? gameLength,
     Expression<int>? challengePoints,
+    Expression<int>? winningPoints,
+    Expression<int>? clearPoints,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -418,6 +510,8 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
       if (lastAccessed != null) 'last_accessed': lastAccessed,
       if (gameLength != null) 'game_length': gameLength,
       if (challengePoints != null) 'challenge_points': challengePoints,
+      if (winningPoints != null) 'winning_points': winningPoints,
+      if (clearPoints != null) 'clear_points': clearPoints,
     });
   }
 
@@ -429,6 +523,8 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
     Value<DateTime>? lastAccessed,
     Value<int>? gameLength,
     Value<int>? challengePoints,
+    Value<int>? winningPoints,
+    Value<int>? clearPoints,
   }) {
     return ShowdownTeamsCompanion(
       id: id ?? this.id,
@@ -438,6 +534,8 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
       lastAccessed: lastAccessed ?? this.lastAccessed,
       gameLength: gameLength ?? this.gameLength,
       challengePoints: challengePoints ?? this.challengePoints,
+      winningPoints: winningPoints ?? this.winningPoints,
+      clearPoints: clearPoints ?? this.clearPoints,
     );
   }
 
@@ -465,6 +563,12 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
     if (challengePoints.present) {
       map['challenge_points'] = Variable<int>(challengePoints.value);
     }
+    if (winningPoints.present) {
+      map['winning_points'] = Variable<int>(winningPoints.value);
+    }
+    if (clearPoints.present) {
+      map['clear_points'] = Variable<int>(clearPoints.value);
+    }
     return map;
   }
 
@@ -477,7 +581,9 @@ class ShowdownTeamsCompanion extends UpdateCompanion<ShowdownTeam> {
           ..write('emailAddress: $emailAddress, ')
           ..write('lastAccessed: $lastAccessed, ')
           ..write('gameLength: $gameLength, ')
-          ..write('challengePoints: $challengePoints')
+          ..write('challengePoints: $challengePoints, ')
+          ..write('winningPoints: $winningPoints, ')
+          ..write('clearPoints: $clearPoints')
           ..write(')'))
         .toString();
   }
@@ -2944,6 +3050,8 @@ typedef $$ShowdownTeamsTableCreateCompanionBuilder =
       Value<DateTime> lastAccessed,
       Value<int> gameLength,
       Value<int> challengePoints,
+      Value<int> winningPoints,
+      Value<int> clearPoints,
     });
 typedef $$ShowdownTeamsTableUpdateCompanionBuilder =
     ShowdownTeamsCompanion Function({
@@ -2954,6 +3062,8 @@ typedef $$ShowdownTeamsTableUpdateCompanionBuilder =
       Value<DateTime> lastAccessed,
       Value<int> gameLength,
       Value<int> challengePoints,
+      Value<int> winningPoints,
+      Value<int> clearPoints,
     });
 
 final class $$ShowdownTeamsTableReferences
@@ -3068,6 +3178,16 @@ class $$ShowdownTeamsTableFilterComposer
 
   ColumnFilters<int> get challengePoints => $composableBuilder(
     column: $table.challengePoints,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get winningPoints => $composableBuilder(
+    column: $table.winningPoints,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get clearPoints => $composableBuilder(
+    column: $table.clearPoints,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3190,6 +3310,16 @@ class $$ShowdownTeamsTableOrderingComposer
     column: $table.challengePoints,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get winningPoints => $composableBuilder(
+    column: $table.winningPoints,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get clearPoints => $composableBuilder(
+    column: $table.clearPoints,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ShowdownTeamsTableAnnotationComposer
@@ -3227,6 +3357,16 @@ class $$ShowdownTeamsTableAnnotationComposer
 
   GeneratedColumn<int> get challengePoints => $composableBuilder(
     column: $table.challengePoints,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get winningPoints => $composableBuilder(
+    column: $table.winningPoints,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get clearPoints => $composableBuilder(
+    column: $table.clearPoints,
     builder: (column) => column,
   );
 
@@ -3347,6 +3487,8 @@ class $$ShowdownTeamsTableTableManager
                 Value<DateTime> lastAccessed = const Value.absent(),
                 Value<int> gameLength = const Value.absent(),
                 Value<int> challengePoints = const Value.absent(),
+                Value<int> winningPoints = const Value.absent(),
+                Value<int> clearPoints = const Value.absent(),
               }) => ShowdownTeamsCompanion(
                 id: id,
                 name: name,
@@ -3355,6 +3497,8 @@ class $$ShowdownTeamsTableTableManager
                 lastAccessed: lastAccessed,
                 gameLength: gameLength,
                 challengePoints: challengePoints,
+                winningPoints: winningPoints,
+                clearPoints: clearPoints,
               ),
           createCompanionCallback:
               ({
@@ -3365,6 +3509,8 @@ class $$ShowdownTeamsTableTableManager
                 Value<DateTime> lastAccessed = const Value.absent(),
                 Value<int> gameLength = const Value.absent(),
                 Value<int> challengePoints = const Value.absent(),
+                Value<int> winningPoints = const Value.absent(),
+                Value<int> clearPoints = const Value.absent(),
               }) => ShowdownTeamsCompanion.insert(
                 id: id,
                 name: name,
@@ -3373,6 +3519,8 @@ class $$ShowdownTeamsTableTableManager
                 lastAccessed: lastAccessed,
                 gameLength: gameLength,
                 challengePoints: challengePoints,
+                winningPoints: winningPoints,
+                clearPoints: clearPoints,
               ),
           withReferenceMapper: (p0) => p0
               .map(

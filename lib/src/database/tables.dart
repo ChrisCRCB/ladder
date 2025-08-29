@@ -1,5 +1,11 @@
 import 'package:drift/drift.dart';
-import 'package:ladder/ladder.dart';
+import 'package:ladder/ladder.dart' show GameSet, LadderNight, ShowdownGame;
+import 'package:ladder/src/database/_DATABASE.dart'
+    show GameSet, LadderNight, ShowdownGame;
+import 'package:ladder/src/database/_database.dart'
+    show GameSet, LadderNight, ShowdownGame;
+import 'package:ladder/src/database/database.dart'
+    show GameSet, LadderNight, ShowdownGame;
 
 /// Add an [id] column.
 mixin IdMixin on Table {
@@ -58,6 +64,12 @@ class ShowdownTeams extends Table
 
   /// The points difference before a challenge can be made.
   late final challengePoints = integer().withDefault(const Constant(5))();
+
+  /// The number of points to win a game.
+  late final winningPoints = integer().withDefault(const Constant(11))();
+
+  /// The number of clear points.
+  late final clearPoints = integer().withDefault(const Constant(2))();
 }
 
 /// The team players table.
