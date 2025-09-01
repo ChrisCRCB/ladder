@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
 
@@ -48,6 +50,15 @@ class _HomeScreenState extends ConsumerState<_HomeScreen> {
   @override
   Widget build(final BuildContext context) {
     _database = ref.watch(databaseProvider);
+    if (kIsWeb) {
+      RendererBinding.instance.ensureSemantics();
+      if (kDebugMode) {
+        print(
+          // ignore: lines_longer_than_80_chars
+          'Forcing semantics on web. Target platform: ${defaultTargetPlatform.name}.',
+        );
+      }
+    }
     return const TeamsScreen();
   }
 }

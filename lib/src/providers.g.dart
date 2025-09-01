@@ -93,7 +93,7 @@ final class DatabaseProvider
   }
 }
 
-String _$databaseHash() => r'9a4f1a58acff20e190eac7bfa49cd300ea8dcf2c';
+String _$databaseHash() => r'e5564696ccbb1fd85d684b18852129c8a05baab7';
 
 /// Provide all teams in the database.
 @ProviderFor(showdownTeams)

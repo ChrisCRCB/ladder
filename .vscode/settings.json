@@ -3,6 +3,7 @@
     "challengeable",
     "Colors",
     "daos",
+    "ffi",
     "riverpod"
   ]
 }

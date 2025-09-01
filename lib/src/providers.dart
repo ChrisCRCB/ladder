@@ -21,7 +21,7 @@ Future<ApplicationSettings> applicationSettings(final Ref ref) async {
 
 /// Provide the database.
 @Riverpod(keepAlive: true)
-LadderDatabase database(final Ref ref) => LadderDatabase();
+LadderDatabase database(final Ref ref) => openDatabase();
 
 /// Provide all teams in the database.
 @riverpod

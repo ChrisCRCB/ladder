@@ -1,10 +1,5 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:ladder/src/database/tables.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 
 part 'database.g.dart';
 
@@ -23,14 +18,7 @@ part 'database.g.dart';
 )
 class LadderDatabase extends _$LadderDatabase {
   /// Create an instance.
-  LadderDatabase({final String filename = 'ladder.sqlite3'})
-    : super(
-        LazyDatabase(() async {
-          final directory = await getApplicationDocumentsDirectory();
-          final file = File(path.join(directory.path, filename));
-          return NativeDatabase(file);
-        }),
-      );
+  LadderDatabase(super.e);
 
   /// The schema version to use.
   @override
