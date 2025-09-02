@@ -22,13 +22,17 @@ class LadderDatabase extends _$LadderDatabase {
 
   /// The schema version to use.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   /// The migration strategy to use.
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (final m) => m.createAll(),
     beforeOpen: (final details) => customStatement('PRAGMA foreign_keys = ON'),
-    onUpgrade: (final m, final from, final to) async {},
+    onUpgrade: (final m, final from, final to) async {
+      if (from < 2) {
+        await m.addColumn(showdownTeams, showdownTeams.servesPerPlayer);
+      }
+    },
   );
 }

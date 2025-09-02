@@ -70,6 +70,9 @@ class ShowdownTeams extends Table
 
   /// The number of clear points.
   late final clearPoints = integer().withDefault(const Constant(2))();
+
+  /// The number of serves each player gets.
+  late final servesPerPlayer = integer().withDefault(const Constant(2))();
 }
 
 /// The team players table.
