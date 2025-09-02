@@ -68,7 +68,7 @@ Future<TeamPlayer> teamPlayer(final Ref ref, final int playerId) {
 ///
 /// It is worth noting that even "fouls" are "scored" by the player they are
 /// against.
-@Riverpod(dependencies: [setPoints])
+@riverpod
 Future<List<ShowdownPoint>> showdownPoints(
   final Ref ref,
   final int teamId, {
@@ -370,7 +370,7 @@ Future<SetResults> setResults(final Ref ref, final int setId) async {
 
 /// Returns the possible points, organised by how often the given player has
 /// scored them.
-@Riverpod(dependencies: [setPoints])
+@riverpod
 Future<List<({ShowdownPoint point, int score})>> showdownPointScores(
   final Ref ref,
   final int playerId,

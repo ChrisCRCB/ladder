@@ -423,8 +423,6 @@ final class ShowdownPointsProvider
          $allTransitiveDependencies: null,
        );
 
-  static const $allTransitiveDependencies0 = setPointsProvider;
-
   @override
   String debugGetCreateSourceHash() => _$showdownPointsHash();
 
@@ -458,7 +456,7 @@ final class ShowdownPointsProvider
   }
 }
 
-String _$showdownPointsHash() => r'd04d15a90ed834362b94a540cded809fa4380317';
+String _$showdownPointsHash() => r'4a5714593e375af633656f8509f1d2204958a63d';
 
 /// Provide all the fouls for a given team.
 ///
@@ -477,10 +475,8 @@ final class ShowdownPointsFamily extends $Family
     : super(
         retry: null,
         name: r'showdownPointsProvider',
-        dependencies: const <ProviderOrFamily>[setPointsProvider],
-        $allTransitiveDependencies: const <ProviderOrFamily>[
-          ShowdownPointsProvider.$allTransitiveDependencies0,
-        ],
+        dependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
@@ -1496,8 +1492,6 @@ final class ShowdownPointScoresProvider
          $allTransitiveDependencies: null,
        );
 
-  static const $allTransitiveDependencies0 = setPointsProvider;
-
   @override
   String debugGetCreateSourceHash() => _$showdownPointScoresHash();
 
@@ -1531,7 +1525,7 @@ final class ShowdownPointScoresProvider
 }
 
 String _$showdownPointScoresHash() =>
-    r'3786ee40edcb78026e5d8c1d825f5c76ee7c5600';
+    r'67ed25cc15c4601ad99b21648b71fbc5180746ef';
 
 /// Returns the possible points, organised by how often the given player has
 /// scored them.
@@ -1545,10 +1539,8 @@ final class ShowdownPointScoresFamily extends $Family
     : super(
         retry: null,
         name: r'showdownPointScoresProvider',
-        dependencies: const <ProviderOrFamily>[setPointsProvider],
-        $allTransitiveDependencies: const <ProviderOrFamily>[
-          ShowdownPointScoresProvider.$allTransitiveDependencies0,
-        ],
+        dependencies: null,
+        $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
