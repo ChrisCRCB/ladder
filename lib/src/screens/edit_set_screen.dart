@@ -243,7 +243,14 @@ class _PlayerListTile extends ConsumerWidget {
                       pointId: point.id,
                     ),
                   );
-                  ref.invalidate(setPointsProvider(setId));
+                  ref
+                    ..invalidate(setPointsProvider(setId))
+                    ..invalidate(
+                      showdownPointsProvider(
+                        player.teamId,
+                        playerId: player.id,
+                      ),
+                    );
                 },
               ),
             )

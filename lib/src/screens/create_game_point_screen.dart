@@ -34,7 +34,11 @@ class CreateGamePointScreen extends ConsumerWidget {
                 (final f) =>
                     f(gameSetId: setId, playerId: playerId, pointId: point.id),
               );
-              ref.invalidate(setPointsProvider(setId));
+              ref
+                ..invalidate(setPointsProvider(setId))
+                ..invalidate(
+                  showdownPointsProvider(player.teamId, playerId: playerId),
+                );
             },
             playerId: playerId,
           ),
