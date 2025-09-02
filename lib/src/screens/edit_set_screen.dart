@@ -81,27 +81,15 @@ class EditSetScreen extends ConsumerWidget {
                       children: [
                         ...players.map((final player) {
                           final isServing = player.id == server.id;
-                          return ListTile(
+                          return _PlayerListTile(
                             autofocus: player.id == players.first.id,
-                            selected: isServing,
-                            title: PlayerCustomText(
-                              playerId: player.id,
-                              points: getPoints(points, player),
-                            ),
-                            subtitle: isServing
-                                ? CustomText(text: '$serveNumber')
-                                : const CustomText(text: 'Receiving'),
-                            onTap: () {
-                              if (readOnly) {
-                                return;
-                              }
-                              context.pushWidgetBuilder(
-                                (_) => CreateGamePointScreen(
-                                  setId: setId,
-                                  playerId: player.id,
-                                ),
-                              );
-                            },
+                            isServing: isServing,
+                            player: player,
+                            readOnly: readOnly,
+                            serveNumber: serveNumber,
+                            setId: setId,
+                            setNumber: setNumber,
+                            points: points,
                           );
                         }),
                         ...points.map((final pointContext) {
@@ -192,6 +180,109 @@ class EditSetScreen extends ConsumerWidget {
           error: ErrorScreen.withPositional,
           loading: LoadingScreen.new,
         ),
+      ),
+    );
+  }
+}
+
+class _PlayerListTile extends ConsumerWidget {
+  /// Create an instance.
+  const _PlayerListTile({
+    required this.autofocus,
+    required this.isServing,
+    required this.player,
+    required this.readOnly,
+    required this.serveNumber,
+    required this.setId,
+    required this.setNumber,
+    required this.points,
+  });
+
+  /// The ID of the set that [player] is playing in.
+  final int setId;
+
+  /// The set number.
+  final int setNumber;
+
+  /// The player to show.
+  final TeamPlayer player;
+
+  /// The serve number for [player].
+  final int serveNumber;
+
+  /// Whether the set is read-only.
+  final bool readOnly;
+
+  /// Whether the [ListTile] should be autofocused.
+  final bool autofocus;
+
+  /// Whether [player] is serving.
+  final bool isServing;
+
+  /// The list of points which have been scored so far in the set.
+  final List<SetPointContext> points;
+
+  /// Build the widget.
+  @override
+  Widget build(final BuildContext context, final WidgetRef ref) {
+    final database = ref.watch(databaseProvider);
+    final value = ref.watch(showdownPointsProvider(player.teamId));
+    return value.when(
+      data: (final showdownPoints) => PerformableActionsListTile(
+        actions: showdownPoints
+            .map(
+              (final point) => PerformableAction(
+                name: '${point.name} (${point.value})',
+                invoke: () async {
+                  await database.managers.setPoints.create(
+                    (final o) => o(
+                      gameSetId: setId,
+                      playerId: player.id,
+                      pointId: point.id,
+                    ),
+                  );
+                  ref.invalidate(setPointsProvider(setId));
+                },
+              ),
+            )
+            .toList(),
+        autofocus: autofocus,
+        selected: isServing,
+        title: PlayerCustomText(
+          playerId: player.id,
+          points: getPoints(points, player),
+        ),
+        subtitle: isServing
+            ? CustomText(text: '$serveNumber')
+            : const CustomText(text: 'Receiving'),
+        onTap: () {
+          if (readOnly) {
+            return;
+          }
+          context.pushWidgetBuilder(
+            (_) => CreateGamePointScreen(setId: setId, playerId: player.id),
+          );
+        },
+      ),
+      error: ErrorText.withPositional,
+      loading: () => ListTile(
+        autofocus: autofocus,
+        selected: isServing,
+        title: PlayerCustomText(
+          playerId: player.id,
+          points: getPoints(points, player),
+        ),
+        subtitle: isServing
+            ? CustomText(text: '$serveNumber')
+            : const CustomText(text: 'Receiving'),
+        onTap: () {
+          if (readOnly) {
+            return;
+          }
+          context.pushWidgetBuilder(
+            (_) => CreateGamePointScreen(setId: setId, playerId: player.id),
+          );
+        },
       ),
     );
   }
