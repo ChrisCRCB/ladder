@@ -36,6 +36,7 @@ class CreateGamePointScreen extends ConsumerWidget {
               );
               ref.invalidate(setPointsProvider(setId));
             },
+            playerId: playerId,
           ),
           error: ErrorScreen.withPositional,
           loading: LoadingScreen.new,

@@ -62,13 +62,64 @@ Future<TeamPlayer> teamPlayer(final Ref ref, final int playerId) {
 }
 
 /// Provide all the fouls for a given team.
+///
+/// If [playerId] is not `null`, then points will be ordered by the frequency
+/// they have been scored by that player.
+///
+/// It is worth noting that even "fouls" are "scored" by the player they are
+/// against.
 @riverpod
-Future<List<ShowdownPoint>> showdownPoints(final Ref ref, final int teamId) {
+Future<List<ShowdownPoint>> showdownPoints(
+  final Ref ref,
+  final int teamId, {
+  final int? playerId,
+}) async {
   final database = ref.watch(databaseProvider);
-  return database.managers.showdownPoints
-      .filter((final f) => f.teamId.id.equals(teamId))
-      .orderBy((final o) => o.name.asc())
-      .get();
+  if (playerId == null) {
+    return database.managers.showdownPoints
+        .filter((final f) => f.teamId.id.equals(teamId))
+        .orderBy((final o) => o.name.asc())
+        .get();
+  }
+  final setPointsTable = database.setPoints;
+  final showdownPointsTable = database.showdownPoints;
+  final player = await ref.watch(teamPlayerProvider(playerId).future);
+  final countColumn = setPointsTable.id.count();
+  final rows =
+      await (database.selectOnly(showdownPointsTable)
+            ..addColumns([
+              showdownPointsTable.id,
+              showdownPointsTable.name,
+              showdownPointsTable.value,
+              showdownPointsTable.teamId,
+              countColumn, // exposes the aggregate
+            ])
+            ..join([
+              // LEFT JOIN so points with zero usage still appear with count = 0
+              leftOuterJoin(
+                setPointsTable,
+                setPointsTable.pointId.equalsExp(showdownPointsTable.id) &
+                    setPointsTable.playerId.equals(playerId),
+              ),
+            ])
+            ..where(showdownPointsTable.teamId.equals(player.teamId))
+            ..groupBy([showdownPointsTable.id])
+            ..orderBy([
+              OrderingTerm.desc(countColumn),
+              OrderingTerm.asc(showdownPointsTable.name),
+            ]))
+          .get();
+
+  return rows
+      .map(
+        (final row) => ShowdownPoint(
+          id: row.read(showdownPointsTable.id)!,
+          name: row.read(showdownPointsTable.name)!,
+          value: row.read(showdownPointsTable.value)!,
+          teamId: row.read(showdownPointsTable.teamId)!,
+        ),
+      )
+      .toList();
 }
 
 /// Provide the recent ladder nights.
@@ -315,4 +366,73 @@ Future<SetResults> setResults(final Ref ref, final int setId) async {
     );
   }
   return const UndecidedSetResults();
+}
+
+/// Returns the possible points, organised by how often the given player has
+/// scored them.
+@riverpod
+Future<List<({ShowdownPoint point, int score})>> showdownPointScores(
+  final Ref ref,
+  final int playerId,
+) async {
+  final database = ref.watch(databaseProvider);
+  final setPointsTable = database.setPoints;
+  final showdownPointsTable = database.showdownPoints;
+  final player = await ref.watch(teamPlayerProvider(playerId).future);
+  final countColumn = setPointsTable.id.count();
+  final rows =
+      await (database.selectOnly(showdownPointsTable)
+            ..addColumns([
+              showdownPointsTable.id,
+              showdownPointsTable.name,
+              showdownPointsTable.value,
+              showdownPointsTable.teamId,
+              countColumn, // exposes the aggregate
+            ])
+            ..join([
+              // LEFT JOIN so points with zero usage still appear with count = 0
+              leftOuterJoin(
+                setPointsTable,
+                setPointsTable.pointId.equalsExp(showdownPointsTable.id) &
+                    setPointsTable.playerId.equals(playerId),
+              ),
+            ])
+            ..where(showdownPointsTable.teamId.equals(player.teamId))
+            ..groupBy([showdownPointsTable.id])
+            ..orderBy([
+              OrderingTerm.desc(countColumn),
+              OrderingTerm.asc(showdownPointsTable.name),
+            ]))
+          .get();
+
+  return rows
+      .map(
+        (final row) => (
+          point: ShowdownPoint(
+            id: row.read(showdownPointsTable.id)!,
+            name: row.read(showdownPointsTable.name)!,
+            value: row.read(showdownPointsTable.value)!,
+            teamId: row.read(showdownPointsTable.teamId)!,
+          ),
+          score: row.read(countColumn) ?? 0,
+        ),
+      )
+      .toList();
+}
+
+/// Provide all the games played by the given player.
+@riverpod
+Future<List<ShowdownGame>> playerGames(
+  final Ref ref,
+  final int playerId,
+) async {
+  final database = ref.watch(databaseProvider);
+  return database.managers.showdownGames
+      .filter(
+        (final f) =>
+            f.firstPlayerId.id.equals(playerId) |
+            f.secondPlayerId.id.equals(playerId),
+      )
+      .orderBy((final o) => o.createdAt.desc())
+      .get();
 }

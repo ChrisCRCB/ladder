@@ -12,6 +12,7 @@ class SelectShowdownPointScreen extends ConsumerWidget {
     required this.teamId,
     required this.onChanged,
     this.showdownPointId,
+    this.playerId,
     this.title = 'Select Point Type',
     super.key,
   });
@@ -25,13 +26,16 @@ class SelectShowdownPointScreen extends ConsumerWidget {
   /// The ID of the current point.
   final int? showdownPointId;
 
+  /// The ID of the player to sort points by.
+  final int? playerId;
+
   /// The title of the screen.
   final String title;
 
   /// Build the widget.
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
-    final value = ref.watch(showdownPointsProvider(teamId));
+    final value = ref.watch(showdownPointsProvider(teamId, playerId: playerId));
     return Cancel(
       child: FontShortcuts(
         child: SimpleScaffold(

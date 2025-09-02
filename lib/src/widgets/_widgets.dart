@@ -6,6 +6,8 @@ export 'games_page.dart';
 export 'ladder_nights_page.dart';
 export 'player_attendance_page.dart';
 export 'player_custom_text.dart';
+export 'player_games_page.dart';
+export 'player_points_page.dart';
 export 'players_custom_text.dart';
 export 'players_page.dart';
 export 'points_page.dart';

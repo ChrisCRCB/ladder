@@ -226,7 +226,9 @@ class _PlayerListTile extends ConsumerWidget {
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
     final database = ref.watch(databaseProvider);
-    final value = ref.watch(showdownPointsProvider(player.teamId));
+    final value = ref.watch(
+      showdownPointsProvider(player.teamId, playerId: player.id),
+    );
     return value.when(
       data: (final showdownPoints) => PerformableActionsListTile(
         actions: showdownPoints

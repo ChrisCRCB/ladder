@@ -3,6 +3,7 @@ export 'create_game_screen.dart';
 export 'edit_game_screen.dart';
 export 'edit_set_screen.dart';
 export 'ladder_night_screen.dart';
+export 'player_screen.dart';
 export 'select_showdown_point_screen.dart';
 export 'team_screen.dart';
 export 'teams_screen.dart';

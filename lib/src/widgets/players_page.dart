@@ -82,7 +82,9 @@ class PlayersPage extends ConsumerWidget {
             ],
             title: CustomText(text: player.name),
             subtitle: CustomText(text: '${player.points}'),
-            onTap: () {},
+            onTap: () => context.pushWidgetBuilder(
+              (_) => PlayerScreen(playerId: player.id),
+            ),
           );
         },
         itemCount: players.length,

@@ -379,10 +379,22 @@ final class TeamPlayerFamily extends $Family
 }
 
 /// Provide all the fouls for a given team.
+///
+/// If [playerId] is not `null`, then points will be ordered by the frequency
+/// they have been scored by that player.
+///
+/// It is worth noting that even "fouls" are "scored" by the player they are
+/// against.
 @ProviderFor(showdownPoints)
 const showdownPointsProvider = ShowdownPointsFamily._();
 
 /// Provide all the fouls for a given team.
+///
+/// If [playerId] is not `null`, then points will be ordered by the frequency
+/// they have been scored by that player.
+///
+/// It is worth noting that even "fouls" are "scored" by the player they are
+/// against.
 final class ShowdownPointsProvider
     extends
         $FunctionalProvider<
@@ -394,9 +406,15 @@ final class ShowdownPointsProvider
         $FutureModifier<List<ShowdownPoint>>,
         $FutureProvider<List<ShowdownPoint>> {
   /// Provide all the fouls for a given team.
+  ///
+  /// If [playerId] is not `null`, then points will be ordered by the frequency
+  /// they have been scored by that player.
+  ///
+  /// It is worth noting that even "fouls" are "scored" by the player they are
+  /// against.
   const ShowdownPointsProvider._({
     required ShowdownPointsFamily super.from,
-    required int super.argument,
+    required (int, {int? playerId}) super.argument,
   }) : super(
          retry: null,
          name: r'showdownPointsProvider',
@@ -412,7 +430,7 @@ final class ShowdownPointsProvider
   String toString() {
     return r'showdownPointsProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
@@ -423,8 +441,8 @@ final class ShowdownPointsProvider
 
   @override
   FutureOr<List<ShowdownPoint>> create(Ref ref) {
-    final argument = this.argument as int;
-    return showdownPoints(ref, argument);
+    final argument = this.argument as (int, {int? playerId});
+    return showdownPoints(ref, argument.$1, playerId: argument.playerId);
   }
 
   @override
@@ -438,11 +456,21 @@ final class ShowdownPointsProvider
   }
 }
 
-String _$showdownPointsHash() => r'48fa0a6c0c61c70eba51ef7060c5ce8fc0053a12';
+String _$showdownPointsHash() => r'4a5714593e375af633656f8509f1d2204958a63d';
 
 /// Provide all the fouls for a given team.
+///
+/// If [playerId] is not `null`, then points will be ordered by the frequency
+/// they have been scored by that player.
+///
+/// It is worth noting that even "fouls" are "scored" by the player they are
+/// against.
 final class ShowdownPointsFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<List<ShowdownPoint>>, int> {
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<List<ShowdownPoint>>,
+          (int, {int? playerId})
+        > {
   const ShowdownPointsFamily._()
     : super(
         retry: null,
@@ -453,8 +481,17 @@ final class ShowdownPointsFamily extends $Family
       );
 
   /// Provide all the fouls for a given team.
-  ShowdownPointsProvider call(int teamId) =>
-      ShowdownPointsProvider._(argument: teamId, from: this);
+  ///
+  /// If [playerId] is not `null`, then points will be ordered by the frequency
+  /// they have been scored by that player.
+  ///
+  /// It is worth noting that even "fouls" are "scored" by the player they are
+  /// against.
+  ShowdownPointsProvider call(int teamId, {int? playerId}) =>
+      ShowdownPointsProvider._(
+        argument: (teamId, playerId: playerId),
+        from: this,
+      );
 
   @override
   String toString() => r'showdownPointsProvider';
@@ -1423,6 +1460,179 @@ final class SetResultsFamily extends $Family
 
   @override
   String toString() => r'setResultsProvider';
+}
+
+/// Returns the possible points, organised by how often the given player has
+/// scored them.
+@ProviderFor(showdownPointScores)
+const showdownPointScoresProvider = ShowdownPointScoresFamily._();
+
+/// Returns the possible points, organised by how often the given player has
+/// scored them.
+final class ShowdownPointScoresProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<({ShowdownPoint point, int score})>>,
+          List<({ShowdownPoint point, int score})>,
+          FutureOr<List<({ShowdownPoint point, int score})>>
+        >
+    with
+        $FutureModifier<List<({ShowdownPoint point, int score})>>,
+        $FutureProvider<List<({ShowdownPoint point, int score})>> {
+  /// Returns the possible points, organised by how often the given player has
+  /// scored them.
+  const ShowdownPointScoresProvider._({
+    required ShowdownPointScoresFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'showdownPointScoresProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$showdownPointScoresHash();
+
+  @override
+  String toString() {
+    return r'showdownPointScoresProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<({ShowdownPoint point, int score})>>
+  $createElement($ProviderPointer pointer) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<({ShowdownPoint point, int score})>> create(Ref ref) {
+    final argument = this.argument as int;
+    return showdownPointScores(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ShowdownPointScoresProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$showdownPointScoresHash() =>
+    r'67ed25cc15c4601ad99b21648b71fbc5180746ef';
+
+/// Returns the possible points, organised by how often the given player has
+/// scored them.
+final class ShowdownPointScoresFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<List<({ShowdownPoint point, int score})>>,
+          int
+        > {
+  const ShowdownPointScoresFamily._()
+    : super(
+        retry: null,
+        name: r'showdownPointScoresProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Returns the possible points, organised by how often the given player has
+  /// scored them.
+  ShowdownPointScoresProvider call(int playerId) =>
+      ShowdownPointScoresProvider._(argument: playerId, from: this);
+
+  @override
+  String toString() => r'showdownPointScoresProvider';
+}
+
+/// Provide all the games played by the given player.
+@ProviderFor(playerGames)
+const playerGamesProvider = PlayerGamesFamily._();
+
+/// Provide all the games played by the given player.
+final class PlayerGamesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ShowdownGame>>,
+          List<ShowdownGame>,
+          FutureOr<List<ShowdownGame>>
+        >
+    with
+        $FutureModifier<List<ShowdownGame>>,
+        $FutureProvider<List<ShowdownGame>> {
+  /// Provide all the games played by the given player.
+  const PlayerGamesProvider._({
+    required PlayerGamesFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'playerGamesProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$playerGamesHash();
+
+  @override
+  String toString() {
+    return r'playerGamesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ShowdownGame>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<ShowdownGame>> create(Ref ref) {
+    final argument = this.argument as int;
+    return playerGames(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PlayerGamesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$playerGamesHash() => r'8349e00f4799d8d9f9c2e87fc40f091307e09af9';
+
+/// Provide all the games played by the given player.
+final class PlayerGamesFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<ShowdownGame>>, int> {
+  const PlayerGamesFamily._()
+    : super(
+        retry: null,
+        name: r'playerGamesProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provide all the games played by the given player.
+  PlayerGamesProvider call(int playerId) =>
+      PlayerGamesProvider._(argument: playerId, from: this);
+
+  @override
+  String toString() => r'playerGamesProvider';
 }
 
 // ignore_for_file: type=lint
