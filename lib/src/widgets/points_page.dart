@@ -40,7 +40,7 @@ class PointsPage extends ConsumerWidget {
                     onDone: (final value) async {
                       innerContext.pop();
                       await query.update((final o) => o(name: Value(value)));
-                      ref.invalidate(teamPlayersProvider(teamId));
+                      ref.invalidate(showdownPointsProvider(teamId));
                     },
                     labelText: 'Team name',
                     text: point.name,
