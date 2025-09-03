@@ -879,7 +879,7 @@ final class ChallengeablePlayersProvider
 }
 
 String _$challengeablePlayersHash() =>
-    r'c52b1c644e7c7407991841c57f749d76380f8cfc';
+    r'b78b59ab99c3df56576f31ca50ce712fec51e070';
 
 /// Provide all the players which the given player can challenge.
 final class ChallengeablePlayersFamily extends $Family
@@ -1045,7 +1045,7 @@ final class AttendingTeamPlayersProvider
 }
 
 String _$attendingTeamPlayersHash() =>
-    r'74f3e2d92d63a83f7a6d2ff541439ca41d1677e4';
+    r'a9816985fe00386fd7f0b6f901caf5aa6edf6771';
 
 /// Provide all the players who are attending the given ladder night.
 final class AttendingTeamPlayersFamily extends $Family

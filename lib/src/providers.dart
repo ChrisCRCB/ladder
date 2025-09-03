@@ -172,14 +172,8 @@ Future<List<TeamPlayer>> challengeablePlayers(
   final team = await ref.watch(showdownTeamProvider(firstPlayer.teamId).future);
   final players = db.alias(db.teamPlayers, 'players');
   final absences = db.alias(db.ladderNightAbsences, 'absences');
-  final nights = db.alias(db.ladderNights, 'nights');
   final query =
       await (db.select(players).join([
-              innerJoin(
-                nights,
-                nights.teamId.equals(firstPlayer.teamId),
-                useColumns: false,
-              ),
               leftOuterJoin(
                 absences,
                 absences.teamPlayerId.equalsExp(players.id) &
@@ -243,11 +237,6 @@ Future<List<TeamPlayer>> attendingTeamPlayers(
   final night = await ref.watch(ladderNightProvider(ladderNightId).future);
   final query =
       await (db.select(db.teamPlayers).join([
-              innerJoin(
-                db.ladderNights,
-                db.ladderNights.teamId.equalsExp(db.teamPlayers.teamId),
-                useColumns: false,
-              ),
               leftOuterJoin(
                 db.ladderNightAbsences,
                 db.teamPlayers.id.equalsExp(
