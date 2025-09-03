@@ -86,8 +86,19 @@ class TeamsScreen extends ConsumerWidget {
                         message: 'Really delete ${team.name}?',
                         title: deleteConfirmationTitle,
                         yesCallback: () async {
-                          await query.delete();
-                          ref.invalidate(showdownTeamsProvider);
+                          final nights = await ref.read(
+                            ladderNightsProvider(team.id).future,
+                          );
+                          if (nights.isEmpty) {
+                            await query.delete();
+                            ref.invalidate(showdownTeamsProvider);
+                          } else if (context.mounted) {
+                            await context.showMessage(
+                              message:
+                                  // ignore: lines_longer_than_80_chars
+                                  'You can only delete teams before ladder nights have been created.',
+                            );
+                          }
                         },
                       ),
                     ),
