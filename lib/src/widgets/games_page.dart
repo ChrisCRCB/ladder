@@ -145,21 +145,19 @@ class GamesPage extends ConsumerWidget {
                       name: 'Delete game',
                       activator: deleteShortcut,
                       invoke: () async {
-                        final sets = await ref.read(
-                          gameSetsProvider(game.id).future,
-                        );
-                        if (sets.isNotEmpty) {
-                          if (context.mounted) {
-                            await context.showMessage(
-                              message:
-                                  // ignore: lines_longer_than_80_chars
-                                  'You cannot delete this game as it has at least 1 set.',
-                            );
-                          }
-                          return;
+                        final setsCount = await database.managers.gameSets
+                            .filter((final f) => f.gameId.id.equals(game.id))
+                            .count();
+                        if (setsCount == 0) {
+                          await query.delete();
+                          ref.invalidate(gamesProvider(night.id));
+                        } else if (context.mounted) {
+                          await context.showMessage(
+                            message:
+                                // ignore: lines_longer_than_80_chars
+                                'You cannot delete this game as it has at least 1 set.',
+                          );
                         }
-                        await query.delete();
-                        ref.invalidate(gamesProvider(night.id));
                       },
                     ),
                   ],

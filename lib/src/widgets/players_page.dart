@@ -74,8 +74,28 @@ class PlayersPage extends ConsumerWidget {
                   message: 'Really delete ${player.name}?',
                   title: deleteConfirmationTitle,
                   yesCallback: () async {
-                    await query.delete();
-                    ref.invalidate(teamPlayersProvider(teamId));
+                    final gamesCount = await database.managers.showdownGames
+                        .filter(
+                          (final f) =>
+                              f.firstPlayerId.id.equals(player.id) |
+                              f.secondPlayerId.id.equals(player.id),
+                        )
+                        .count();
+                    if (gamesCount == 0) {
+                      await database.managers.ladderNightAbsences
+                          .filter(
+                            (final f) => f.teamPlayerId.id.equals(player.id),
+                          )
+                          .delete();
+                      await query.delete();
+                      ref.invalidate(teamPlayersProvider(teamId));
+                    } else if (context.mounted) {
+                      await context.showMessage(
+                        message:
+                            // ignore: lines_longer_than_80_chars
+                            'You can only delete players which have not been added to a game.',
+                      );
+                    }
                   },
                 ),
               ),

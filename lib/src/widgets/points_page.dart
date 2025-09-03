@@ -75,10 +75,10 @@ class PointsPage extends ConsumerWidget {
                   message: 'Really delete ${point.name}?',
                   title: deleteConfirmationTitle,
                   yesCallback: () async {
-                    final setPoints = await database.managers.setPoints
+                    final setPointsCount = await database.managers.setPoints
                         .filter((final f) => f.pointId.id.equals(point.id))
-                        .get();
-                    if (setPoints.isEmpty) {
+                        .count();
+                    if (setPointsCount == 0) {
                       await query.delete();
                       if (points.length == 1) {
                         for (final MapEntry(key: name, value: points)
