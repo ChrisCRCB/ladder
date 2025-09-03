@@ -29,6 +29,8 @@ class PlayerPointsPage extends ConsumerWidget {
             onTap: () {},
           );
         },
+        itemCount: points.length,
+        shrinkWrap: true,
       );
     });
   }
