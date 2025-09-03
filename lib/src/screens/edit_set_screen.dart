@@ -87,7 +87,7 @@ class EditSetScreen extends ConsumerWidget {
                     return ListView(
                       shrinkWrap: true,
                       children: [
-                        ...players.map(
+                        ...setPlayers.map(
                           (final player) => _PlayerListTile(
                             autofocus: player.id == players.first.id,
                             player: player,
@@ -100,84 +100,93 @@ class EditSetScreen extends ConsumerWidget {
                             points: points,
                           ),
                         ),
-                        ...points.map((final pointContext) {
-                          final gamePoint = pointContext.setPoint;
-                          final playerId = gamePoint.playerId;
-                          final player = players.firstWhere(
-                            (final p) => p.id == playerId,
-                          );
-                          final point = pointContext.showdownPoint;
-                          final query = database.managers.setPoints.filter(
-                            (final f) => f.id.equals(gamePoint.id),
-                          );
-                          if (readOnly) {
-                            return ListTile(
-                              title: PlayerCustomText(
-                                playerId: playerId,
-                                showPoints: false,
-                              ),
-                              subtitle: CustomText(
-                                text: '${point.name} (${point.value})',
-                              ),
-                              onTap: () {},
-                            );
-                          }
-                          return PerformableActionsListTile(
-                            actions: [
-                              ...players.map(
-                                (final player) => PerformableAction(
-                                  name: player.name,
-                                  checked: player.id == playerId,
-                                  invoke: () async {
-                                    await query.update(
-                                      (final o) =>
-                                          o(playerId: Value(player.id)),
-                                    );
-                                    ref.invalidate(setPointsProvider(setId));
-                                  },
-                                ),
-                              ),
-                              if (gamePoint.id == points.last.setPoint.id)
-                                PerformableAction(
-                                  name: 'delete',
-                                  activator: deleteShortcut,
-                                  invoke: () {
-                                    context.showConfirmMessage(
-                                      message:
-                                          // ignore: lines_longer_than_80_chars
-                                          'Are you sure you want to delete this point?',
-                                      title: deleteConfirmationTitle,
-                                      yesCallback: () async {
-                                        await query.delete();
+                        ...[
+                          for (var i = 0; i < points.length; i++)
+                            () {
+                              final pointContext = points[i];
+                              final gamePoint = pointContext.setPoint;
+                              final playerId = gamePoint.playerId;
+                              final player = players.firstWhere(
+                                (final p) => p.id == playerId,
+                              );
+                              final point = pointContext.showdownPoint;
+                              final query = database.managers.setPoints.filter(
+                                (final f) => f.id.equals(gamePoint.id),
+                              );
+                              if (readOnly) {
+                                return ListTile(
+                                  title: PlayerCustomText(
+                                    playerId: playerId,
+                                    showPoints: false,
+                                  ),
+                                  subtitle: CustomText(
+                                    text: '${point.name} (${point.value})',
+                                  ),
+                                  onTap: () {},
+                                );
+                              }
+                              return PerformableActionsListTile(
+                                actions: [
+                                  ...players.map(
+                                    (final player) => PerformableAction(
+                                      name: player.name,
+                                      checked: player.id == playerId,
+                                      invoke: () async {
+                                        await query.update(
+                                          (final o) =>
+                                              o(playerId: Value(player.id)),
+                                        );
                                         ref.invalidate(
                                           setPointsProvider(setId),
                                         );
                                       },
-                                    );
-                                  },
+                                    ),
+                                  ),
+                                  if (gamePoint.id == points.last.setPoint.id)
+                                    PerformableAction(
+                                      name: 'delete',
+                                      activator: deleteShortcut,
+                                      invoke: () {
+                                        context.showConfirmMessage(
+                                          message:
+                                              // ignore: lines_longer_than_80_chars
+                                              'Are you sure you want to delete this point?',
+                                          title: deleteConfirmationTitle,
+                                          yesCallback: () async {
+                                            await query.delete();
+                                            ref.invalidate(
+                                              setPointsProvider(setId),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                ],
+                                title: PlayerCustomText(
+                                  playerId: playerId,
+                                  points: getPoints(
+                                    points.sublist(0, i + 1),
+                                    player,
+                                  ),
                                 ),
-                            ],
-                            title: PlayerCustomText(
-                              playerId: playerId,
-                              showPoints: false,
-                            ),
-                            subtitle: CustomText(
-                              text: '${point.name} (${point.value})',
-                            ),
-                            onTap: () => context.pushWidgetBuilder(
-                              (_) => SelectShowdownPointScreen(
-                                teamId: player.teamId,
-                                onChanged: (final showdownPoint) async {
-                                  await query.update(
-                                    (final o) =>
-                                        o(pointId: Value(showdownPoint.id)),
-                                  );
-                                  ref.invalidate(setPointsProvider(setId));
-                                },
-                              ),
-                            ),
-                          );
-                        }),
+                                subtitle: CustomText(
+                                  text: '${point.name} (${point.value})',
+                                ),
+                                onTap: () => context.pushWidgetBuilder(
+                                  (_) => SelectShowdownPointScreen(
+                                    teamId: player.teamId,
+                                    onChanged: (final showdownPoint) async {
+                                      await query.update(
+                                        (final o) =>
+                                            o(pointId: Value(showdownPoint.id)),
+                                      );
+                                      ref.invalidate(setPointsProvider(setId));
+                                    },
+                                  ),
+                                ),
+                              );
+                            }(),
+                        ],
                       ],
                     );
                   });
