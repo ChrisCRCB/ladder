@@ -75,17 +75,28 @@ class PointsPage extends ConsumerWidget {
                   message: 'Really delete ${point.name}?',
                   title: deleteConfirmationTitle,
                   yesCallback: () async {
-                    await query.delete();
-                    if (points.length == 1) {
-                      for (final MapEntry(key: name, value: points)
-                          in defaultPoints.entries) {
-                        await database.managers.showdownPoints.create(
-                          (final o) =>
-                              o(teamId: teamId, name: name, value: points),
-                        );
+                    final setPoints = await database.managers.setPoints
+                        .filter((final f) => f.pointId.id.equals(point.id))
+                        .get();
+                    if (setPoints.isEmpty) {
+                      await query.delete();
+                      if (points.length == 1) {
+                        for (final MapEntry(key: name, value: points)
+                            in defaultPoints.entries) {
+                          await database.managers.showdownPoints.create(
+                            (final o) =>
+                                o(teamId: teamId, name: name, value: points),
+                          );
+                        }
                       }
+                      ref.invalidate(showdownPointsProvider(teamId));
+                    } else if (context.mounted) {
+                      await context.showMessage(
+                        message:
+                            // ignore: lines_longer_than_80_chars
+                            'You can only delete points which have not yet been used.',
+                      );
                     }
-                    ref.invalidate(showdownPointsProvider(teamId));
                   },
                 ),
               ),
