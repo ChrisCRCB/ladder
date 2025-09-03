@@ -64,34 +64,42 @@ class EditSetScreen extends ConsumerWidget {
               ],
               title: 'Set #$setNumber',
               body: value.simpleWhen((final players) {
+                final setPlayers = [
+                  players.firstWhere(
+                    (final player) => player.id == set.startingPlayerId,
+                  ),
+                  players.firstWhere(
+                    (final player) => player.id != set.startingPlayerId,
+                  ),
+                ];
                 final value = ref.watch(setPointsProvider(setId));
                 return value.simpleWhen((final points) {
                   final value = ref.watch(
-                    showdownTeamProvider(players.first.teamId),
+                    showdownTeamProvider(setPlayers.first.teamId),
                   );
                   return value.simpleWhen((final team) {
                     final totalServes = points.length;
                     final serveBlock = totalServes ~/ team.servesPerPlayer;
                     final currentPlayerIndex = serveBlock % players.length;
-                    final server = players[currentPlayerIndex];
+                    final server = setPlayers[currentPlayerIndex];
                     final serveNumber =
                         (totalServes % team.servesPerPlayer) + 1;
                     return ListView(
                       shrinkWrap: true,
                       children: [
-                        ...players.map((final player) {
-                          final isServing = player.id == server.id;
-                          return _PlayerListTile(
+                        ...players.map(
+                          (final player) => _PlayerListTile(
                             autofocus: player.id == players.first.id,
-                            isServing: isServing,
                             player: player,
                             readOnly: readOnly,
-                            serveNumber: serveNumber,
+                            serveNumber: player.id == server.id
+                                ? serveNumber
+                                : null,
                             setId: setId,
                             setNumber: setNumber,
                             points: points,
-                          );
-                        }),
+                          ),
+                        ),
                         ...points.map((final pointContext) {
                           final gamePoint = pointContext.setPoint;
                           final playerId = gamePoint.playerId;
@@ -189,7 +197,6 @@ class _PlayerListTile extends ConsumerWidget {
   /// Create an instance.
   const _PlayerListTile({
     required this.autofocus,
-    required this.isServing,
     required this.player,
     required this.readOnly,
     required this.serveNumber,
@@ -208,7 +215,7 @@ class _PlayerListTile extends ConsumerWidget {
   final TeamPlayer player;
 
   /// The serve number for [player].
-  final int serveNumber;
+  final int? serveNumber;
 
   /// Whether the set is read-only.
   final bool readOnly;
@@ -216,15 +223,13 @@ class _PlayerListTile extends ConsumerWidget {
   /// Whether the [ListTile] should be autofocused.
   final bool autofocus;
 
-  /// Whether [player] is serving.
-  final bool isServing;
-
   /// The list of points which have been scored so far in the set.
   final List<SetPointContext> points;
 
   /// Build the widget.
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
+    final isServing = serveNumber != null;
     final database = ref.watch(databaseProvider);
     final value = ref.watch(
       showdownPointsProvider(player.teamId, playerId: player.id),
