@@ -11,14 +11,16 @@ const applicationSettingsKey = 'ladder_application_preferences';
 const defaultPoints = <String, int>{
   'Goal': 2,
   'Body touch': -1,
-  'Hand infringement': -1,
+  'infringement': -1,
   'Touched shades': -2,
   'Long serve': -1,
   'Short serve': -1,
   'Centre board': -1,
   'Out': -1,
-  'Illegal serve': -1,
+  'Service fault': -1,
   'Own goal': -2,
+  'Equipment fault': -2,
+  'Player forfeit': -11,
 };
 
 /// The date format to use.
