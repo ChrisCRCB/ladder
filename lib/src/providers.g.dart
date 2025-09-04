@@ -1127,7 +1127,7 @@ final class PlayerAttendanceProvider
   }
 }
 
-String _$playerAttendanceHash() => r'791dcf3c1d302804494f452ea4d26648b7aae4f2';
+String _$playerAttendanceHash() => r'392d75257a62f6d6846a135659bc36525b49d1ee';
 
 /// Provide a list of player attendances for the given ladder night.
 final class PlayerAttendanceFamily extends $Family
