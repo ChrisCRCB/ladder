@@ -208,7 +208,6 @@ class LadderNightScreen extends ConsumerWidget {
       );
       startTime += team.gameLength.minutes;
     }
-    startTime += team.gameLength.minutes;
     if (extraPlayer != null) {
       await gamesManager.create((final f) {
         final game = games[random.nextInt(games.length)];
