@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/widgets.dart';
@@ -91,9 +93,29 @@ class CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                   }
                   return ListView.builder(
                     itemBuilder: (final context, final index) {
-                      final player = players[index];
+                      if (index == 0) {
+                        return ListTile(
+                          autofocus: true,
+                          title: const CustomText(text: 'Random player'),
+                          onTap: () async {
+                            context.pop();
+                            final random = Random();
+                            final player =
+                                players[random.nextInt(players.length)];
+                            await database.managers.showdownGames.create(
+                              (final o) => o(
+                                firstPlayerId: firstPlayerId,
+                                secondPlayerId: player.id,
+                                ladderNightId: widget.ladderNightId,
+                                createdAt: Value(widget.gameStartTime),
+                              ),
+                            );
+                            ref.invalidate(gamesProvider(night.id));
+                          },
+                        );
+                      }
+                      final player = players[index - 1];
                       return ListTile(
-                        autofocus: index == 0,
                         title: CustomText(text: player.name),
                         onTap: () async {
                           context.pop();
@@ -109,7 +131,7 @@ class CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                         },
                       );
                     },
-                    itemCount: players.length,
+                    itemCount: players.length + 1,
                     shrinkWrap: true,
                   );
                 }),
