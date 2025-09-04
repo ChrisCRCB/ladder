@@ -266,10 +266,6 @@ Future<List<PlayerAttendance>> playerAttendance(
   final night = await ref.watch(ladderNightProvider(ladderNightId).future);
   final query =
       db.select(db.teamPlayers).join([
-          innerJoin(
-            db.ladderNights,
-            db.teamPlayers.teamId.equalsExp(db.ladderNights.teamId),
-          ),
           leftOuterJoin(
             db.ladderNightAbsences,
             db.ladderNightAbsences.ladderNightId.equals(ladderNightId) &
