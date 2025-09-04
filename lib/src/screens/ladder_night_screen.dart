@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
+import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
 import 'package:time/time.dart';
@@ -19,46 +21,93 @@ class LadderNightScreen extends ConsumerWidget {
 
   /// Build the widget.
   @override
-  Widget build(final BuildContext context, final WidgetRef ref) =>
-      FontShortcuts(
-        child: Cancel(
-          child: TabbedScaffold(
-            tabs: [
-              TabbedScaffoldTab(
-                actions: [
-                  IconButton(
-                    onPressed: () => _randomiseGames(ref),
-                    icon: const Icon(Icons.shuffle),
-                    tooltip: 'Shuffle games',
-                  ),
-                ],
-                title: 'Games',
-                icon: const Icon(Icons.emoji_events),
-                child: CommonShortcuts(
-                  child: GamesPage(ladderNightId: ladderNightId),
-                  newCallback: () => _createGame(ref),
-                ),
-                floatingActionButton: NewButton(
-                  onPressed: () => _createGame(ref),
-                  tooltip: 'New game',
-                ),
-              ),
-              TabbedScaffoldTab(
-                title: 'Players',
-                icon: const Icon(Icons.group),
-                child: CommonShortcuts(
-                  newCallback: () => _createPlayer(ref),
-                  child: PlayerAttendancePage(ladderNightId: ladderNightId),
-                ),
-                floatingActionButton: NewButton(
-                  onPressed: () => _createPlayer(ref),
-                  tooltip: 'New player',
-                ),
-              ),
-            ],
-          ),
+  Widget build(final BuildContext context, final WidgetRef ref) {
+    final gamesActionsContext = PerformableActionsContext.fromActions([
+      PerformableAction(
+        name: 'Copy scheduled',
+        activator: CrossPlatformSingleActivator(
+          LogicalKeyboardKey.keyC,
+          shift: true,
         ),
-      );
+        invoke: () async {
+          final night = await ref.read(
+            ladderNightProvider(ladderNightId).future,
+          );
+          final games = await ref.read(gamesProvider(ladderNightId).future);
+          final buffer = StringBuffer()
+            ..writeln('Schedule for ${dateFormat.format(night.createdAt)}:');
+          for (final game in games) {
+            buffer.write('• ${timeFormat.format(game.createdAt)}: ');
+            final firstPlayer = await ref.read(
+              teamPlayerProvider(game.firstPlayerId).future,
+            );
+            final secondPlayer = await ref.read(
+              teamPlayerProvider(game.secondPlayerId).future,
+            );
+            buffer.writeln('${firstPlayer.name} vs ${secondPlayer.name}');
+          }
+          buffer.toString().copyToClipboard();
+        },
+      ),
+      PerformableAction(
+        name: 'Randomise Games',
+        activator: CrossPlatformSingleActivator(
+          LogicalKeyboardKey.keyR,
+          shift: true,
+        ),
+        invoke: () => _randomiseGames(ref),
+      ),
+    ]);
+    return FontShortcuts(
+      child: Cancel(
+        child: TabbedScaffold(
+          tabs: [
+            TabbedScaffoldTab(
+              actions: [
+                Semantics(
+                  customSemanticsActions:
+                      gamesActionsContext.customSemanticActions,
+                  child: MenuAnchor(
+                    menuChildren: gamesActionsContext.menuChildren,
+                    builder: (_, final controller, _) => IconButton(
+                      onPressed: controller.toggle,
+                      icon: const Icon(Icons.more_vert),
+                      tooltip: 'Menu',
+                    ),
+                  ),
+                ),
+              ],
+              title: 'Games',
+              icon: const Icon(Icons.emoji_events),
+              child: CommonShortcuts(
+                child: CallbackShortcuts(
+                  bindings: gamesActionsContext.bindings,
+                  child: GamesPage(ladderNightId: ladderNightId),
+                ),
+                newCallback: () => _createGame(ref),
+              ),
+              floatingActionButton: NewButton(
+                onPressed: () => _createGame(ref),
+                tooltip: 'New game',
+              ),
+            ),
+            TabbedScaffoldTab(
+              title: 'Players',
+              icon: const Icon(Icons.group),
+              child: CommonShortcuts(
+                newCallback: () => _createPlayer(ref),
+                child: PlayerAttendancePage(ladderNightId: ladderNightId),
+              ),
+              floatingActionButton: NewButton(
+                onPressed: () => _createPlayer(ref),
+                tooltip: 'New player',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   /// Create a new game.
   Future<void> _createGame(final WidgetRef ref) async {
