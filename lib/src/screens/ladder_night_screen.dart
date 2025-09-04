@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/widgets.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
@@ -22,6 +25,13 @@ class LadderNightScreen extends ConsumerWidget {
           child: TabbedScaffold(
             tabs: [
               TabbedScaffoldTab(
+                actions: [
+                  IconButton(
+                    onPressed: () => _randomiseGames(ref),
+                    icon: const Icon(Icons.shuffle),
+                    tooltip: 'Shuffle games',
+                  ),
+                ],
                 title: 'Games',
                 icon: const Icon(Icons.emoji_events),
                 child: CommonShortcuts(
@@ -94,4 +104,74 @@ class LadderNightScreen extends ConsumerWidget {
           title: 'Create Player',
         ),
       );
+
+  /// Create randomised games for this night.
+  Future<void> _randomiseGames(final WidgetRef ref) async {
+    final database = ref.read(databaseProvider);
+    final night = await ref.read(ladderNightProvider(ladderNightId).future);
+    final gamesManager = database.managers.showdownGames;
+    final context = ref.context;
+    final players = await ref.read(
+      attendingTeamPlayersProvider(night.id).future,
+    );
+    final numberOfPlayers = players.length;
+    if (numberOfPlayers < 2) {
+      if (context.mounted) {
+        await context.showMessage(
+          message:
+              // ignore: lines_longer_than_80_chars
+              'You can only randomise games if you have at least 2 players attending.',
+        );
+      }
+      return;
+    }
+    if ((await gamesManager
+            .filter((final f) => f.ladderNightId.id.equals(night.id))
+            .count()) >
+        0) {
+      if (context.mounted) {
+        await context.showMessage(
+          message:
+              // ignore: lines_longer_than_80_chars
+              'You can only randomise games for nights with no scheduled games.',
+        );
+      }
+      return;
+    }
+    final random = Random();
+    players.shuffle(random);
+    final extraPlayer = numberOfPlayers.isOdd ? players.removeAt(0) : null;
+    final games = <ShowdownGame>[];
+    final team = await ref.read(showdownTeamProvider(night.teamId).future);
+    var startTime = night.createdAt;
+    while (players.isNotEmpty) {
+      final firstPlayer = players.removeAt(0);
+      final secondPlayer = players.removeAt(0);
+      games.add(
+        await gamesManager.createReturning(
+          (final f) => f(
+            firstPlayerId: firstPlayer.id,
+            secondPlayerId: secondPlayer.id,
+            ladderNightId: night.id,
+            createdAt: Value(startTime),
+          ),
+        ),
+      );
+      startTime += team.gameLength.minutes;
+    }
+    startTime += team.gameLength.minutes;
+    if (extraPlayer != null) {
+      await gamesManager.create((final f) {
+        final game = games[random.nextInt(games.length)];
+        final playerIds = [game.firstPlayerId, game.secondPlayerId];
+        return f(
+          firstPlayerId: extraPlayer.id,
+          secondPlayerId: playerIds[random.nextInt(playerIds.length)],
+          ladderNightId: night.id,
+          createdAt: Value(startTime),
+        );
+      });
+    }
+    ref.invalidate(gamesProvider(night.id));
+  }
 }

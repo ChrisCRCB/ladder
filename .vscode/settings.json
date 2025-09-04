@@ -4,6 +4,7 @@
     "Colors",
     "daos",
     "ffi",
+    "math",
     "riverpod"
   ]
 }
