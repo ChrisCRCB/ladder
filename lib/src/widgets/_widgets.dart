@@ -2,6 +2,7 @@ export 'custom_center_text.dart';
 export 'custom_text.dart';
 export 'error_text.dart';
 export 'font_shortcuts.dart';
+export 'game_list_tile.dart';
 export 'games_page.dart';
 export 'ladder_nights_page.dart';
 export 'player_attendance_page.dart';

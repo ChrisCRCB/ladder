@@ -147,7 +147,7 @@ Future<List<ShowdownGame>> games(final Ref ref, final int ladderNightId) {
   final database = ref.watch(databaseProvider);
   return database.managers.showdownGames
       .filter((final f) => f.ladderNightId.id.equals(ladderNightId))
-      .orderBy((final o) => o.createdAt.asc())
+      .orderBy((final o) => o.startAfter.asc())
       .get();
 }
 
@@ -418,6 +418,6 @@ Future<List<ShowdownGame>> playerGames(
             f.firstPlayerId.id.equals(playerId) |
             f.secondPlayerId.id.equals(playerId),
       )
-      .orderBy((final o) => o.createdAt.desc())
+      .orderBy((final o) => o.startAfter.desc())
       .get();
 }

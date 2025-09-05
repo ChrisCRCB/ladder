@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
-import 'package:time/time.dart';
 
 /// A screen showing the details of a ladder night.
 class LadderNightScreen extends ConsumerWidget {
@@ -37,7 +36,8 @@ class LadderNightScreen extends ConsumerWidget {
           final buffer = StringBuffer()
             ..writeln('Schedule for ${dateFormat.format(night.createdAt)}:');
           for (final game in games) {
-            buffer.write('• ${timeFormat.format(game.createdAt)}: ');
+            final startTime = night.getStartTime(game);
+            buffer.write('• ${timeFormat.format(startTime)}: ');
             final firstPlayer = await ref.read(
               teamPlayerProvider(game.firstPlayerId).future,
             );
@@ -114,18 +114,18 @@ class LadderNightScreen extends ConsumerWidget {
     final night = await ref.read(ladderNightProvider(ladderNightId).future);
     final team = await ref.read(showdownTeamProvider(night.teamId).future);
     final games = await ref.read(gamesProvider(ladderNightId).future);
-    final DateTime gameStart;
+    final int startAfter;
     if (games.isEmpty) {
-      gameStart = night.createdAt;
+      startAfter = 0;
     } else {
-      gameStart = games.last.createdAt + team.gameLength.minutes;
+      startAfter = games.last.startAfter + team.gameLength;
     }
     final context = ref.context;
     if (context.mounted) {
       await context.pushWidgetBuilder(
         (_) => CreateGameScreen(
           ladderNightId: ladderNightId,
-          gameStartTime: gameStart,
+          startAfter: startAfter,
           excludedPlayer1Ids: games.map((final game) => game.firstPlayerId),
         ),
       );
@@ -192,7 +192,7 @@ class LadderNightScreen extends ConsumerWidget {
     final extraPlayer = numberOfPlayers.isOdd ? players.removeAt(0) : null;
     final games = <ShowdownGame>[];
     final team = await ref.read(showdownTeamProvider(night.teamId).future);
-    var startTime = night.createdAt;
+    var startAfter = 0;
     while (players.isNotEmpty) {
       final firstPlayer = players.removeAt(0);
       final secondPlayer = players.removeAt(0);
@@ -202,11 +202,11 @@ class LadderNightScreen extends ConsumerWidget {
             firstPlayerId: firstPlayer.id,
             secondPlayerId: secondPlayer.id,
             ladderNightId: night.id,
-            createdAt: Value(startTime),
+            startAfter: Value(startAfter),
           ),
         ),
       );
-      startTime += team.gameLength.minutes;
+      startAfter += team.gameLength;
     }
     if (extraPlayer != null) {
       await gamesManager.create((final f) {
@@ -216,7 +216,7 @@ class LadderNightScreen extends ConsumerWidget {
           firstPlayerId: extraPlayer.id,
           secondPlayerId: playerIds[random.nextInt(playerIds.length)],
           ladderNightId: night.id,
-          createdAt: Value(startTime),
+          startAfter: Value(startAfter),
         );
       });
     }

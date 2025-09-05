@@ -719,7 +719,7 @@ final class GamesProvider
   }
 }
 
-String _$gamesHash() => r'45fc59a7cdf7148ca4d22da2fac667e30485d31f';
+String _$gamesHash() => r'04b2cdcaf0bdff50fb584b14be2ab1f9dfe3fc36';
 
 /// Provide all the games for a given ladder night.
 final class GamesFamily extends $Family
@@ -1613,7 +1613,7 @@ final class PlayerGamesProvider
   }
 }
 
-String _$playerGamesHash() => r'8349e00f4799d8d9f9c2e87fc40f091307e09af9';
+String _$playerGamesHash() => r'307cd3efd8aef48d5e2f1e8008832937fd617f63';
 
 /// Provide all the games played by the given player.
 final class PlayerGamesFamily extends $Family

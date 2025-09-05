@@ -1,4 +1,3 @@
-import 'package:backstreets_widgets/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
@@ -24,21 +23,7 @@ class PlayerGamesPage extends ConsumerWidget {
       return ListView.builder(
         itemBuilder: (final context, final index) {
           final game = games[index];
-          return ListTile(
-            autofocus: index == 0,
-            title: PlayersCustomText(
-              firstPlayerId: game.firstPlayerId,
-              secondPlayerId: game.secondPlayerId,
-            ),
-            subtitle: CustomText(text: timeFormat.format(game.createdAt)),
-            trailing: const Icon(Icons.lock, semanticLabel: 'Locked'),
-            onTap: () => context.pushWidgetBuilder(
-              (_) => EditGameScreen(
-                gameId: game.id,
-                readOnly: game.lockedOn != null,
-              ),
-            ),
-          );
+          return GameListTile(gameId: game.id, autofocus: index == 0);
         },
         itemCount: games.length,
         shrinkWrap: true,

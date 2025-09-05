@@ -13,7 +13,7 @@ class CreateGameScreen extends ConsumerStatefulWidget {
   /// Create an instance.
   const CreateGameScreen({
     required this.ladderNightId,
-    required this.gameStartTime,
+    required this.startAfter,
     this.excludedPlayer1Ids = const [],
     super.key,
   });
@@ -21,8 +21,8 @@ class CreateGameScreen extends ConsumerStatefulWidget {
   /// The ID of the night this game will be part of.
   final int ladderNightId;
 
-  /// The time the newly-created game should start.
-  final DateTime gameStartTime;
+  /// The `startAfter` for the new game.
+  final int startAfter;
 
   /// The player IDs who should be excluded when selecting player 1.
   final Iterable<int> excludedPlayer1Ids;
@@ -107,7 +107,7 @@ class CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                                 firstPlayerId: firstPlayerId,
                                 secondPlayerId: player.id,
                                 ladderNightId: widget.ladderNightId,
-                                createdAt: Value(widget.gameStartTime),
+                                startAfter: Value(widget.startAfter),
                               ),
                             );
                             ref.invalidate(gamesProvider(night.id));
@@ -124,7 +124,7 @@ class CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                               firstPlayerId: firstPlayerId,
                               secondPlayerId: player.id,
                               ladderNightId: widget.ladderNightId,
-                              createdAt: Value(widget.gameStartTime),
+                              startAfter: Value(widget.startAfter),
                             ),
                           );
                           ref.invalidate(gamesProvider(night.id));

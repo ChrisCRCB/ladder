@@ -88,7 +88,7 @@ class TeamPlayers extends Table
 class LadderNights extends Table with IdMixin, CreatedAtMixin, TeamIdMixin {}
 
 /// A game in a [LadderNight].
-class ShowdownGames extends Table with IdMixin, CreatedAtMixin {
+class ShowdownGames extends Table with IdMixin {
   /// The ID of the night this game belongs to.
   late final ladderNightId = integer().references(
     LadderNights,
@@ -116,6 +116,9 @@ class ShowdownGames extends Table with IdMixin, CreatedAtMixin {
 
   /// The date this game was locked on.
   late final lockedOn = dateTime().nullable()();
+
+  /// The number of minutes after the night starts that this game will commence.
+  late final startAfter = integer().withDefault(const Constant(0))();
 }
 
 /// A set in a [ShowdownGame].

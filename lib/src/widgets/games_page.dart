@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
@@ -6,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
-import 'package:time/time.dart';
 
 /// The ladder night games page.
 class GamesPage extends ConsumerWidget {
@@ -34,11 +35,11 @@ class GamesPage extends ConsumerWidget {
           return ListView.builder(
             itemBuilder: (final context, final index) {
               final game = games[index];
+              final startTime = night.getStartTime(game);
               final query = database.managers.showdownGames.filter(
                 (final f) => f.id.equals(game.id),
               );
-              final previousSlot = game.createdAt - team.gameLength.minutes;
-              final nextSlot = game.createdAt + team.gameLength.minutes;
+              final gameLength = team.gameLength;
               if (game.lockedOn == null) {
                 return PerformableActionsListTile(
                   actions: [
@@ -47,23 +48,27 @@ class GamesPage extends ConsumerWidget {
                       activator: moveUpShortcut,
                       invoke: () async {
                         await query.update(
-                          (final o) => o(createdAt: Value(nextSlot)),
+                          (final o) => o(
+                            startAfter: Value(game.startAfter + gameLength),
+                          ),
                         );
                         ref.invalidate(gamesProvider(ladderNightId));
                       },
                     ),
-                    if (previousSlot.isAfter(night.createdAt) ||
-                        previousSlot.isAtSameHourAs(night.createdAt))
-                      PerformableAction(
-                        name: 'Move game back',
-                        activator: moveDownShortcut,
-                        invoke: () async {
-                          await query.update(
-                            (final o) => o(createdAt: Value(previousSlot)),
-                          );
-                          ref.invalidate(gamesProvider(night.id));
-                        },
-                      ),
+                    PerformableAction(
+                      name: 'Move game back',
+                      activator: moveDownShortcut,
+                      invoke: () async {
+                        await query.update(
+                          (final o) => o(
+                            startAfter: Value(
+                              max(0, game.startAfter - gameLength),
+                            ),
+                          ),
+                        );
+                        ref.invalidate(gamesProvider(night.id));
+                      },
+                    ),
                     PerformableAction(
                       name: 'Lock',
                       activator: CrossPlatformSingleActivator(
@@ -166,7 +171,7 @@ class GamesPage extends ConsumerWidget {
                     firstPlayerId: game.firstPlayerId,
                     secondPlayerId: game.secondPlayerId,
                   ),
-                  subtitle: CustomText(text: timeFormat.format(game.createdAt)),
+                  subtitle: CustomText(text: timeFormat.format(startTime)),
                   onTap: () => context.pushWidgetBuilder(
                     (_) => EditGameScreen(gameId: game.id),
                   ),
@@ -178,7 +183,7 @@ class GamesPage extends ConsumerWidget {
                   firstPlayerId: game.firstPlayerId,
                   secondPlayerId: game.secondPlayerId,
                 ),
-                subtitle: CustomText(text: timeFormat.format(game.createdAt)),
+                subtitle: CustomText(text: timeFormat.format(startTime)),
                 trailing: const Icon(Icons.lock, semanticLabel: 'Locked'),
                 onTap: () => context.pushWidgetBuilder(
                   (_) => EditGameScreen(gameId: game.id, readOnly: true),
