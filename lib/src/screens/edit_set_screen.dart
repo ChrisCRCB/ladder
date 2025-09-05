@@ -371,7 +371,7 @@ class EditSetScreen extends ConsumerWidget {
       return null;
     }
     return ref.context.showConfirmMessage(
-      message: 'Do you want to award ${player.name} a ${point.name}?',
+      message: 'Award ${player.name} a ${point.name}?',
       yesCallback: () async {
         final database = ref.read(databaseProvider);
         await database.managers.setPoints.create(
