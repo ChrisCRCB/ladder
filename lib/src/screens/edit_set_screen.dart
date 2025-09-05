@@ -257,6 +257,7 @@ class EditSetScreen extends ConsumerWidget {
                             points: points,
                           ),
                         ),
+                        const SizedBox(height: 100),
                         ...[
                           for (var i = 0; i < points.length; i++)
                             () {
