@@ -12,7 +12,7 @@ const applicationSettingsKey = 'ladder_application_preferences';
 const defaultPoints = <String, int>{
   'Goal': 2,
   'Body touch': -1,
-  'infringement': -1,
+  'Infringement': -1,
   'Touched shades': -2,
   'Long serve': -1,
   'Short serve': -1,
