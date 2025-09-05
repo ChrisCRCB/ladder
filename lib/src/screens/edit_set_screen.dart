@@ -33,299 +33,265 @@ class EditSetScreen extends ConsumerWidget {
   Widget build(final BuildContext context, final WidgetRef ref) {
     final database = ref.watch(databaseProvider);
     final value = ref.watch(gameSetProvider(setId));
-    return Cancel(
-      child: value.when(
-        data: (final set) {
-          final value = ref.watch(gamePlayersProvider(set.gameId));
-          return SimpleScaffold(
-            actions: [
-              if (!readOnly)
-                IconButton(
-                  onPressed: () async {
-                    final points = await ref.read(
-                      setPointsProvider(setId).future,
-                    );
-                    if (points.isEmpty) {
-                      await database.managers.gameSets
-                          .filter((final f) => f.id.equals(setId))
-                          .delete();
-                      ref.invalidate(gameSetsProvider(set.gameId));
-                      if (context.mounted) {
-                        context.pop();
-                      }
-                    } else if (context.mounted) {
-                      await context.showMessage(
-                        message: 'You can only delete empty sets.',
-                      );
+    return value.when(
+      data: (final set) {
+        final value = ref.watch(gamePlayersProvider(set.gameId));
+        return SimpleScaffold(
+          actions: [
+            if (!readOnly)
+              IconButton(
+                onPressed: () async {
+                  final points = await ref.read(
+                    setPointsProvider(setId).future,
+                  );
+                  if (points.isEmpty) {
+                    await database.managers.gameSets
+                        .filter((final f) => f.id.equals(setId))
+                        .delete();
+                    ref.invalidate(gameSetsProvider(set.gameId));
+                    if (context.mounted) {
+                      context.pop();
                     }
-                  },
-                  icon: const Icon(Icons.delete),
-                  tooltip: 'Delete set',
-                ),
-            ],
-            title: 'Set #$setNumber',
-            body: value.simpleWhen((final players) {
-              final setPlayers = [
-                players.firstWhere(
-                  (final player) => player.id == set.startingPlayerId,
-                ),
-                players.firstWhere(
-                  (final player) => player.id != set.startingPlayerId,
-                ),
-              ];
-              final value = ref.watch(setPointsProvider(setId));
-              return value.simpleWhen((final points) {
-                final value = ref.watch(
-                  showdownTeamProvider(setPlayers.first.teamId),
-                );
-                return value.simpleWhen((final team) {
-                  final value = ref.watch(showdownPointsProvider(team.id));
-                  return value.simpleWhen((final showdownPoints) {
-                    final includedPoints = points
-                        .where((final p) => p.showdownPoint.value != 0)
-                        .toList();
-                    final totalServes = includedPoints.length;
-                    final serveBlock = totalServes ~/ team.servesPerPlayer;
-                    final currentPlayerIndex = serveBlock % players.length;
-                    final server = setPlayers[currentPlayerIndex];
-                    final receiver = setPlayers.firstWhere(
-                      (final p) => p.id != server.id,
+                  } else if (context.mounted) {
+                    await context.showMessage(
+                      message: 'You can only delete empty sets.',
                     );
-                    final serveNumber =
-                        (totalServes % team.servesPerPlayer) + 1;
-                    ShowdownPoint? showdownPoint;
-                    TeamPlayer? awardingPlayer;
-                    final shortcuts = [
-                      GameShortcut(
-                        title: 'Speak first player points',
-                        shortcut: GameShortcutsShortcut.bracketLeft,
-                        controlKey: useControlKey,
-                        metaKey: useMetaKey,
-                        onStart: (final _) => _speakPlayerStats(
-                          ref: ref,
-                          player: setPlayers.first,
-                          points: points,
-                        ),
+                  }
+                },
+                icon: const Icon(Icons.delete),
+                tooltip: 'Delete set',
+              ),
+          ],
+          title: 'Set #$setNumber',
+          body: value.simpleWhen((final players) {
+            final setPlayers = [
+              players.firstWhere(
+                (final player) => player.id == set.startingPlayerId,
+              ),
+              players.firstWhere(
+                (final player) => player.id != set.startingPlayerId,
+              ),
+            ];
+            final value = ref.watch(setPointsProvider(setId));
+            return value.simpleWhen((final points) {
+              final value = ref.watch(
+                showdownTeamProvider(setPlayers.first.teamId),
+              );
+              return value.simpleWhen((final team) {
+                final value = ref.watch(showdownPointsProvider(team.id));
+                return value.simpleWhen((final showdownPoints) {
+                  final includedPoints = points
+                      .where((final p) => p.showdownPoint.value != 0)
+                      .toList();
+                  final totalServes = includedPoints.length;
+                  final serveBlock = totalServes ~/ team.servesPerPlayer;
+                  final currentPlayerIndex = serveBlock % players.length;
+                  final server = setPlayers[currentPlayerIndex];
+                  final receiver = setPlayers.firstWhere(
+                    (final p) => p.id != server.id,
+                  );
+                  final serveNumber = (totalServes % team.servesPerPlayer) + 1;
+                  ShowdownPoint? showdownPoint;
+                  TeamPlayer? awardingPlayer;
+                  final shortcuts = [
+                    GameShortcut(
+                      title: 'Speak first player points',
+                      shortcut: GameShortcutsShortcut.bracketLeft,
+                      controlKey: useControlKey,
+                      metaKey: useMetaKey,
+                      onStart: (final _) => _speakPlayerStats(
+                        ref: ref,
+                        player: setPlayers.first,
+                        points: points,
                       ),
-                      GameShortcut(
-                        title: 'Speak second player points',
-                        shortcut: GameShortcutsShortcut.bracketRight,
-                        controlKey: useControlKey,
-                        metaKey: useMetaKey,
-                        onStart: (final _) => _speakPlayerStats(
-                          ref: ref,
-                          player: setPlayers.last,
-                          points: points,
-                        ),
+                    ),
+                    GameShortcut(
+                      title: 'Speak second player points',
+                      shortcut: GameShortcutsShortcut.bracketRight,
+                      controlKey: useControlKey,
+                      metaKey: useMetaKey,
+                      onStart: (final _) => _speakPlayerStats(
+                        ref: ref,
+                        player: setPlayers.last,
+                        points: points,
                       ),
-                      GameShortcut(
-                        title: 'Speak serve details',
-                        shortcut: GameShortcutsShortcut.keyB,
-                        controlKey: useControlKey,
-                        metaKey: useMetaKey,
-                        onStart: (_) {
-                          final serverPoints = getPoints(points, server);
-                          final receiverPoints = getPoints(points, receiver);
-                          context.announce(
-                            // ignore: lines_longer_than_80_chars
-                            'Serve $serveNumber for ${server.name}: $serverPoints : $receiverPoints',
-                          );
-                        },
-                      ),
-                      for (var i = 0; i < numberKeys.length; i++)
-                        ...(() {
-                          final numberKey = numberKeys[i];
-                          final sp = i < showdownPoints.length
-                              ? showdownPoints[i]
-                              : null;
-                          return <GameShortcut>[
+                    ),
+                    GameShortcut(
+                      title: 'Speak serve details',
+                      shortcut: GameShortcutsShortcut.keyB,
+                      controlKey: useControlKey,
+                      metaKey: useMetaKey,
+                      onStart: (_) {
+                        final serverPoints = getPoints(points, server);
+                        final receiverPoints = getPoints(points, receiver);
+                        context.announce(
+                          // ignore: lines_longer_than_80_chars
+                          'Serve $serveNumber for ${server.name}: $serverPoints : $receiverPoints',
+                        );
+                      },
+                    ),
+                    for (var i = 0; i < numberKeys.length; i++)
+                      ...(() {
+                        final numberKey = numberKeys[i];
+                        final sp = i < showdownPoints.length
+                            ? showdownPoints[i]
+                            : null;
+                        return <GameShortcut>[
+                          GameShortcut(
+                            title: 'Speak point number ${i + 1}',
+                            shortcut: numberKey,
+                            controlKey: useControlKey,
+                            metaKey: useMetaKey,
+                            onStart: (_) {
+                              if (i >= points.length) {
+                                return context.announce(
+                                  "There aren't that many points.",
+                                );
+                              }
+                              final point = points[i];
+                              final player =
+                                  point.setPoint.playerId == server.id
+                                  ? server
+                                  : receiver;
+                              context.announce(
+                                // ignore: lines_longer_than_80_chars
+                                '${player.name}: ${point.showdownPoint.name}',
+                              );
+                            },
+                          ),
+                          if (sp != null && !readOnly)
                             GameShortcut(
-                              title: 'Speak point number ${i + 1}',
+                              title: 'Award a $sp',
                               shortcut: numberKey,
-                              controlKey: useControlKey,
-                              metaKey: useMetaKey,
                               onStart: (_) {
-                                if (i >= points.length) {
+                                if (awardingPlayer == null) {
                                   return context.announce(
-                                    "There aren't that many points.",
+                                    // ignore: lines_longer_than_80_chars
+                                    'You cannot award ${sp.name} without first setting the player to award.',
                                   );
                                 }
-                                final point = points[i];
-                                final player =
-                                    point.setPoint.playerId == server.id
-                                    ? server
-                                    : receiver;
-                                context.announce(
-                                  // ignore: lines_longer_than_80_chars
-                                  '${player.name}: ${point.showdownPoint.name}',
-                                );
+                                showdownPoint = sp;
+                                context.announce(sp.name);
                               },
                             ),
-                            if (sp != null && !readOnly)
-                              GameShortcut(
-                                title: 'Award a $sp',
-                                shortcut: numberKey,
-                                onStart: (_) {
-                                  if (awardingPlayer == null) {
-                                    return context.announce(
-                                      // ignore: lines_longer_than_80_chars
-                                      'You cannot award ${sp.name} without first setting the player to award.',
-                                    );
-                                  }
-                                  showdownPoint = sp;
-                                  context.announce(sp.name);
-                                },
-                              ),
-                          ];
-                        })(),
-                      GameShortcut(
-                        title: 'Award point to first player',
-                        shortcut: GameShortcutsShortcut.bracketLeft,
-                        onStart: (_) {
-                          showdownPoint = null;
-                          awardingPlayer = setPlayers.first;
-                          context.announce(awardingPlayer!.name);
-                        },
-                        onStop: (_) {
+                        ];
+                      })(),
+                    GameShortcut(
+                      title: 'Award point to first player',
+                      shortcut: GameShortcutsShortcut.bracketLeft,
+                      onStart: (_) {
+                        showdownPoint = null;
+                        awardingPlayer = setPlayers.first;
+                        context.announce(awardingPlayer!.name);
+                      },
+                      onStop: (_) {
+                        awardingPlayer = null;
+                        _awardPoint(
+                          ref: ref,
+                          point: showdownPoint,
+                          player: setPlayers.first,
+                        );
+                      },
+                    ),
+                    GameShortcut(
+                      title: 'Award point to second player',
+                      shortcut: GameShortcutsShortcut.bracketRight,
+                      onStart: (_) {
+                        showdownPoint = null;
+                        awardingPlayer = setPlayers.last;
+                        context.announce(awardingPlayer!.name);
+                      },
+                      onStop: (_) {
+                        awardingPlayer = null;
+                        _awardPoint(
+                          ref: ref,
+                          point: showdownPoint,
+                          player: setPlayers.last,
+                        );
+                      },
+                    ),
+                    GameShortcut(
+                      title:
+                          'Clear awarding player or return to previous screen',
+                      shortcut: GameShortcutsShortcut.escape,
+                      onStart: (final innerContext) {
+                        if (awardingPlayer == null) {
+                          innerContext.pop();
+                        } else {
                           awardingPlayer = null;
-                          _awardPoint(
-                            ref: ref,
-                            point: showdownPoint,
-                            player: setPlayers.first,
-                          );
-                        },
-                      ),
-                      GameShortcut(
-                        title: 'Award point to second player',
-                        shortcut: GameShortcutsShortcut.bracketRight,
-                        onStart: (_) {
                           showdownPoint = null;
-                          awardingPlayer = setPlayers.last;
-                          context.announce(awardingPlayer!.name);
-                        },
-                        onStop: (_) {
-                          awardingPlayer = null;
-                          _awardPoint(
-                            ref: ref,
-                            point: showdownPoint,
-                            player: setPlayers.last,
-                          );
-                        },
-                      ),
-                    ];
-                    shortcuts.add(
-                      GameShortcut(
-                        title: 'Show help',
-                        shortcut: GameShortcutsShortcut.slash,
-                        shiftKey: true,
-                        onStart: (final innerContext) =>
-                            innerContext.pushWidgetBuilder(
-                              (_) =>
-                                  GameShortcutsHelpScreen(shortcuts: shortcuts),
-                            ),
-                      ),
-                    );
-                    return GameShortcuts(
-                      autofocus: false,
-                      canRequestFocus: false,
-                      shortcuts: shortcuts,
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: [
-                          ...setPlayers.map(
-                            (final player) => _PlayerListTile(
-                              autofocus: player.id == players.first.id,
-                              player: player,
-                              readOnly: readOnly,
-                              serveNumber: player.id == server.id
-                                  ? serveNumber
-                                  : null,
-                              setId: setId,
-                              setNumber: setNumber,
-                              points: points,
-                            ),
+                          innerContext.announce('Cancelled.');
+                        }
+                      },
+                    ),
+                  ];
+                  shortcuts.add(
+                    GameShortcut(
+                      title: 'Show help',
+                      shortcut: GameShortcutsShortcut.slash,
+                      shiftKey: true,
+                      onStart: (final innerContext) =>
+                          innerContext.pushWidgetBuilder(
+                            (_) =>
+                                GameShortcutsHelpScreen(shortcuts: shortcuts),
                           ),
-                          ...[
-                            for (var i = 0; i < points.length; i++)
-                              () {
-                                final pointContext = points[i];
-                                final gamePoint = pointContext.setPoint;
-                                final playerId = gamePoint.playerId;
-                                final player = players.firstWhere(
-                                  (final p) => p.id == playerId,
-                                );
-                                final point = pointContext.showdownPoint;
-                                final query = database.managers.setPoints
-                                    .filter(
-                                      (final f) => f.id.equals(gamePoint.id),
-                                    );
-                                if (readOnly) {
-                                  return ListTile(
-                                    title: PlayerCustomText(
-                                      playerId: playerId,
-                                      showPoints: false,
-                                    ),
-                                    subtitle: CustomText(
-                                      text: '${point.name} (${point.value})',
-                                    ),
-                                    onTap: () {},
-                                  );
-                                }
-                                return PerformableActionsListTile(
-                                  actions: [
-                                    ...players.map(
-                                      (final player) => PerformableAction(
-                                        name: player.name,
-                                        checked: player.id == playerId,
-                                        invoke: () async {
-                                          await query.update(
-                                            (final o) =>
-                                                o(playerId: Value(player.id)),
-                                          );
-                                          ref.invalidate(
-                                            setPointsProvider(setId),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    if (gamePoint.id == points.last.setPoint.id)
-                                      PerformableAction(
-                                        name: 'delete',
-                                        activator: deleteShortcut,
-                                        invoke: () {
-                                          context.showConfirmMessage(
-                                            message:
-                                                // ignore: lines_longer_than_80_chars
-                                                'Are you sure you want to delete this point?',
-                                            title: deleteConfirmationTitle,
-                                            yesCallback: () async {
-                                              await query.delete();
-                                              ref.invalidate(
-                                                setPointsProvider(setId),
-                                              );
-                                            },
-                                          );
-                                        },
-                                      ),
-                                  ],
+                    ),
+                  );
+                  return GameShortcuts(
+                    autofocus: false,
+                    canRequestFocus: false,
+                    shortcuts: shortcuts,
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        ...setPlayers.map(
+                          (final player) => _PlayerListTile(
+                            autofocus: player.id == players.first.id,
+                            player: player,
+                            readOnly: readOnly,
+                            serveNumber: player.id == server.id
+                                ? serveNumber
+                                : null,
+                            setId: setId,
+                            setNumber: setNumber,
+                            points: points,
+                          ),
+                        ),
+                        ...[
+                          for (var i = 0; i < points.length; i++)
+                            () {
+                              final pointContext = points[i];
+                              final gamePoint = pointContext.setPoint;
+                              final playerId = gamePoint.playerId;
+                              final player = players.firstWhere(
+                                (final p) => p.id == playerId,
+                              );
+                              final point = pointContext.showdownPoint;
+                              final query = database.managers.setPoints.filter(
+                                (final f) => f.id.equals(gamePoint.id),
+                              );
+                              if (readOnly) {
+                                return ListTile(
                                   title: PlayerCustomText(
                                     playerId: playerId,
-                                    points: getPoints(
-                                      points.sublist(0, i + 1),
-                                      player,
-                                    ),
+                                    showPoints: false,
                                   ),
                                   subtitle: CustomText(
                                     text: '${point.name} (${point.value})',
                                   ),
-                                  onTap: () => context.pushWidgetBuilder(
-                                    (_) => SelectShowdownPointScreen(
-                                      teamId: player.teamId,
-                                      onChanged: (final showdownPoint) async {
+                                  onTap: () {},
+                                );
+                              }
+                              return PerformableActionsListTile(
+                                actions: [
+                                  ...players.map(
+                                    (final player) => PerformableAction(
+                                      name: player.name,
+                                      checked: player.id == playerId,
+                                      invoke: () async {
                                         await query.update(
-                                          (final o) => o(
-                                            pointId: Value(showdownPoint.id),
-                                          ),
+                                          (final o) =>
+                                              o(playerId: Value(player.id)),
                                         );
                                         ref.invalidate(
                                           setPointsProvider(setId),
@@ -333,21 +299,62 @@ class EditSetScreen extends ConsumerWidget {
                                       },
                                     ),
                                   ),
-                                );
-                              }(),
-                          ],
+                                  if (gamePoint.id == points.last.setPoint.id)
+                                    PerformableAction(
+                                      name: 'delete',
+                                      activator: deleteShortcut,
+                                      invoke: () {
+                                        context.showConfirmMessage(
+                                          message:
+                                              // ignore: lines_longer_than_80_chars
+                                              'Are you sure you want to delete this point?',
+                                          title: deleteConfirmationTitle,
+                                          yesCallback: () async {
+                                            await query.delete();
+                                            ref.invalidate(
+                                              setPointsProvider(setId),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                ],
+                                title: PlayerCustomText(
+                                  playerId: playerId,
+                                  points: getPoints(
+                                    points.sublist(0, i + 1),
+                                    player,
+                                  ),
+                                ),
+                                subtitle: CustomText(
+                                  text: '${point.name} (${point.value})',
+                                ),
+                                onTap: () => context.pushWidgetBuilder(
+                                  (_) => SelectShowdownPointScreen(
+                                    teamId: player.teamId,
+                                    onChanged: (final showdownPoint) async {
+                                      await query.update(
+                                        (final o) =>
+                                            o(pointId: Value(showdownPoint.id)),
+                                      );
+                                      ref.invalidate(setPointsProvider(setId));
+                                    },
+                                  ),
+                                ),
+                              );
+                            }(),
                         ],
-                      ),
-                    );
-                  });
+                      ],
+                    ),
+                  );
                 });
               });
-            }),
-          );
-        },
-        error: ErrorScreen.withPositional,
-        loading: LoadingScreen.new,
-      ),
+            });
+          }),
+        );
+      },
+      error: ErrorScreen.withPositional,
+      loading: LoadingScreen.new,
     );
   }
 
