@@ -5,6 +5,7 @@
     "daos",
     "ffi",
     "math",
-    "riverpod"
+    "riverpod",
+    "sp"
   ]
 }
