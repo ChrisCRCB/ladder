@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:ladder/ladder.dart';
 
@@ -21,6 +22,7 @@ const defaultPoints = <String, int>{
   'Own goal': -2,
   'Equipment fault': -2,
   'Player forfeit': -11,
+  'Timeout': 0,
 };
 
 /// The date format to use.
@@ -46,3 +48,19 @@ int getPoints(final List<SetPointContext> points, final TeamPlayer player) {
       })
       .reduce((final value, final element) => value + element);
 }
+
+/// The number keys, used by the set editor.
+const numberKeys = <LogicalKeyboardKey>[
+  LogicalKeyboardKey.digit1,
+  LogicalKeyboardKey.digit2,
+  LogicalKeyboardKey.digit3,
+  LogicalKeyboardKey.digit4,
+  LogicalKeyboardKey.digit5,
+  LogicalKeyboardKey.digit6,
+  LogicalKeyboardKey.digit7,
+  LogicalKeyboardKey.digit8,
+  LogicalKeyboardKey.digit9,
+  LogicalKeyboardKey.digit0,
+  LogicalKeyboardKey.minus,
+  LogicalKeyboardKey.equal,
+];

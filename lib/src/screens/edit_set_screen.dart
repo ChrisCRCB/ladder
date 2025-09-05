@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
 
@@ -82,59 +85,150 @@ class EditSetScreen extends ConsumerWidget {
                     final serveBlock = totalServes ~/ team.servesPerPlayer;
                     final currentPlayerIndex = serveBlock % players.length;
                     final server = setPlayers[currentPlayerIndex];
+                    final receiver = setPlayers.firstWhere(
+                      (final p) => p.id != server.id,
+                    );
                     final serveNumber =
                         (totalServes % team.servesPerPlayer) + 1;
-                    return ListView(
-                      shrinkWrap: true,
-                      children: [
-                        ...setPlayers.map(
-                          (final player) => _PlayerListTile(
-                            autofocus: player.id == players.first.id,
-                            player: player,
-                            readOnly: readOnly,
-                            serveNumber: player.id == server.id
-                                ? serveNumber
-                                : null,
-                            setId: setId,
-                            setNumber: setNumber,
-                            points: points,
-                          ),
+                    return CallbackShortcuts(
+                      bindings: {
+                        CrossPlatformSingleActivator(
+                          LogicalKeyboardKey.bracketLeft,
+                        ): () => _speakPlayerStats(
+                          ref: ref,
+                          player: setPlayers.first,
+                          points: points,
                         ),
-                        ...[
-                          for (var i = 0; i < points.length; i++)
-                            () {
-                              final pointContext = points[i];
-                              final gamePoint = pointContext.setPoint;
-                              final playerId = gamePoint.playerId;
-                              final player = players.firstWhere(
-                                (final p) => p.id == playerId,
-                              );
-                              final point = pointContext.showdownPoint;
-                              final query = database.managers.setPoints.filter(
-                                (final f) => f.id.equals(gamePoint.id),
-                              );
-                              if (readOnly) {
-                                return ListTile(
+                        CrossPlatformSingleActivator(
+                          LogicalKeyboardKey.bracketRight,
+                        ): () => _speakPlayerStats(
+                          ref: ref,
+                          player: setPlayers.last,
+                          points: points,
+                        ),
+                        CrossPlatformSingleActivator(
+                          LogicalKeyboardKey.keyB,
+                        ): () {
+                          final serverPoints = getPoints(points, server);
+                          final receiverPoints = getPoints(points, receiver);
+                          context.announce(
+                            // ignore: lines_longer_than_80_chars
+                            'Serve $serveNumber for ${server.name}: $serverPoints : $receiverPoints',
+                          );
+                        },
+
+                        for (
+                          var i = 0;
+                          i < min(numberKeys.length, points.length);
+                          i++
+                        )
+                          CrossPlatformSingleActivator(numberKeys[i]): () {
+                            final point = points[i];
+                            final player = point.setPoint.playerId == server.id
+                                ? server
+                                : receiver;
+                            context.announce(
+                              '${player.name}: ${point.showdownPoint.name}',
+                            );
+                          },
+                      },
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: [
+                          ...setPlayers.map(
+                            (final player) => _PlayerListTile(
+                              autofocus: player.id == players.first.id,
+                              player: player,
+                              readOnly: readOnly,
+                              serveNumber: player.id == server.id
+                                  ? serveNumber
+                                  : null,
+                              setId: setId,
+                              setNumber: setNumber,
+                              points: points,
+                            ),
+                          ),
+                          ...[
+                            for (var i = 0; i < points.length; i++)
+                              () {
+                                final pointContext = points[i];
+                                final gamePoint = pointContext.setPoint;
+                                final playerId = gamePoint.playerId;
+                                final player = players.firstWhere(
+                                  (final p) => p.id == playerId,
+                                );
+                                final point = pointContext.showdownPoint;
+                                final query = database.managers.setPoints
+                                    .filter(
+                                      (final f) => f.id.equals(gamePoint.id),
+                                    );
+                                if (readOnly) {
+                                  return ListTile(
+                                    title: PlayerCustomText(
+                                      playerId: playerId,
+                                      showPoints: false,
+                                    ),
+                                    subtitle: CustomText(
+                                      text: '${point.name} (${point.value})',
+                                    ),
+                                    onTap: () {},
+                                  );
+                                }
+                                return PerformableActionsListTile(
+                                  actions: [
+                                    ...players.map(
+                                      (final player) => PerformableAction(
+                                        name: player.name,
+                                        checked: player.id == playerId,
+                                        invoke: () async {
+                                          await query.update(
+                                            (final o) =>
+                                                o(playerId: Value(player.id)),
+                                          );
+                                          ref.invalidate(
+                                            setPointsProvider(setId),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    if (gamePoint.id == points.last.setPoint.id)
+                                      PerformableAction(
+                                        name: 'delete',
+                                        activator: deleteShortcut,
+                                        invoke: () {
+                                          context.showConfirmMessage(
+                                            message:
+                                                // ignore: lines_longer_than_80_chars
+                                                'Are you sure you want to delete this point?',
+                                            title: deleteConfirmationTitle,
+                                            yesCallback: () async {
+                                              await query.delete();
+                                              ref.invalidate(
+                                                setPointsProvider(setId),
+                                              );
+                                            },
+                                          );
+                                        },
+                                      ),
+                                  ],
                                   title: PlayerCustomText(
                                     playerId: playerId,
-                                    showPoints: false,
+                                    points: getPoints(
+                                      points.sublist(0, i + 1),
+                                      player,
+                                    ),
                                   ),
                                   subtitle: CustomText(
                                     text: '${point.name} (${point.value})',
                                   ),
-                                  onTap: () {},
-                                );
-                              }
-                              return PerformableActionsListTile(
-                                actions: [
-                                  ...players.map(
-                                    (final player) => PerformableAction(
-                                      name: player.name,
-                                      checked: player.id == playerId,
-                                      invoke: () async {
+                                  onTap: () => context.pushWidgetBuilder(
+                                    (_) => SelectShowdownPointScreen(
+                                      teamId: player.teamId,
+                                      onChanged: (final showdownPoint) async {
                                         await query.update(
-                                          (final o) =>
-                                              o(playerId: Value(player.id)),
+                                          (final o) => o(
+                                            pointId: Value(showdownPoint.id),
+                                          ),
                                         );
                                         ref.invalidate(
                                           setPointsProvider(setId),
@@ -142,52 +236,11 @@ class EditSetScreen extends ConsumerWidget {
                                       },
                                     ),
                                   ),
-                                  if (gamePoint.id == points.last.setPoint.id)
-                                    PerformableAction(
-                                      name: 'delete',
-                                      activator: deleteShortcut,
-                                      invoke: () {
-                                        context.showConfirmMessage(
-                                          message:
-                                              // ignore: lines_longer_than_80_chars
-                                              'Are you sure you want to delete this point?',
-                                          title: deleteConfirmationTitle,
-                                          yesCallback: () async {
-                                            await query.delete();
-                                            ref.invalidate(
-                                              setPointsProvider(setId),
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                ],
-                                title: PlayerCustomText(
-                                  playerId: playerId,
-                                  points: getPoints(
-                                    points.sublist(0, i + 1),
-                                    player,
-                                  ),
-                                ),
-                                subtitle: CustomText(
-                                  text: '${point.name} (${point.value})',
-                                ),
-                                onTap: () => context.pushWidgetBuilder(
-                                  (_) => SelectShowdownPointScreen(
-                                    teamId: player.teamId,
-                                    onChanged: (final showdownPoint) async {
-                                      await query.update(
-                                        (final o) =>
-                                            o(pointId: Value(showdownPoint.id)),
-                                      );
-                                      ref.invalidate(setPointsProvider(setId));
-                                    },
-                                  ),
-                                ),
-                              );
-                            }(),
+                                );
+                              }(),
+                          ],
                         ],
-                      ],
+                      ),
                     );
                   });
                 });
@@ -199,6 +252,16 @@ class EditSetScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Speak the stats of [player].
+  void _speakPlayerStats({
+    required final WidgetRef ref,
+    required final TeamPlayer player,
+    required final List<SetPointContext> points,
+  }) {
+    final playerPoints = getPoints(points, player);
+    ref.context.announce('${player.name}: $playerPoints');
   }
 }
 
