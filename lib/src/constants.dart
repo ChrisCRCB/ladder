@@ -1,4 +1,4 @@
-import 'package:flutter/services.dart';
+import 'package:backstreets_widgets/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:ladder/ladder.dart';
 
@@ -50,17 +50,18 @@ int getPoints(final List<SetPointContext> points, final TeamPlayer player) {
 }
 
 /// The number keys, used by the set editor.
-const numberKeys = <LogicalKeyboardKey>[
-  LogicalKeyboardKey.digit1,
-  LogicalKeyboardKey.digit2,
-  LogicalKeyboardKey.digit3,
-  LogicalKeyboardKey.digit4,
-  LogicalKeyboardKey.digit5,
-  LogicalKeyboardKey.digit6,
-  LogicalKeyboardKey.digit7,
-  LogicalKeyboardKey.digit8,
-  LogicalKeyboardKey.digit9,
-  LogicalKeyboardKey.digit0,
-  LogicalKeyboardKey.minus,
-  LogicalKeyboardKey.equal,
+const numberKeys = <GameShortcutsShortcut>[
+  GameShortcutsShortcut.digit1,
+  GameShortcutsShortcut.digit2,
+  GameShortcutsShortcut.digit3,
+  GameShortcutsShortcut.digit4,
+  GameShortcutsShortcut.digit5,
+  GameShortcutsShortcut.digit6,
+  GameShortcutsShortcut.digit7,
+  GameShortcutsShortcut.digit8,
+  GameShortcutsShortcut.digit9,
+  GameShortcutsShortcut.digit0,
+  GameShortcutsShortcut.minus,
+  GameShortcutsShortcut.equal,
+  GameShortcutsShortcut.backspace,
 ];

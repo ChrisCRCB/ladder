@@ -1,12 +1,9 @@
-import 'dart:math';
-
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
 
@@ -90,25 +87,35 @@ class EditSetScreen extends ConsumerWidget {
                     );
                     final serveNumber =
                         (totalServes % team.servesPerPlayer) + 1;
-                    return CallbackShortcuts(
-                      bindings: {
-                        CrossPlatformSingleActivator(
-                          LogicalKeyboardKey.bracketLeft,
-                        ): () => _speakPlayerStats(
+                    final shortcuts = [
+                      GameShortcut(
+                        title: 'Speak first player points',
+                        shortcut: GameShortcutsShortcut.bracketLeft,
+                        controlKey: useControlKey,
+                        metaKey: useMetaKey,
+                        onStart: (final _) => _speakPlayerStats(
                           ref: ref,
                           player: setPlayers.first,
                           points: points,
                         ),
-                        CrossPlatformSingleActivator(
-                          LogicalKeyboardKey.bracketRight,
-                        ): () => _speakPlayerStats(
+                      ),
+                      GameShortcut(
+                        title: 'Speak second player points',
+                        shortcut: GameShortcutsShortcut.bracketRight,
+                        controlKey: useControlKey,
+                        metaKey: useMetaKey,
+                        onStart: (final _) => _speakPlayerStats(
                           ref: ref,
                           player: setPlayers.last,
                           points: points,
                         ),
-                        CrossPlatformSingleActivator(
-                          LogicalKeyboardKey.keyB,
-                        ): () {
+                      ),
+                      GameShortcut(
+                        title: 'Speak serve details',
+                        shortcut: GameShortcutsShortcut.keyB,
+                        controlKey: useControlKey,
+                        metaKey: useMetaKey,
+                        onStart: (_) {
                           final serverPoints = getPoints(points, server);
                           final receiverPoints = getPoints(points, receiver);
                           context.announce(
@@ -116,13 +123,19 @@ class EditSetScreen extends ConsumerWidget {
                             'Serve $serveNumber for ${server.name}: $serverPoints : $receiverPoints',
                           );
                         },
-
-                        for (
-                          var i = 0;
-                          i < min(numberKeys.length, points.length);
-                          i++
-                        )
-                          CrossPlatformSingleActivator(numberKeys[i]): () {
+                      ),
+                      for (var i = 0; i < numberKeys.length; i++)
+                        GameShortcut(
+                          title: 'Speak point number ${i + 1}',
+                          shortcut: numberKeys[i],
+                          controlKey: useControlKey,
+                          metaKey: useMetaKey,
+                          onStart: (_) {
+                            if (i >= points.length) {
+                              return context.announce(
+                                "There aren't that many points.",
+                              );
+                            }
                             final point = points[i];
                             final player = point.setPoint.playerId == server.id
                                 ? server
@@ -131,7 +144,24 @@ class EditSetScreen extends ConsumerWidget {
                               '${player.name}: ${point.showdownPoint.name}',
                             );
                           },
-                      },
+                        ),
+                    ];
+                    shortcuts.add(
+                      GameShortcut(
+                        title: 'Show help',
+                        shortcut: GameShortcutsShortcut.slash,
+                        shiftKey: true,
+                        onStart: (final innerContext) =>
+                            innerContext.pushWidgetBuilder(
+                              (_) =>
+                                  GameShortcutsHelpScreen(shortcuts: shortcuts),
+                            ),
+                      ),
+                    );
+                    return GameShortcuts(
+                      autofocus: false,
+                      canRequestFocus: false,
+                      shortcuts: shortcuts,
                       child: ListView(
                         shrinkWrap: true,
                         children: [
