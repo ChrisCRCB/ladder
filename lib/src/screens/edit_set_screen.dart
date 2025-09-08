@@ -385,6 +385,10 @@ class EditSetScreen extends ConsumerWidget {
     ref
       ..invalidate(setPointsProvider(setId))
       ..invalidate(showdownPointScoresProvider(player.teamId));
+    final context = ref.context;
+    if (context.mounted) {
+      context.announce('Awarded ${point.name} to ${player.name}.');
+    }
   }
 }
 
