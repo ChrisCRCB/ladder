@@ -1,11 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:ladder/ladder.dart' show GameSet, LadderNight, ShowdownGame;
-import 'package:ladder/src/database/_DATABASE.dart'
-    show GameSet, LadderNight, ShowdownGame;
-import 'package:ladder/src/database/_database.dart'
-    show GameSet, LadderNight, ShowdownGame;
-import 'package:ladder/src/database/database.dart'
-    show GameSet, LadderNight, ShowdownGame;
+import 'package:ladder/ladder.dart';
 
 /// Add an [id] column.
 mixin IdMixin on Table {
@@ -119,6 +113,9 @@ class ShowdownGames extends Table with IdMixin {
 
   /// The number of minutes after the night starts that this game will commence.
   late final startAfter = integer().withDefault(const Constant(0))();
+
+  /// Whether the first player won the tos or not.
+  late final wonToss = boolean().withDefault(const Constant(true))();
 }
 
 /// A set in a [ShowdownGame].

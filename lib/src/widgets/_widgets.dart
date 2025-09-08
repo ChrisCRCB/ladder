@@ -5,6 +5,7 @@ export 'font_shortcuts.dart';
 export 'game_list_tile.dart';
 export 'games_page.dart';
 export 'ladder_nights_page.dart';
+export 'lucky_players_page.dart';
 export 'player_attendance_page.dart';
 export 'player_custom_text.dart';
 export 'player_games_page.dart';

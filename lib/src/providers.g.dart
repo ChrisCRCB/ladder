@@ -1635,5 +1635,87 @@ final class PlayerGamesFamily extends $Family
   String toString() => r'playerGamesProvider';
 }
 
+/// Provide the players, sorted by luck.
+@ProviderFor(luckyPlayers)
+const luckyPlayersProvider = LuckyPlayersFamily._();
+
+/// Provide the players, sorted by luck.
+final class LuckyPlayersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<(TeamPlayer, int)>>,
+          List<(TeamPlayer, int)>,
+          FutureOr<List<(TeamPlayer, int)>>
+        >
+    with
+        $FutureModifier<List<(TeamPlayer, int)>>,
+        $FutureProvider<List<(TeamPlayer, int)>> {
+  /// Provide the players, sorted by luck.
+  const LuckyPlayersProvider._({
+    required LuckyPlayersFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'luckyPlayersProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$luckyPlayersHash();
+
+  @override
+  String toString() {
+    return r'luckyPlayersProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<(TeamPlayer, int)>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<(TeamPlayer, int)>> create(Ref ref) {
+    final argument = this.argument as int;
+    return luckyPlayers(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LuckyPlayersProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$luckyPlayersHash() => r'c73cbc94aeae86eac082d8b77686298e1d6f92ec';
+
+/// Provide the players, sorted by luck.
+final class LuckyPlayersFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<(TeamPlayer, int)>>, int> {
+  const LuckyPlayersFamily._()
+    : super(
+        retry: null,
+        name: r'luckyPlayersProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provide the players, sorted by luck.
+  LuckyPlayersProvider call(int teamId) =>
+      LuckyPlayersProvider._(argument: teamId, from: this);
+
+  @override
+  String toString() => r'luckyPlayersProvider';
+}
+
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

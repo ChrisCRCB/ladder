@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/widgets.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
@@ -31,6 +32,9 @@ class EditGameScreen extends ConsumerWidget {
     final gameValue = ref.watch(gameProvider(gameId));
     return gameValue.when(
       data: (final game) {
+        final query = database.managers.showdownGames.filter(
+          (final f) => f.id.equals(game.id),
+        );
         final setsValue = ref.watch(gameSetsProvider(game.id));
         return Cancel(
           child: CommonShortcuts(
@@ -48,9 +52,26 @@ class EditGameScreen extends ConsumerWidget {
                   return playersValue.simpleWhen(
                     (final players) => ListView.builder(
                       itemBuilder: (final context, final index) {
-                        final player = players[index];
+                        if (index == 0) {
+                          return CheckboxListTile(
+                            value: game.wonToss,
+                            onChanged: (_) async {
+                              await query.update(
+                                (final o) => o(wonToss: Value(!game.wonToss)),
+                              );
+                              ref
+                                ..invalidate(gamesProvider(game.ladderNightId))
+                                ..invalidate(gameProvider(game.id));
+                            },
+                            autofocus: true,
+                            isThreeLine: false,
+                            title: CustomText(
+                              text: '${players.first.name} won the toss',
+                            ),
+                          );
+                        }
+                        final player = players[index - 1];
                         return ListTile(
-                          autofocus: index == 0,
                           title: PlayerCustomText(playerId: player.id),
                           onTap: () async {
                             final set = await database.managers.gameSets
@@ -70,7 +91,7 @@ class EditGameScreen extends ConsumerWidget {
                           },
                         );
                       },
-                      itemCount: players.length,
+                      itemCount: players.length + 1,
                       shrinkWrap: true,
                     ),
                   );

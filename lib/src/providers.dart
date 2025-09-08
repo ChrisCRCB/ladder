@@ -421,3 +421,39 @@ Future<List<ShowdownGame>> playerGames(
       .orderBy((final o) => o.startAfter.desc())
       .get();
 }
+
+/// Provide the players, sorted by luck.
+@riverpod
+Future<List<(TeamPlayer, int)>> luckyPlayers(
+  final Ref ref,
+  final int teamId,
+) async {
+  final db = ref.watch(databaseProvider);
+  final games = db.showdownGames;
+  final players = db.teamPlayers;
+  final query = db.selectOnly(games)
+    ..addColumns([
+      players.id,
+      players.name,
+      players.createdAt,
+      players.emailAddress,
+      players.points,
+    ])
+    ..addColumns([games.id.count()])
+    ..join([innerJoin(players, players.id.equalsExp(games.firstPlayerId))])
+    ..where(games.wonToss.equals(true) & players.teamId.equals(teamId))
+    ..groupBy([players.id, players.name]);
+  final results = await query.get();
+  return results.map((final row) {
+    final player = TeamPlayer(
+      id: row.read(players.id)!,
+      name: row.read(players.name)!,
+      createdAt: row.read(players.createdAt)!,
+      emailAddress: row.read(players.emailAddress)!,
+      points: row.read(players.points)!,
+      teamId: teamId,
+    );
+    final tossWins = row.read(games.id.count())!;
+    return (player, tossWins);
+  }).toList();
+}

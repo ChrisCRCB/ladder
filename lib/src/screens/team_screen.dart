@@ -56,6 +56,11 @@ class TeamScreen extends ConsumerWidget {
               tooltip: 'Create point',
             ),
           ),
+          TabbedScaffoldTab(
+            title: 'Lucky Players',
+            icon: const Icon(Icons.casino),
+            child: LuckyPlayersPage(teamId: teamId),
+          ),
         ],
       ),
     ),

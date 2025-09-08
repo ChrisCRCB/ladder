@@ -1702,6 +1702,21 @@ class $ShowdownGamesTable extends ShowdownGames
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _wonTossMeta = const VerificationMeta(
+    'wonToss',
+  );
+  @override
+  late final GeneratedColumn<bool> wonToss = GeneratedColumn<bool>(
+    'won_toss',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("won_toss" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1710,6 +1725,7 @@ class $ShowdownGamesTable extends ShowdownGames
     secondPlayerId,
     lockedOn,
     startAfter,
+    wonToss,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1771,6 +1787,12 @@ class $ShowdownGamesTable extends ShowdownGames
         startAfter.isAcceptableOrUnknown(data['start_after']!, _startAfterMeta),
       );
     }
+    if (data.containsKey('won_toss')) {
+      context.handle(
+        _wonTossMeta,
+        wonToss.isAcceptableOrUnknown(data['won_toss']!, _wonTossMeta),
+      );
+    }
     return context;
   }
 
@@ -1804,6 +1826,10 @@ class $ShowdownGamesTable extends ShowdownGames
         DriftSqlType.int,
         data['${effectivePrefix}start_after'],
       )!,
+      wonToss: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}won_toss'],
+      )!,
     );
   }
 
@@ -1833,6 +1859,9 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
 
   /// The number of minutes after the night starts that this game will commence.
   final int startAfter;
+
+  /// Whether the first player won the tos or not.
+  final bool wonToss;
   const ShowdownGame({
     required this.id,
     required this.ladderNightId,
@@ -1840,6 +1869,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
     required this.secondPlayerId,
     this.lockedOn,
     required this.startAfter,
+    required this.wonToss,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1852,6 +1882,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
       map['locked_on'] = Variable<DateTime>(lockedOn);
     }
     map['start_after'] = Variable<int>(startAfter);
+    map['won_toss'] = Variable<bool>(wonToss);
     return map;
   }
 
@@ -1865,6 +1896,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
           ? const Value.absent()
           : Value(lockedOn),
       startAfter: Value(startAfter),
+      wonToss: Value(wonToss),
     );
   }
 
@@ -1880,6 +1912,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
       secondPlayerId: serializer.fromJson<int>(json['secondPlayerId']),
       lockedOn: serializer.fromJson<DateTime?>(json['lockedOn']),
       startAfter: serializer.fromJson<int>(json['startAfter']),
+      wonToss: serializer.fromJson<bool>(json['wonToss']),
     );
   }
   @override
@@ -1892,6 +1925,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
       'secondPlayerId': serializer.toJson<int>(secondPlayerId),
       'lockedOn': serializer.toJson<DateTime?>(lockedOn),
       'startAfter': serializer.toJson<int>(startAfter),
+      'wonToss': serializer.toJson<bool>(wonToss),
     };
   }
 
@@ -1902,6 +1936,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
     int? secondPlayerId,
     Value<DateTime?> lockedOn = const Value.absent(),
     int? startAfter,
+    bool? wonToss,
   }) => ShowdownGame(
     id: id ?? this.id,
     ladderNightId: ladderNightId ?? this.ladderNightId,
@@ -1909,6 +1944,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
     secondPlayerId: secondPlayerId ?? this.secondPlayerId,
     lockedOn: lockedOn.present ? lockedOn.value : this.lockedOn,
     startAfter: startAfter ?? this.startAfter,
+    wonToss: wonToss ?? this.wonToss,
   );
   ShowdownGame copyWithCompanion(ShowdownGamesCompanion data) {
     return ShowdownGame(
@@ -1926,6 +1962,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
       startAfter: data.startAfter.present
           ? data.startAfter.value
           : this.startAfter,
+      wonToss: data.wonToss.present ? data.wonToss.value : this.wonToss,
     );
   }
 
@@ -1937,7 +1974,8 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
           ..write('firstPlayerId: $firstPlayerId, ')
           ..write('secondPlayerId: $secondPlayerId, ')
           ..write('lockedOn: $lockedOn, ')
-          ..write('startAfter: $startAfter')
+          ..write('startAfter: $startAfter, ')
+          ..write('wonToss: $wonToss')
           ..write(')'))
         .toString();
   }
@@ -1950,6 +1988,7 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
     secondPlayerId,
     lockedOn,
     startAfter,
+    wonToss,
   );
   @override
   bool operator ==(Object other) =>
@@ -1960,7 +1999,8 @@ class ShowdownGame extends DataClass implements Insertable<ShowdownGame> {
           other.firstPlayerId == this.firstPlayerId &&
           other.secondPlayerId == this.secondPlayerId &&
           other.lockedOn == this.lockedOn &&
-          other.startAfter == this.startAfter);
+          other.startAfter == this.startAfter &&
+          other.wonToss == this.wonToss);
 }
 
 class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
@@ -1970,6 +2010,7 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
   final Value<int> secondPlayerId;
   final Value<DateTime?> lockedOn;
   final Value<int> startAfter;
+  final Value<bool> wonToss;
   const ShowdownGamesCompanion({
     this.id = const Value.absent(),
     this.ladderNightId = const Value.absent(),
@@ -1977,6 +2018,7 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
     this.secondPlayerId = const Value.absent(),
     this.lockedOn = const Value.absent(),
     this.startAfter = const Value.absent(),
+    this.wonToss = const Value.absent(),
   });
   ShowdownGamesCompanion.insert({
     this.id = const Value.absent(),
@@ -1985,6 +2027,7 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
     required int secondPlayerId,
     this.lockedOn = const Value.absent(),
     this.startAfter = const Value.absent(),
+    this.wonToss = const Value.absent(),
   }) : ladderNightId = Value(ladderNightId),
        firstPlayerId = Value(firstPlayerId),
        secondPlayerId = Value(secondPlayerId);
@@ -1995,6 +2038,7 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
     Expression<int>? secondPlayerId,
     Expression<DateTime>? lockedOn,
     Expression<int>? startAfter,
+    Expression<bool>? wonToss,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2003,6 +2047,7 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
       if (secondPlayerId != null) 'second_player_id': secondPlayerId,
       if (lockedOn != null) 'locked_on': lockedOn,
       if (startAfter != null) 'start_after': startAfter,
+      if (wonToss != null) 'won_toss': wonToss,
     });
   }
 
@@ -2013,6 +2058,7 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
     Value<int>? secondPlayerId,
     Value<DateTime?>? lockedOn,
     Value<int>? startAfter,
+    Value<bool>? wonToss,
   }) {
     return ShowdownGamesCompanion(
       id: id ?? this.id,
@@ -2021,6 +2067,7 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
       secondPlayerId: secondPlayerId ?? this.secondPlayerId,
       lockedOn: lockedOn ?? this.lockedOn,
       startAfter: startAfter ?? this.startAfter,
+      wonToss: wonToss ?? this.wonToss,
     );
   }
 
@@ -2045,6 +2092,9 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
     if (startAfter.present) {
       map['start_after'] = Variable<int>(startAfter.value);
     }
+    if (wonToss.present) {
+      map['won_toss'] = Variable<bool>(wonToss.value);
+    }
     return map;
   }
 
@@ -2056,7 +2106,8 @@ class ShowdownGamesCompanion extends UpdateCompanion<ShowdownGame> {
           ..write('firstPlayerId: $firstPlayerId, ')
           ..write('secondPlayerId: $secondPlayerId, ')
           ..write('lockedOn: $lockedOn, ')
-          ..write('startAfter: $startAfter')
+          ..write('startAfter: $startAfter, ')
+          ..write('wonToss: $wonToss')
           ..write(')'))
         .toString();
   }
@@ -5428,6 +5479,7 @@ typedef $$ShowdownGamesTableCreateCompanionBuilder =
       required int secondPlayerId,
       Value<DateTime?> lockedOn,
       Value<int> startAfter,
+      Value<bool> wonToss,
     });
 typedef $$ShowdownGamesTableUpdateCompanionBuilder =
     ShowdownGamesCompanion Function({
@@ -5437,6 +5489,7 @@ typedef $$ShowdownGamesTableUpdateCompanionBuilder =
       Value<int> secondPlayerId,
       Value<DateTime?> lockedOn,
       Value<int> startAfter,
+      Value<bool> wonToss,
     });
 
 final class $$ShowdownGamesTableReferences
@@ -5552,6 +5605,11 @@ class $$ShowdownGamesTableFilterComposer
 
   ColumnFilters<int> get startAfter => $composableBuilder(
     column: $table.startAfter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get wonToss => $composableBuilder(
+    column: $table.wonToss,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5674,6 +5732,11 @@ class $$ShowdownGamesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get wonToss => $composableBuilder(
+    column: $table.wonToss,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$LadderNightsTableOrderingComposer get ladderNightId {
     final $$LadderNightsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -5763,6 +5826,9 @@ class $$ShowdownGamesTableAnnotationComposer
     column: $table.startAfter,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get wonToss =>
+      $composableBuilder(column: $table.wonToss, builder: (column) => column);
 
   $$LadderNightsTableAnnotationComposer get ladderNightId {
     final $$LadderNightsTableAnnotationComposer composer = $composerBuilder(
@@ -5900,6 +5966,7 @@ class $$ShowdownGamesTableTableManager
                 Value<int> secondPlayerId = const Value.absent(),
                 Value<DateTime?> lockedOn = const Value.absent(),
                 Value<int> startAfter = const Value.absent(),
+                Value<bool> wonToss = const Value.absent(),
               }) => ShowdownGamesCompanion(
                 id: id,
                 ladderNightId: ladderNightId,
@@ -5907,6 +5974,7 @@ class $$ShowdownGamesTableTableManager
                 secondPlayerId: secondPlayerId,
                 lockedOn: lockedOn,
                 startAfter: startAfter,
+                wonToss: wonToss,
               ),
           createCompanionCallback:
               ({
@@ -5916,6 +5984,7 @@ class $$ShowdownGamesTableTableManager
                 required int secondPlayerId,
                 Value<DateTime?> lockedOn = const Value.absent(),
                 Value<int> startAfter = const Value.absent(),
+                Value<bool> wonToss = const Value.absent(),
               }) => ShowdownGamesCompanion.insert(
                 id: id,
                 ladderNightId: ladderNightId,
@@ -5923,6 +5992,7 @@ class $$ShowdownGamesTableTableManager
                 secondPlayerId: secondPlayerId,
                 lockedOn: lockedOn,
                 startAfter: startAfter,
+                wonToss: wonToss,
               ),
           withReferenceMapper: (p0) => p0
               .map(
