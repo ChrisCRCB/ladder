@@ -304,19 +304,17 @@ class EditSetScreen extends ConsumerWidget {
                                     PerformableAction(
                                       name: 'delete',
                                       activator: deleteShortcut,
-                                      invoke: () {
-                                        context.showConfirmMessage(
-                                          message:
-                                              // ignore: lines_longer_than_80_chars
-                                              'Are you sure you want to delete this point?',
-                                          title: deleteConfirmationTitle,
-                                          yesCallback: () async {
-                                            await query.delete();
-                                            ref.invalidate(
-                                              setPointsProvider(setId),
-                                            );
-                                          },
+                                      invoke: () async {
+                                        await query.delete();
+                                        ref.invalidate(
+                                          setPointsProvider(setId),
                                         );
+                                        if (context.mounted) {
+                                          context.announce(
+                                            // ignore: lines_longer_than_80_chars
+                                            'Deleted ${point.name} from ${player.name}.',
+                                          );
+                                        }
                                       },
                                     ),
                                 ],
