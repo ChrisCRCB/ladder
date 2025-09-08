@@ -224,6 +224,32 @@ class EditSetScreen extends ConsumerWidget {
                         }
                       },
                     ),
+                    GameShortcut(
+                      title: 'Delete the most recent point',
+                      shortcut: GameShortcutsShortcut.backspace,
+                      shiftKey: true,
+                      onStart: (final innerContext) async {
+                        if (points.isEmpty) {
+                          return innerContext.announce(
+                            'There are no points to delete.',
+                          );
+                        }
+                        final point = points.last;
+                        final player = point.setPoint.playerId == server.id
+                            ? server
+                            : receiver;
+                        await database.managers.setPoints
+                            .filter((final f) => f.id.equals(point.setPoint.id))
+                            .delete();
+                        ref.invalidate(setPointsProvider(setId));
+                        if (context.mounted) {
+                          context.announce(
+                            // ignore: lines_longer_than_80_chars
+                            'Deleted ${point.showdownPoint.name} from ${player.name}.',
+                          );
+                        }
+                      },
+                    ),
                   ];
                   shortcuts.add(
                     GameShortcut(
