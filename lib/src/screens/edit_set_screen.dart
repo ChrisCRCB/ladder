@@ -370,27 +370,21 @@ class EditSetScreen extends ConsumerWidget {
   }
 
   /// Award [point] to [player].
-  FutureOr<void> _awardPoint({
+  Future<void> _awardPoint({
     required final WidgetRef ref,
     required final ShowdownPoint? point,
     required final TeamPlayer player,
-  }) {
+  }) async {
     if (point == null) {
-      return null;
+      return;
     }
-    return ref.context.showConfirmMessage(
-      message: 'Award ${player.name} a ${point.name}?',
-      yesCallback: () async {
-        final database = ref.read(databaseProvider);
-        await database.managers.setPoints.create(
-          (final f) =>
-              f(gameSetId: setId, playerId: player.id, pointId: point.id),
-        );
-        ref
-          ..invalidate(setPointsProvider(setId))
-          ..invalidate(showdownPointScoresProvider(player.teamId));
-      },
+    final database = ref.read(databaseProvider);
+    await database.managers.setPoints.create(
+      (final f) => f(gameSetId: setId, playerId: player.id, pointId: point.id),
     );
+    ref
+      ..invalidate(setPointsProvider(setId))
+      ..invalidate(showdownPointScoresProvider(player.teamId));
   }
 }
 
