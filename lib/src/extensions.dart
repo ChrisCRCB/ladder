@@ -20,3 +20,12 @@ extension LadderNightX on LadderNight {
   DateTime getStartTime(final ShowdownGame game) =>
       createdAt.add(game.startAfter.minutes);
 }
+
+/// Useful methods for [ShowdownGame]s.
+extension ShowdownGameX on ShowdownGame {
+  /// Get the name of the coach at the given [coachNumber].
+  String? getCoachName(final CoachNumber coachNumber) => switch (coachNumber) {
+    CoachNumber.first => firstPlayerCoachName,
+    CoachNumber.second => secondPlayerCoachName,
+  };
+}
