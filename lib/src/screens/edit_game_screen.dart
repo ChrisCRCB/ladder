@@ -50,49 +50,60 @@ class EditGameScreen extends ConsumerWidget {
                 if (sets.isEmpty) {
                   final playersValue = ref.watch(gamePlayersProvider(gameId));
                   return playersValue.simpleWhen(
-                    (final players) => ListView.builder(
-                      itemBuilder: (final context, final index) {
-                        if (index == 0) {
-                          return CheckboxListTile(
-                            value: game.wonToss,
-                            onChanged: (_) async {
-                              await query.update(
-                                (final o) => o(wonToss: Value(!game.wonToss)),
-                              );
-                              ref
-                                ..invalidate(gamesProvider(game.ladderNightId))
-                                ..invalidate(gameProvider(game.id));
-                            },
-                            autofocus: true,
-                            isThreeLine: false,
-                            title: CustomText(
-                              text: '${players.first.name} won the toss',
-                            ),
-                          );
-                        }
-                        final player = players[index - 1];
-                        return ListTile(
-                          title: PlayerCustomText(playerId: player.id),
-                          onTap: () async {
-                            final set = await database.managers.gameSets
-                                .createReturning(
-                                  (final o) => o(
-                                    gameId: gameId,
-                                    startingPlayerId: player.id,
+                    (final players) => ListView(
+                      shrinkWrap: true,
+                      children: [
+                        _CoachListTile(
+                          coach: game.firstPlayerCoachName,
+                          gameId: gameId,
+                          player: players.first,
+                          coachNumber: _WhichCoach.first,
+                        ),
+                        _CoachListTile(
+                          coach: game.secondPlayerCoachName,
+                          gameId: gameId,
+                          player: players.last,
+                          coachNumber: _WhichCoach.second,
+                        ),
+                        CheckboxListTile(
+                          value: game.wonToss,
+                          onChanged: (_) async {
+                            await query.update(
+                              (final o) => o(wonToss: Value(!game.wonToss)),
+                            );
+                            ref
+                              ..invalidate(gamesProvider(game.ladderNightId))
+                              ..invalidate(gameProvider(game.id));
+                          },
+                          isThreeLine: false,
+                          title: CustomText(
+                            text: '${players.first.name} won the toss',
+                          ),
+                        ),
+                        ...players.map(
+                          (final player) => ListTile(
+                            title: PlayerCustomText(playerId: player.id),
+                            onTap: () async {
+                              final set = await database.managers.gameSets
+                                  .createReturning(
+                                    (final o) => o(
+                                      gameId: gameId,
+                                      startingPlayerId: player.id,
+                                    ),
+                                  );
+                              ref.invalidate(gameSetsProvider(gameId));
+                              if (context.mounted) {
+                                await context.pushWidgetBuilder(
+                                  (_) => EditSetScreen(
+                                    setId: set.id,
+                                    setNumber: 1,
                                   ),
                                 );
-                            ref.invalidate(gameSetsProvider(gameId));
-                            if (context.mounted) {
-                              await context.pushWidgetBuilder(
-                                (_) =>
-                                    EditSetScreen(setId: set.id, setNumber: 1),
-                              );
-                            }
-                          },
-                        );
-                      },
-                      itemCount: players.length + 1,
-                      shrinkWrap: true,
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 }
@@ -149,5 +160,77 @@ class EditGameScreen extends ConsumerWidget {
       (final o) => o(gameId: gameId, startingPlayerId: startingPlayerId),
     );
     ref.invalidate(gameSetsProvider(gameId));
+  }
+}
+
+/// Which player's coach.
+enum _WhichCoach {
+  /// First coach.
+  first,
+
+  /// Second coach.
+  second,
+}
+
+/// The coaching list tile.
+class _CoachListTile extends ConsumerWidget {
+  /// Create an instance.
+  const _CoachListTile({
+    required this.gameId,
+    required this.player,
+    required this.coach,
+    required this.coachNumber,
+  });
+
+  /// The ID of the game to edit.
+  final int gameId;
+
+  /// The player whose [coach] will be shown.
+  final TeamPlayer player;
+
+  /// The name of [player]'s coach.
+  final String? coach;
+
+  /// The coach to edit.
+  final _WhichCoach coachNumber;
+
+  /// Build the widget.
+  @override
+  Widget build(final BuildContext context, final WidgetRef ref) {
+    final database = ref.watch(databaseProvider);
+    final query = database.managers.showdownGames.filter(
+      (final f) => f.id.equals(gameId),
+    );
+    return ListTile(
+      autofocus: coachNumber == _WhichCoach.first,
+      title: CustomText(text: 'Coach for ${player.name}'),
+      subtitle: Text(coach ?? '<Not Set>'),
+      onTap: () => context.pushWidgetBuilder(
+        (final innerContext) => GetText(
+          onDone: (final value) async {
+            innerContext.pop();
+            switch (coachNumber) {
+              case _WhichCoach.first:
+                await query.update(
+                  (final o) => o(
+                    firstPlayerCoachName: Value(value.isEmpty ? coach : value),
+                  ),
+                );
+                break;
+              case _WhichCoach.second:
+                await query.update(
+                  (final o) => o(
+                    secondPlayerCoachName: Value(value.isEmpty ? coach : value),
+                  ),
+                );
+            }
+            ref.invalidate(gameProvider(gameId));
+          },
+          labelText: 'Coach name',
+          text: coach,
+          title: 'Set Coach',
+        ),
+      ),
+    );
   }
 }

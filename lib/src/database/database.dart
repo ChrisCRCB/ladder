@@ -22,7 +22,7 @@ class LadderDatabase extends _$LadderDatabase {
 
   /// The schema version to use.
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 6;
 
   /// The migration strategy to use.
   @override
@@ -40,6 +40,21 @@ class LadderDatabase extends _$LadderDatabase {
       }
       if (from < 4) {
         await m.addColumn(showdownGames, showdownGames.wonToss);
+      }
+      if (from < 5) {
+        // await m.addColumn(showdownGames, showdownGames.firstPlayerCoach);
+        // await m.addColumn(showdownGames, showdownGames.secondPlayerCoach);
+      }
+      if (from < 6) {
+        await m.alterTable(
+          TableMigration(
+            showdownGames,
+            newColumns: [
+              showdownGames.firstPlayerCoachName,
+              showdownGames.secondPlayerCoachName,
+            ],
+          ),
+        );
       }
     },
   );

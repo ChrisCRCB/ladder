@@ -100,6 +100,9 @@ class ShowdownGames extends Table with IdMixin {
     onDelete: KeyAction.cascade,
   )();
 
+  /// The name of the first player's coach.
+  late final firstPlayerCoachName = text().nullable()();
+
   /// The ID of the second player.
   @ReferenceName('gamesAsSecondPlayer')
   late final secondPlayerId = integer().references(
@@ -107,6 +110,9 @@ class ShowdownGames extends Table with IdMixin {
     #id,
     onDelete: KeyAction.cascade,
   )();
+
+  /// The name of the second player's coach.
+  late final secondPlayerCoachName = text().nullable()();
 
   /// The date this game was locked on.
   late final lockedOn = dateTime().nullable()();
