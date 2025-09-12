@@ -1,3 +1,4 @@
+import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:drift/drift.dart' hide Column;
@@ -30,21 +31,21 @@ class EditCoachScreen extends ConsumerWidget {
   /// The coach to edit.
   final CoachNumber coachNumber;
 
-  /// Build the widget.
+  /// Build a widget.
   @override
   Widget build(final BuildContext context, final WidgetRef ref) {
     const formFieldName = 'coach';
+    final formKey = GlobalKey<FormBuilderState>();
     final database = ref.watch(databaseProvider);
-    final query = database.managers.showdownGames.filter(
-      (final f) => f.id.equals(gameId),
-    );
     final value = ref.watch(gameProvider(gameId));
-    final key = GlobalKey<FormBuilderState>();
     return Cancel(
       child: PopScope(
         onPopInvokedWithResult: (_, _) async {
-          key.currentState?.save();
-          final value = key.currentState?.value[formFieldName] as String?;
+          final query = database.managers.showdownGames.filter(
+            (final f) => f.id.equals(gameId),
+          );
+          formKey.currentState?.save();
+          final value = formKey.currentState?.value[formFieldName] as String?;
           await query.update((final o) {
             switch (coachNumber) {
               case CoachNumber.first:
@@ -61,7 +62,7 @@ class EditCoachScreen extends ConsumerWidget {
           title: 'Edit Coach',
           body: value.simpleWhen(
             (final game) => FormBuilder(
-              key: key,
+              key: formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -73,6 +74,7 @@ class EditCoachScreen extends ConsumerWidget {
                       label: CustomText(text: 'Coach name'),
                     ),
                     initialValue: game.getCoachName(coachNumber),
+                    onSubmitted: (final value) => context.pop(),
                   ),
                 ],
               ),
