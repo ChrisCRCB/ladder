@@ -74,76 +74,76 @@ class GamesPage extends ConsumerWidget {
                       activator: CrossPlatformSingleActivator(
                         LogicalKeyboardKey.keyL,
                       ),
-                      invoke: () {
-                        context.showConfirmMessage(
-                          message:
-                              // ignore: lines_longer_than_80_chars
-                              'Locking this game will prevent further edits. Are you sure?',
-                          yesCallback: () async {
-                            final sets = await ref.read(
-                              gameSetsProvider(game.id).future,
+                      invoke: () async {
+                        final sets = await ref.read(
+                          gameSetsProvider(game.id).future,
+                        );
+                        if (sets.isEmpty) {
+                          if (context.mounted) {
+                            await context.showMessage(
+                              message:
+                                  // ignore: lines_longer_than_80_chars
+                                  'This game cannot be locked without any sets.',
                             );
-                            if (sets.isEmpty) {
+                          }
+                          return;
+                        }
+                        var firstPlayerWins = 0;
+                        var secondPlayerWins = 0;
+                        for (final set in sets) {
+                          final results = await ref.read(
+                            setResultsProvider(set.id).future,
+                          );
+                          switch (results) {
+                            case UndecidedSetResults():
                               if (context.mounted) {
                                 await context.showMessage(
                                   message:
                                       // ignore: lines_longer_than_80_chars
-                                      'This game cannot be locked without any sets.',
+                                      'This game cannot be locked until all sets have a winner.',
                                 );
                               }
                               return;
-                            }
-                            var firstPlayerWins = 0;
-                            var secondPlayerWins = 0;
-                            for (final set in sets) {
-                              final results = await ref.read(
-                                setResultsProvider(set.id).future,
-                              );
-                              switch (results) {
-                                case UndecidedSetResults():
-                                  if (context.mounted) {
-                                    await context.showMessage(
-                                      message:
-                                          // ignore: lines_longer_than_80_chars
-                                          'This game cannot be locked until all sets have a winner.',
-                                    );
-                                  }
-                                  return;
-                                case DecidedSetResults():
-                                  final winner = results.winner;
-                                  if (winner.id == game.firstPlayerId) {
-                                    firstPlayerWins += 1;
-                                  } else {
-                                    secondPlayerWins += 1;
-                                  }
+                            case DecidedSetResults():
+                              final winner = results.winner;
+                              if (winner.id == game.firstPlayerId) {
+                                firstPlayerWins += 1;
+                              } else {
+                                secondPlayerWins += 1;
                               }
-                            }
-                            for (final id in [
-                              game.firstPlayerId,
-                              game.secondPlayerId,
-                            ]) {
-                              final query = database.managers.teamPlayers
-                                  .filter((final f) => f.id.equals(id));
-                              final player = await query.getSingle();
-                              await query.update(
-                                (final o) => o(
-                                  points: Value(
-                                    player.points +
-                                        (id == game.firstPlayerId
-                                            ? firstPlayerWins
-                                            : secondPlayerWins),
-                                  ),
-                                ),
-                              );
-                              ref.invalidate(teamPlayerProvider(id));
-                            }
-                            ref.invalidate(teamPlayersProvider);
-                            await query.update(
-                              (final o) => o(lockedOn: Value(DateTime.now())),
-                            );
-                            ref.invalidate(gamesProvider(ladderNightId));
-                          },
+                          }
+                        }
+                        for (final id in [
+                          game.firstPlayerId,
+                          game.secondPlayerId,
+                        ]) {
+                          final query = database.managers.teamPlayers.filter(
+                            (final f) => f.id.equals(id),
+                          );
+                          final player = await query.getSingle();
+                          await query.update(
+                            (final o) => o(
+                              points: Value(
+                                player.points +
+                                    (id == game.firstPlayerId
+                                        ? firstPlayerWins
+                                        : secondPlayerWins),
+                              ),
+                            ),
+                          );
+                          ref.invalidate(teamPlayerProvider(id));
+                        }
+                        ref.invalidate(teamPlayersProvider);
+                        final lastSet = sets.last;
+                        final points = await ref.read(
+                          setPointsProvider(lastSet.id).future,
                         );
+                        final lastPoint = points.last;
+                        await query.update(
+                          (final o) =>
+                              o(lockedOn: Value(lastPoint.setPoint.createdAt)),
+                        );
+                        ref.invalidate(gamesProvider(ladderNightId));
                       },
                     ),
                     PerformableAction(
