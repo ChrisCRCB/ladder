@@ -163,7 +163,7 @@ class EditSetScreen extends ConsumerWidget {
                             ),
                             if (sp != null && !readOnly)
                               GameShortcut(
-                                title: 'Award a $sp',
+                                title: 'Award ${sp.name} to awarding player',
                                 shortcut: numberKey,
                                 onStart: (_) {
                                   if (awardingPlayer == null) {
