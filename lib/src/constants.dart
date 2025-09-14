@@ -65,3 +65,18 @@ const numberKeys = <GameShortcutsShortcut>[
   GameShortcutsShortcut.equal,
   GameShortcutsShortcut.backspace,
 ];
+
+/// The name of the team information sheet in Excel.
+const teamSheetName = 'Team Information';
+
+/// The name of the point definitions page.
+const showdownPointsSheetName = 'Point Definitions';
+
+/// The name of the players sheet in Excel.
+const playersSheetName = 'Players';
+
+/// The name of the ladder nights sheet in Excel.
+const ladderNightsSheetName = 'Ladder Nights';
+
+/// The name of the games sheet in Excel.
+const gamesSheetName = 'Games';

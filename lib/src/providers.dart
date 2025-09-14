@@ -151,6 +151,19 @@ Future<List<ShowdownGame>> games(final Ref ref, final int ladderNightId) {
       .get();
 }
 
+/// Provide all games for the given team.
+@riverpod
+Future<List<ShowdownGame>> teamGames(final Ref ref, final int teamId) async {
+  final database = ref.watch(databaseProvider);
+  final games = database.showdownGames;
+  final nights = database.ladderNights;
+  final query = database.select(games).join([
+    innerJoin(nights, nights.teamId.equals(teamId)),
+  ])..orderBy([OrderingTerm.asc(games.startAfter)]);
+  final results = await query.get();
+  return results.map((final row) => row.readTable(games)).toList();
+}
+
 /// Provide a single game.
 @riverpod
 Future<ShowdownGame> game(final Ref ref, final int gameId) {
@@ -424,7 +437,7 @@ Future<List<ShowdownGame>> playerGames(
 
 /// Provide the players, sorted by luck.
 @riverpod
-Future<List<(TeamPlayer, int)>> luckyPlayers(
+Future<List<(TeamPlayer, int?)>> luckyPlayers(
   final Ref ref,
   final int teamId,
 ) async {
@@ -453,7 +466,32 @@ Future<List<(TeamPlayer, int)>> luckyPlayers(
       points: row.read(players.points)!,
       teamId: teamId,
     );
-    final tossWins = row.read(games.id.count())!;
+    final tossWins = row.read(games.id.count());
     return (player, tossWins);
   }).toList();
+}
+
+/// Export all game sets for the given [teamId].
+@riverpod
+Future<List<GameContext>> gameContexts(final Ref ref, final int teamId) async {
+  final games = await ref.watch(teamGamesProvider(teamId).future);
+  final contexts = <GameContext>[];
+  for (final game in games) {
+    final sets = await ref.watch(gameSetsProvider(game.id).future);
+    final players = await ref.watch(gamePlayersProvider(game.id).future);
+    final setContexts = <GameSetContext>[];
+    for (final set in sets) {
+      final points = await ref.watch(setPointsProvider(set.id).future);
+      setContexts.add(GameSetContext(gameSet: set, points: points));
+    }
+    contexts.add(
+      GameContext(
+        game: game,
+        firstPlayer: players.first,
+        secondPlayer: players.last,
+        sets: setContexts,
+      ),
+    );
+  }
+  return contexts;
 }

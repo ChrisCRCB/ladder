@@ -1,7 +1,10 @@
 export 'src/constants.dart';
 export 'src/database/_DATABASE.dart';
 export 'src/database/openers/shared.dart';
+export 'src/excel/_excel.dart';
 export 'src/extensions.dart';
+export 'src/game_context.dart';
+export 'src/game_set_context.dart';
 export 'src/json/_json.dart';
 export 'src/player_attendance.dart';
 export 'src/providers.dart';

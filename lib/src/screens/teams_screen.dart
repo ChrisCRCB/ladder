@@ -4,6 +4,7 @@ import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
 
@@ -77,6 +78,16 @@ class TeamsScreen extends ConsumerWidget {
                           text: team.emailAddress,
                           title: 'Change Email Address',
                         ),
+                      ),
+                    ),
+                    PerformableAction(
+                      name: 'Export to Excel',
+                      activator: CrossPlatformSingleActivator(
+                        LogicalKeyboardKey.keyX,
+                        shift: true,
+                      ),
+                      invoke: () => context.pushWidgetBuilder(
+                        (_) => ExportTeamScreen(teamId: team.id),
                       ),
                     ),
                     PerformableAction(

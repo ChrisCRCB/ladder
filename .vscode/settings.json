@@ -1,11 +1,35 @@
 {
   "cSpell.words": [
     "challengeable",
+    "CLT",
     "Colors",
     "daos",
+    "dialog",
+    "ENABLEDELAYEDEXPANSION",
+    "ENABLEEXTENSIONS",
+    "endlocal",
+    "env",
+    "eof",
+    "errorlevel",
+    "euo",
     "ffi",
+    "findstr",
+    "listfile",
     "math",
+    "nul",
+    "popd",
+    "pushd",
+    "RC",
     "riverpod",
-    "sp"
+    "rm",
+    "Rsrc",
+    "sed",
+    "setlocal",
+    "sp",
+    "tzip",
+    "usebackq",
+    "usr",
+    "VAR",
+    "VERSIONLINE"
   ]
 }

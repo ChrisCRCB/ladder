@@ -741,6 +741,88 @@ final class GamesFamily extends $Family
   String toString() => r'gamesProvider';
 }
 
+/// Provide all games for the given team.
+@ProviderFor(teamGames)
+const teamGamesProvider = TeamGamesFamily._();
+
+/// Provide all games for the given team.
+final class TeamGamesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<ShowdownGame>>,
+          List<ShowdownGame>,
+          FutureOr<List<ShowdownGame>>
+        >
+    with
+        $FutureModifier<List<ShowdownGame>>,
+        $FutureProvider<List<ShowdownGame>> {
+  /// Provide all games for the given team.
+  const TeamGamesProvider._({
+    required TeamGamesFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'teamGamesProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$teamGamesHash();
+
+  @override
+  String toString() {
+    return r'teamGamesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<ShowdownGame>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<ShowdownGame>> create(Ref ref) {
+    final argument = this.argument as int;
+    return teamGames(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TeamGamesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$teamGamesHash() => r'9cc864b3cbf9afd8893d7516e2c1500431735c65';
+
+/// Provide all games for the given team.
+final class TeamGamesFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<ShowdownGame>>, int> {
+  const TeamGamesFamily._()
+    : super(
+        retry: null,
+        name: r'teamGamesProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Provide all games for the given team.
+  TeamGamesProvider call(int teamId) =>
+      TeamGamesProvider._(argument: teamId, from: this);
+
+  @override
+  String toString() => r'teamGamesProvider';
+}
+
 /// Provide a single game.
 @ProviderFor(game)
 const gameProvider = GameFamily._();
@@ -1643,13 +1725,13 @@ const luckyPlayersProvider = LuckyPlayersFamily._();
 final class LuckyPlayersProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<(TeamPlayer, int)>>,
-          List<(TeamPlayer, int)>,
-          FutureOr<List<(TeamPlayer, int)>>
+          AsyncValue<List<(TeamPlayer, int?)>>,
+          List<(TeamPlayer, int?)>,
+          FutureOr<List<(TeamPlayer, int?)>>
         >
     with
-        $FutureModifier<List<(TeamPlayer, int)>>,
-        $FutureProvider<List<(TeamPlayer, int)>> {
+        $FutureModifier<List<(TeamPlayer, int?)>>,
+        $FutureProvider<List<(TeamPlayer, int?)>> {
   /// Provide the players, sorted by luck.
   const LuckyPlayersProvider._({
     required LuckyPlayersFamily super.from,
@@ -1674,12 +1756,12 @@ final class LuckyPlayersProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<(TeamPlayer, int)>> $createElement(
+  $FutureProviderElement<List<(TeamPlayer, int?)>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<(TeamPlayer, int)>> create(Ref ref) {
+  FutureOr<List<(TeamPlayer, int?)>> create(Ref ref) {
     final argument = this.argument as int;
     return luckyPlayers(ref, argument);
   }
@@ -1695,11 +1777,11 @@ final class LuckyPlayersProvider
   }
 }
 
-String _$luckyPlayersHash() => r'c73cbc94aeae86eac082d8b77686298e1d6f92ec';
+String _$luckyPlayersHash() => r'64125eddbd669112ae902eca974a7c7c0b1c6dc3';
 
 /// Provide the players, sorted by luck.
 final class LuckyPlayersFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<List<(TeamPlayer, int)>>, int> {
+    with $FunctionalFamilyOverride<FutureOr<List<(TeamPlayer, int?)>>, int> {
   const LuckyPlayersFamily._()
     : super(
         retry: null,
@@ -1715,6 +1797,88 @@ final class LuckyPlayersFamily extends $Family
 
   @override
   String toString() => r'luckyPlayersProvider';
+}
+
+/// Export all game sets for the given [teamId].
+@ProviderFor(gameContexts)
+const gameContextsProvider = GameContextsFamily._();
+
+/// Export all game sets for the given [teamId].
+final class GameContextsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<GameContext>>,
+          List<GameContext>,
+          FutureOr<List<GameContext>>
+        >
+    with
+        $FutureModifier<List<GameContext>>,
+        $FutureProvider<List<GameContext>> {
+  /// Export all game sets for the given [teamId].
+  const GameContextsProvider._({
+    required GameContextsFamily super.from,
+    required int super.argument,
+  }) : super(
+         retry: null,
+         name: r'gameContextsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$gameContextsHash();
+
+  @override
+  String toString() {
+    return r'gameContextsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<GameContext>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<GameContext>> create(Ref ref) {
+    final argument = this.argument as int;
+    return gameContexts(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GameContextsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$gameContextsHash() => r'8b3f5e70c9445f0004ceabf243bfdcd9d0a369ed';
+
+/// Export all game sets for the given [teamId].
+final class GameContextsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<GameContext>>, int> {
+  const GameContextsFamily._()
+    : super(
+        retry: null,
+        name: r'gameContextsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Export all game sets for the given [teamId].
+  GameContextsProvider call(int teamId) =>
+      GameContextsProvider._(argument: teamId, from: this);
+
+  @override
+  String toString() => r'gameContextsProvider';
 }
 
 // ignore_for_file: type=lint
