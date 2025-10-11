@@ -17,6 +17,7 @@ Sheet exportTeam({
       TextCellValue(team.name),
       TextCellValue(team.emailAddress),
     ]);
+  excel.setDefaultSheet(sheet.sheetName);
   return sheet;
 }
 
@@ -30,12 +31,14 @@ Sheet exportShowdownPoints({
       TextCellValue('ID'),
       TextCellValue('Name'),
       TextCellValue('Value'),
+      TextCellValue('Ends current point'),
     ]);
   for (final point in points) {
     sheet.appendRow([
       IntCellValue(point.id),
       TextCellValue(point.name),
       IntCellValue(point.value),
+      BoolCellValue(point.endsPoint),
     ]);
   }
   return sheet;
@@ -219,7 +222,7 @@ void exportGameSets({
       for (var j = 0; j < setContext.points.length; j++) {
         final points = setContext.points.sublist(0, j + 1);
         final includedPoints = points
-            .where((final p) => p.showdownPoint.value != 0)
+            .where((final p) => p.showdownPoint.endsPoint)
             .toList();
         final totalServes = includedPoints.length;
         final serveBlock = totalServes ~/ team.servesPerPlayer;
