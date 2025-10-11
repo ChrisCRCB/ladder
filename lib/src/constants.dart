@@ -14,7 +14,7 @@ const defaultPoints = <DefaultShowdownPoint>{
   DefaultShowdownPoint(name: 'Goal', value: 2),
   DefaultShowdownPoint(name: 'Body touch', value: -1),
   DefaultShowdownPoint(name: 'Infringement', value: -1),
-  DefaultShowdownPoint(name: 'Touched shades', value: -2),
+  DefaultShowdownPoint(name: 'Touched shades', value: -2, endsPoint: false),
   DefaultShowdownPoint(name: 'Long serve', value: -1),
   DefaultShowdownPoint(name: 'Short serve', value: -1),
   DefaultShowdownPoint(name: 'Centre board', value: -1),
