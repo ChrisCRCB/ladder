@@ -82,7 +82,7 @@ class EditSetScreen extends ConsumerWidget {
                   final value = ref.watch(showdownPointsProvider(team.id));
                   return value.simpleWhen((final showdownPoints) {
                     final includedPoints = points
-                        .where((final p) => p.showdownPoint.value != 0)
+                        .where((final p) => p.showdownPoint.endsPoint)
                         .toList();
                     final totalServes = includedPoints.length;
                     final serveBlock = totalServes ~/ team.servesPerPlayer;
