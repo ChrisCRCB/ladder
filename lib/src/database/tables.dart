@@ -45,6 +45,9 @@ class ShowdownPoints extends Table with IdMixin, NameMixin, TeamIdMixin {
   ///
   ///  If [value] is < 0, then this ending gives the points to the opponent.
   late final value = integer()();
+
+  /// Whether this point ends a point.
+  late final endsPoint = boolean().withDefault(const Constant(true))();
 }
 
 /// The showdown teams table.

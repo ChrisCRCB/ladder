@@ -22,7 +22,7 @@ class LadderDatabase extends _$LadderDatabase {
 
   /// The schema version to use.
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   /// The migration strategy to use.
   @override
@@ -55,6 +55,9 @@ class LadderDatabase extends _$LadderDatabase {
             ],
           ),
         );
+      }
+      if (from < 7) {
+        await m.addColumn(showdownPoints, showdownPoints.endsPoint);
       }
     },
   );

@@ -695,8 +695,23 @@ class $ShowdownPointsTable extends ShowdownPoints
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _endsPointMeta = const VerificationMeta(
+    'endsPoint',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, name, teamId, value];
+  late final GeneratedColumn<bool> endsPoint = GeneratedColumn<bool>(
+    'ends_point',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("ends_point" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, teamId, value, endsPoint];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -736,6 +751,12 @@ class $ShowdownPointsTable extends ShowdownPoints
     } else if (isInserting) {
       context.missing(_valueMeta);
     }
+    if (data.containsKey('ends_point')) {
+      context.handle(
+        _endsPointMeta,
+        endsPoint.isAcceptableOrUnknown(data['ends_point']!, _endsPointMeta),
+      );
+    }
     return context;
   }
 
@@ -761,6 +782,10 @@ class $ShowdownPointsTable extends ShowdownPoints
         DriftSqlType.int,
         data['${effectivePrefix}value'],
       )!,
+      endsPoint: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}ends_point'],
+      )!,
     );
   }
 
@@ -784,11 +809,15 @@ class ShowdownPoint extends DataClass implements Insertable<ShowdownPoint> {
   ///
   ///  If [value] is < 0, then this ending gives the points to the opponent.
   final int value;
+
+  /// Whether this point ends a point.
+  final bool endsPoint;
   const ShowdownPoint({
     required this.id,
     required this.name,
     required this.teamId,
     required this.value,
+    required this.endsPoint,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -797,6 +826,7 @@ class ShowdownPoint extends DataClass implements Insertable<ShowdownPoint> {
     map['name'] = Variable<String>(name);
     map['team_id'] = Variable<int>(teamId);
     map['value'] = Variable<int>(value);
+    map['ends_point'] = Variable<bool>(endsPoint);
     return map;
   }
 
@@ -806,6 +836,7 @@ class ShowdownPoint extends DataClass implements Insertable<ShowdownPoint> {
       name: Value(name),
       teamId: Value(teamId),
       value: Value(value),
+      endsPoint: Value(endsPoint),
     );
   }
 
@@ -819,6 +850,7 @@ class ShowdownPoint extends DataClass implements Insertable<ShowdownPoint> {
       name: serializer.fromJson<String>(json['name']),
       teamId: serializer.fromJson<int>(json['teamId']),
       value: serializer.fromJson<int>(json['value']),
+      endsPoint: serializer.fromJson<bool>(json['endsPoint']),
     );
   }
   @override
@@ -829,22 +861,30 @@ class ShowdownPoint extends DataClass implements Insertable<ShowdownPoint> {
       'name': serializer.toJson<String>(name),
       'teamId': serializer.toJson<int>(teamId),
       'value': serializer.toJson<int>(value),
+      'endsPoint': serializer.toJson<bool>(endsPoint),
     };
   }
 
-  ShowdownPoint copyWith({int? id, String? name, int? teamId, int? value}) =>
-      ShowdownPoint(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        teamId: teamId ?? this.teamId,
-        value: value ?? this.value,
-      );
+  ShowdownPoint copyWith({
+    int? id,
+    String? name,
+    int? teamId,
+    int? value,
+    bool? endsPoint,
+  }) => ShowdownPoint(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    teamId: teamId ?? this.teamId,
+    value: value ?? this.value,
+    endsPoint: endsPoint ?? this.endsPoint,
+  );
   ShowdownPoint copyWithCompanion(ShowdownPointsCompanion data) {
     return ShowdownPoint(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       teamId: data.teamId.present ? data.teamId.value : this.teamId,
       value: data.value.present ? data.value.value : this.value,
+      endsPoint: data.endsPoint.present ? data.endsPoint.value : this.endsPoint,
     );
   }
 
@@ -854,13 +894,14 @@ class ShowdownPoint extends DataClass implements Insertable<ShowdownPoint> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('teamId: $teamId, ')
-          ..write('value: $value')
+          ..write('value: $value, ')
+          ..write('endsPoint: $endsPoint')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, teamId, value);
+  int get hashCode => Object.hash(id, name, teamId, value, endsPoint);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -868,7 +909,8 @@ class ShowdownPoint extends DataClass implements Insertable<ShowdownPoint> {
           other.id == this.id &&
           other.name == this.name &&
           other.teamId == this.teamId &&
-          other.value == this.value);
+          other.value == this.value &&
+          other.endsPoint == this.endsPoint);
 }
 
 class ShowdownPointsCompanion extends UpdateCompanion<ShowdownPoint> {
@@ -876,17 +918,20 @@ class ShowdownPointsCompanion extends UpdateCompanion<ShowdownPoint> {
   final Value<String> name;
   final Value<int> teamId;
   final Value<int> value;
+  final Value<bool> endsPoint;
   const ShowdownPointsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.teamId = const Value.absent(),
     this.value = const Value.absent(),
+    this.endsPoint = const Value.absent(),
   });
   ShowdownPointsCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     required int teamId,
     required int value,
+    this.endsPoint = const Value.absent(),
   }) : name = Value(name),
        teamId = Value(teamId),
        value = Value(value);
@@ -895,12 +940,14 @@ class ShowdownPointsCompanion extends UpdateCompanion<ShowdownPoint> {
     Expression<String>? name,
     Expression<int>? teamId,
     Expression<int>? value,
+    Expression<bool>? endsPoint,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (teamId != null) 'team_id': teamId,
       if (value != null) 'value': value,
+      if (endsPoint != null) 'ends_point': endsPoint,
     });
   }
 
@@ -909,12 +956,14 @@ class ShowdownPointsCompanion extends UpdateCompanion<ShowdownPoint> {
     Value<String>? name,
     Value<int>? teamId,
     Value<int>? value,
+    Value<bool>? endsPoint,
   }) {
     return ShowdownPointsCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       teamId: teamId ?? this.teamId,
       value: value ?? this.value,
+      endsPoint: endsPoint ?? this.endsPoint,
     );
   }
 
@@ -933,6 +982,9 @@ class ShowdownPointsCompanion extends UpdateCompanion<ShowdownPoint> {
     if (value.present) {
       map['value'] = Variable<int>(value.value);
     }
+    if (endsPoint.present) {
+      map['ends_point'] = Variable<bool>(endsPoint.value);
+    }
     return map;
   }
 
@@ -942,7 +994,8 @@ class ShowdownPointsCompanion extends UpdateCompanion<ShowdownPoint> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('teamId: $teamId, ')
-          ..write('value: $value')
+          ..write('value: $value, ')
+          ..write('endsPoint: $endsPoint')
           ..write(')'))
         .toString();
   }
@@ -3897,6 +3950,7 @@ typedef $$ShowdownPointsTableCreateCompanionBuilder =
       required String name,
       required int teamId,
       required int value,
+      Value<bool> endsPoint,
     });
 typedef $$ShowdownPointsTableUpdateCompanionBuilder =
     ShowdownPointsCompanion Function({
@@ -3904,6 +3958,7 @@ typedef $$ShowdownPointsTableUpdateCompanionBuilder =
       Value<String> name,
       Value<int> teamId,
       Value<int> value,
+      Value<bool> endsPoint,
     });
 
 final class $$ShowdownPointsTableReferences
@@ -3974,6 +4029,11 @@ class $$ShowdownPointsTableFilterComposer
 
   ColumnFilters<int> get value => $composableBuilder(
     column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get endsPoint => $composableBuilder(
+    column: $table.endsPoint,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4050,6 +4110,11 @@ class $$ShowdownPointsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get endsPoint => $composableBuilder(
+    column: $table.endsPoint,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$ShowdownTeamsTableOrderingComposer get teamId {
     final $$ShowdownTeamsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -4091,6 +4156,9 @@ class $$ShowdownPointsTableAnnotationComposer
 
   GeneratedColumn<int> get value =>
       $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumn<bool> get endsPoint =>
+      $composableBuilder(column: $table.endsPoint, builder: (column) => column);
 
   $$ShowdownTeamsTableAnnotationComposer get teamId {
     final $$ShowdownTeamsTableAnnotationComposer composer = $composerBuilder(
@@ -4175,11 +4243,13 @@ class $$ShowdownPointsTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<int> teamId = const Value.absent(),
                 Value<int> value = const Value.absent(),
+                Value<bool> endsPoint = const Value.absent(),
               }) => ShowdownPointsCompanion(
                 id: id,
                 name: name,
                 teamId: teamId,
                 value: value,
+                endsPoint: endsPoint,
               ),
           createCompanionCallback:
               ({
@@ -4187,11 +4257,13 @@ class $$ShowdownPointsTableTableManager
                 required String name,
                 required int teamId,
                 required int value,
+                Value<bool> endsPoint = const Value.absent(),
               }) => ShowdownPointsCompanion.insert(
                 id: id,
                 name: name,
                 teamId: teamId,
                 value: value,
+                endsPoint: endsPoint,
               ),
           withReferenceMapper: (p0) => p0
               .map(

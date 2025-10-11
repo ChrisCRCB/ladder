@@ -91,6 +91,7 @@ Future<List<ShowdownPoint>> showdownPoints(
               showdownPointsTable.id,
               showdownPointsTable.name,
               showdownPointsTable.value,
+              showdownPointsTable.endsPoint,
               showdownPointsTable.teamId,
               countColumn, // exposes the aggregate
             ])
@@ -116,6 +117,7 @@ Future<List<ShowdownPoint>> showdownPoints(
           id: row.read(showdownPointsTable.id)!,
           name: row.read(showdownPointsTable.name)!,
           value: row.read(showdownPointsTable.value)!,
+          endsPoint: row.read(showdownPointsTable.endsPoint)!,
           teamId: row.read(showdownPointsTable.teamId)!,
         ),
       )
@@ -384,6 +386,7 @@ Future<List<({ShowdownPoint point, int score})>> showdownPointScores(
               showdownPointsTable.id,
               showdownPointsTable.name,
               showdownPointsTable.value,
+              showdownPointsTable.endsPoint,
               showdownPointsTable.teamId,
               countColumn, // exposes the aggregate
             ])
@@ -410,6 +413,7 @@ Future<List<({ShowdownPoint point, int score})>> showdownPointScores(
             id: row.read(showdownPointsTable.id)!,
             name: row.read(showdownPointsTable.name)!,
             value: row.read(showdownPointsTable.value)!,
+            endsPoint: row.read(showdownPointsTable.endsPoint)!,
             teamId: row.read(showdownPointsTable.teamId)!,
           ),
           score: row.read(countColumn) ?? 0,

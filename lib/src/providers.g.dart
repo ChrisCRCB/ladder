@@ -456,7 +456,7 @@ final class ShowdownPointsProvider
   }
 }
 
-String _$showdownPointsHash() => r'4a5714593e375af633656f8509f1d2204958a63d';
+String _$showdownPointsHash() => r'97f5524aceffba50ed5b521ffd2785bc7c57a64d';
 
 /// Provide all the fouls for a given team.
 ///
@@ -1607,7 +1607,7 @@ final class ShowdownPointScoresProvider
 }
 
 String _$showdownPointScoresHash() =>
-    r'67ed25cc15c4601ad99b21648b71fbc5180746ef';
+    r'930e5feaae6d43e6d29757bbf795400834f878d7';
 
 /// Returns the possible points, organised by how often the given player has
 /// scored them.

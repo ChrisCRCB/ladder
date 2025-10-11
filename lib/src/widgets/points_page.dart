@@ -69,6 +69,16 @@ class PointsPage extends ConsumerWidget {
                 },
               ),
               PerformableAction(
+                name: 'Ends point',
+                checked: point.endsPoint,
+                invoke: () async {
+                  await query.update(
+                    (final o) => o(endsPoint: Value(!point.endsPoint)),
+                  );
+                  ref.invalidate(showdownPointsProvider(teamId));
+                },
+              ),
+              PerformableAction(
                 name: 'Delete',
                 activator: deleteShortcut,
                 invoke: () => context.showConfirmMessage(
