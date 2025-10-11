@@ -68,6 +68,23 @@ class PlayersPage extends ConsumerWidget {
                 ),
               ),
               PerformableAction(
+                name: 'Copy report',
+                activator: copyOtherShortcut,
+                invoke: () async {
+                  final buffer = StringBuffer()
+                    ..writeln('${player.name} (${player.points})');
+                  final points = await ref.read(
+                    showdownPointScoresProvider(player.id).future,
+                  );
+                  for (final point in points) {
+                    if (point.score > 0) {
+                      buffer.writeln(' - ${point.point.name}: ${point.score}');
+                    }
+                  }
+                  buffer.toString().copyToClipboard();
+                },
+              ),
+              PerformableAction(
                 name: 'Delete',
                 activator: deleteShortcut,
                 invoke: () => context.showConfirmMessage(
