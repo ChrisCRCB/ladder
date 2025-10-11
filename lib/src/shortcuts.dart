@@ -8,3 +8,9 @@ final renameShortcut = CrossPlatformSingleActivator(LogicalKeyboardKey.keyR);
 final changeEmailAddressShortcut = CrossPlatformSingleActivator(
   LogicalKeyboardKey.keyE,
 );
+
+/// The shortcut for exporting something.
+final exportShortcut = CrossPlatformSingleActivator(
+  LogicalKeyboardKey.keyX,
+  shift: true,
+);

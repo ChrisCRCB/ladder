@@ -1,10 +1,8 @@
-import 'dart:io';
+import 'dart:async';
 
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:excel/excel.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
@@ -24,129 +22,130 @@ class ExportTeamScreen extends ConsumerStatefulWidget {
 
 /// State for [ExportTeamScreen].
 class ExportTeamScreenState extends ConsumerState<ExportTeamScreen> {
+  /// An error to show.
+  Object? _error;
+
+  /// A stack trace to show.
+  StackTrace? _stackTrace;
+
   /// The steps which have been performed.
   late final List<String> _steps;
 
   /// The excel file to work with.
   late final Excel _excel;
 
+  /// The team to work with.
+  ShowdownTeam? _team;
+
+  /// The points to use.
+  List<ShowdownPoint>? _points;
+
+  /// The players for [_team].
+  List<TeamPlayer>? _players;
+
   /// Initialise state.
   @override
   void initState() {
     super.initState();
-    _steps = ['Loading team from the database.'];
+    _steps = [];
     _excel = Excel.createExcel();
   }
 
   /// Build a widget.
   @override
   Widget build(final BuildContext context) {
-    const title = 'Export Text';
-    const error = ErrorScreen.withPositional;
-    Widget loading() => SimpleScaffold(
-      title: title,
-      body: _StepsListView(steps: _steps),
-    );
-    final value = ref.watch(showdownTeamProvider(widget.teamId));
-    return value.when(
-      data: (final team) {
-        final sheet = exportTeam(excel: _excel, team: team);
-        _excel.setDefaultSheet(sheet.sheetName);
-        _steps.add('Loading point definitions for ${team.name}.');
-        final value = ref.watch(showdownPointsProvider(team.id));
-        return value.when(
-          data: (final points) {
+    final errorObject = _error;
+    if (errorObject != null) {
+      return ErrorScreen(error: errorObject, stackTrace: _stackTrace);
+    }
+    final team = _team;
+    if (team == null) {
+      _steps.add('Loading team from the database.');
+      ref
+          .read(showdownTeamProvider(widget.teamId).future)
+          .then((final team) {
+            final sheet = exportTeam(excel: _excel, team: team);
+            _excel.setDefaultSheet(sheet.sheetName);
+            setState(() {
+              _team = team;
+            });
+          })
+          .onError(handleError);
+      return _loading();
+    }
+    final points = _points;
+    if (points == null) {
+      _steps.add('Loading point definitions for ${team.name}.');
+      ref
+          .read(showdownPointsProvider(team.id).future)
+          .then((final points) {
             exportShowdownPoints(excel: _excel, points: points);
-            _steps.add('Loading players for ${team.name}.');
-            final value = ref.watch(teamPlayersProvider(team.id));
-            return value.when(
-              data: (final players) {
-                exportPlayers(excel: _excel, players: players);
-                _steps.add('Loading ladder nights for ${team.name}.');
-                final value = ref.watch(ladderNightsProvider(team.id));
-                return value.when(
-                  data: (final nights) {
-                    exportLadderNights(excel: _excel, nights: nights);
-                    _steps.add('Loading games.');
-                    final value = ref.watch(gameContextsProvider(team.id));
-                    return value.when(
-                      data: (final contexts) {
-                        exportGameSets(
-                          excel: _excel,
-                          gameContexts: contexts,
-                          players: players,
-                          nights: nights,
-                          team: team,
-                        );
-                        _steps.add('Done.');
-                        return SimpleScaffold(
-                          title: 'Export Complete',
-                          body: _StepsListView(steps: _steps),
-                          floatingActionButton: FloatingActionButton(
-                            onPressed: () async {
-                              final filename = await FilePicker.platform
-                                  .saveFile(
-                                    allowedExtensions: ['xlsx'],
-                                    dialogTitle: 'Save Excel file',
-                                    fileName: 'Team.xlsx',
-                                    type: FileType.custom,
-                                  );
-                              if (filename != null) {
-                                if (kIsWeb) {
-                                  _excel.save(fileName: filename);
-                                } else {
-                                  final file = File(filename);
-                                  final bytes = _excel.save(fileName: filename);
-                                  if (bytes != null) {
-                                    file.writeAsBytesSync(bytes);
-                                  }
-                                }
-                              }
-                            },
-                            tooltip: 'Save excel file',
-                            child: const Icon(Icons.save),
-                          ),
-                        );
-                      },
-                      error: error,
-                      loading: loading,
-                    );
-                  },
-                  error: error,
-                  loading: loading,
-                );
-              },
-              error: error,
-              loading: loading,
-            );
-          },
-          error: error,
-          loading: loading,
-        );
-      },
-      error: error,
-      loading: loading,
-    );
+            setState(() {
+              _points = points;
+            });
+          })
+          .onError(handleError);
+      return _loading();
+    }
+    final players = _players;
+    if (players == null) {
+      _steps.add('Loading players for ${team.name}.');
+      ref
+          .read(teamPlayersProvider(team.id).future)
+          .then((final players) {
+            exportPlayers(excel: _excel, players: players);
+            setState(() {
+              _players = players;
+            });
+          })
+          .onError(handleError);
+      return _loading();
+    }
+    return _StepsListView(steps: _steps, loading: false);
+  }
+
+  Widget _loading() => _StepsListView(steps: _steps, loading: true);
+
+  /// Handle an [error] and [stackTrace].
+  FutureOr<Null> handleError(final Object error, final StackTrace stackTrace) {
+    setState(() {
+      _error = error;
+      _stackTrace = stackTrace;
+    });
   }
 }
 
 /// The [ListView] which shows all steps.
 class _StepsListView extends StatelessWidget {
   /// Create an instance.
-  const _StepsListView({required this.steps});
+  const _StepsListView({required this.steps, required this.loading});
 
   /// The steps which are being performed.
   final List<String> steps;
 
+  /// Whether something is loading or not.
+  final bool loading;
+
   /// Build the widget.
   @override
-  Widget build(final BuildContext context) => ListView.builder(
-    shrinkWrap: true,
-    itemBuilder: (final context, final index) => ListTile(
-      autofocus: index == 0,
-      title: CustomText(text: steps[index]),
-      onTap: () => steps[index].copyToClipboard(),
+  Widget build(final BuildContext context) => SimpleScaffold(
+    title: loading ? 'Export In Progress' : 'Export Complete',
+    body: ListView.builder(
+      shrinkWrap: true,
+      itemBuilder: (final context, final index) {
+        if (index == steps.length) {
+          return const Focus(
+            autofocus: true,
+            child: CircularProgressIndicator(semanticsLabel: 'Loading...'),
+          );
+        }
+        return ListTile(
+          autofocus: !loading && index == (steps.length - 1),
+          title: CustomText(text: steps[index]),
+          onTap: () => steps[index].copyToClipboard(),
+        );
+      },
+      itemCount: loading ? steps.length + 1 : steps.length,
     ),
-    itemCount: steps.length,
   );
 }
