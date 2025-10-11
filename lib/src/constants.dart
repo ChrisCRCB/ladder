@@ -1,4 +1,5 @@
 import 'package:backstreets_widgets/widgets.dart';
+import 'package:drift/drift.dart';
 import 'package:intl/intl.dart';
 import 'package:ladder/ladder.dart';
 
@@ -9,22 +10,23 @@ const deleteConfirmationTitle = 'Confirm Delete';
 const applicationSettingsKey = 'ladder_application_preferences';
 
 /// The default points to use when creating new teams.
-const defaultPoints = <String, int>{
-  'Goal': 2,
-  'Body touch': -1,
-  'Infringement': -1,
-  'Touched shades': -2,
-  'Long serve': -1,
-  'Short serve': -1,
-  'Centre board': -1,
-  'Out': -1,
-  'Service fault': -1,
-  'Own goal': -2,
-  'Equipment fault': -2,
-  'Player forfeit': -11,
-  'Timeout': 0,
-  'Player talks': -2,
-  'Coach talks': -2,
+const defaultPoints = <DefaultShowdownPoint>{
+  DefaultShowdownPoint(name: 'Goal', value: 2),
+  DefaultShowdownPoint(name: 'Body touch', value: -1),
+  DefaultShowdownPoint(name: 'Infringement', value: -1),
+  DefaultShowdownPoint(name: 'Touched shades', value: -2),
+  DefaultShowdownPoint(name: 'Long serve', value: -1),
+  DefaultShowdownPoint(name: 'Short serve', value: -1),
+  DefaultShowdownPoint(name: 'Centre board', value: -1),
+  DefaultShowdownPoint(name: 'Out', value: -1),
+  DefaultShowdownPoint(name: 'Service fault', value: -1),
+  DefaultShowdownPoint(name: 'Own goal', value: -2),
+  DefaultShowdownPoint(name: 'Equipment fault', value: -2),
+  DefaultShowdownPoint(name: 'Player forfeit', value: -11),
+  DefaultShowdownPoint(name: 'Timeout from player', value: 0, endsPoint: false),
+  DefaultShowdownPoint(name: 'Timeout from coach', value: 0, endsPoint: false),
+  DefaultShowdownPoint(name: 'Player talks', value: -2, endsPoint: false),
+  DefaultShowdownPoint(name: 'Coach talks', value: -1, endsPoint: false),
 };
 
 /// The date format to use.
@@ -91,3 +93,20 @@ const ladderNightsSheetName = 'Ladder Nights';
 
 /// The name of the games sheet in Excel.
 const gamesSheetName = 'Games';
+
+/// Create default points.
+Future<void> createDefaultPoints(
+  final LadderDatabase database,
+  final int teamId,
+) async {
+  for (final defaultPoint in defaultPoints) {
+    await database.managers.showdownPoints.create(
+      (final o) => o(
+        teamId: teamId,
+        name: defaultPoint.name,
+        value: defaultPoint.value,
+        endsPoint: Value(defaultPoint.endsPoint),
+      ),
+    );
+  }
+}

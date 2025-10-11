@@ -91,13 +91,7 @@ class PointsPage extends ConsumerWidget {
                     if (setPointsCount == 0) {
                       await query.delete();
                       if (points.length == 1) {
-                        for (final MapEntry(key: name, value: points)
-                            in defaultPoints.entries) {
-                          await database.managers.showdownPoints.create(
-                            (final o) =>
-                                o(teamId: teamId, name: name, value: points),
-                          );
-                        }
+                        await createDefaultPoints(database, teamId);
                       }
                       ref.invalidate(showdownPointsProvider(teamId));
                     } else if (context.mounted) {

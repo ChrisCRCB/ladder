@@ -144,11 +144,7 @@ class TeamsScreen extends ConsumerWidget {
     final team = await database.managers.showdownTeams.createReturning(
       (final o) => o(name: 'Untitled Team'),
     );
-    for (final MapEntry(key: name, value: points) in defaultPoints.entries) {
-      await database.managers.showdownPoints.create(
-        (final o) => o(teamId: team.id, name: name, value: points),
-      );
-    }
+    await createDefaultPoints(database, team.id);
     ref.invalidate(showdownTeamsProvider);
   }
 }

@@ -1,6 +1,7 @@
 export 'src/constants.dart';
 export 'src/database/_DATABASE.dart';
 export 'src/database/openers/shared.dart';
+export 'src/default_showdown_point.dart';
 export 'src/excel/_excel.dart';
 export 'src/extensions.dart';
 export 'src/game_context.dart';
