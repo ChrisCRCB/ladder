@@ -23,6 +23,8 @@ const defaultPoints = <String, int>{
   'Equipment fault': -2,
   'Player forfeit': -11,
   'Timeout': 0,
+  'Player talks': -2,
+  'Coach talks': -2,
 };
 
 /// The date format to use.
