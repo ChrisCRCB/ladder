@@ -64,6 +64,15 @@ const numberKeys = <GameShortcutsShortcut>[
   GameShortcutsShortcut.minus,
   GameShortcutsShortcut.equal,
   GameShortcutsShortcut.backspace,
+  GameShortcutsShortcut.keyW,
+  GameShortcutsShortcut.keyE,
+  GameShortcutsShortcut.keyR,
+  GameShortcutsShortcut.keyT,
+  GameShortcutsShortcut.keyY,
+  GameShortcutsShortcut.keyU,
+  GameShortcutsShortcut.keyI,
+  GameShortcutsShortcut.keyO,
+  GameShortcutsShortcut.keyP,
 ];
 
 /// The name of the team information sheet in Excel.
