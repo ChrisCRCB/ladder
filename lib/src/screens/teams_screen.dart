@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:backstreets_widgets/extensions.dart';
 import 'package:backstreets_widgets/screens.dart';
 import 'package:backstreets_widgets/shortcuts.dart';
 import 'package:backstreets_widgets/widgets.dart';
 import 'package:drift/drift.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ladder/ladder.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 /// The screen which shows all teams.
 class TeamsScreen extends ConsumerWidget {
@@ -22,6 +28,34 @@ class TeamsScreen extends ConsumerWidget {
       child: CommonShortcuts(
         newCallback: () => _createTeam(ref),
         child: SimpleScaffold(
+          actions: [
+            if (!kIsWeb)
+              SaveButton(
+                onPressed: () async {
+                  final directory = await getApplicationDocumentsDirectory();
+                  const filename = 'ladder.sqlite3';
+                  final file = File(path.join(directory.path, filename));
+                  if (file.existsSync()) {
+                    final bytes = file.readAsBytesSync();
+                    await FilePicker.platform.saveFile(
+                      allowedExtensions: ['.sqlite3'],
+                      fileName: filename,
+                      bytes: Uint8List.fromList(bytes),
+                      dialogTitle: 'Save Database',
+                      initialDirectory: directory.path,
+                      type: FileType.custom,
+                    );
+                  } else if (context.mounted) {
+                    await context.showMessage(
+                      message:
+                          // ignore: lines_longer_than_80_chars
+                          'The database file could not be found at ${file.path}.',
+                    );
+                  }
+                },
+                tooltip: 'Save database',
+              ),
+          ],
           title: 'Teams',
           body: value.simpleWhen((final teams) {
             if (teams.isEmpty) {
